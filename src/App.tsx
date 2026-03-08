@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import OverviewPage from './pages/OverviewPage';
 import AgentHubPage from './pages/AgentHubPage';
 import KanbanPage from './pages/KanbanPage';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/" element={<OverviewPage />} />
             <Route path="/agents" element={<AgentHubPage />} />
             <Route path="/kanban" element={<KanbanPage />} />
+            <Route path="/chat" element={<ChatPage />} />
           </Routes>
         </main>
       </div>

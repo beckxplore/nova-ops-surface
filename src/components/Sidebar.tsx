@@ -5,6 +5,7 @@ const navItems = [
   { path: '/', label: 'Overview', icon: '📊' },
   { path: '/agents', label: 'Agent Hub', icon: '🤖' },
   { path: '/kanban', label: 'Kanban', icon: '📋' },
+  { path: '/chat', label: 'Chat', icon: '💬' },
 ];
 
 const Sidebar: React.FC = () => {
