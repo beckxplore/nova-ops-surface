@@ -6,6 +6,7 @@ import RecentActivitiesWidget from './components/RecentActivitiesWidget';
 import ResourceUsageWidget from './components/ResourceUsageWidget';
 import NetworkActivityWidget from './components/NetworkActivityWidget';
 import ServerHealthWidget from './components/ServerHealthWidget';
+import QuickLinksWidget from './components/QuickLinksWidget';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <ResourceUsageWidget />
           <NetworkActivityWidget />
           <ServerHealthWidget />
+          <QuickLinksWidget />
         </div>
       </main>
       <Footer />
