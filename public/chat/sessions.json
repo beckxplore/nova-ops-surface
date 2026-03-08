@@ -15,7 +15,11 @@
       "hashtag": "#test",
       "description": "test test",
       "source": "dashboard",
-      "lastMessage": null,
+      "lastMessage": {
+        "content": "hey",
+        "timestamp": "2026-03-08T20:54:50.089Z",
+        "source": "dashboard"
+      },
       "createdAt": "2026-03-08T20:54:42.836Z"
     }
   ]
