@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "// Note": "This is a dummy entry to force a new Vercel build"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.27",
