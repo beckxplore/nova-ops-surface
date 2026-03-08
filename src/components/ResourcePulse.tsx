@@ -5,74 +5,86 @@ interface ResourceData {
   specialistSpawns: { [key: string]: string };
 }
 
+const activityColor: Record<string, string> = {
+  'High': 'bg-emerald-400',
+  'Medium': 'bg-amber-400',
+  'Low': 'bg-slate-500',
+};
+
 const ResourcePulse: React.FC = () => {
-  const [resourceData, setResourceData] = useState<ResourceData>({
+  const [data, setData] = useState<ResourceData>({
     departmentActivity: {},
     specialistSpawns: {},
   });
 
   useEffect(() => {
-    const fetchResourceData = async () => {
+    const fetchData = async () => {
       try {
         const response = await fetch('/PERFORMANCE.md');
         const text = await response.text();
-        
         const departmentActivity: { [key: string]: string } = {};
         const specialistSpawns: { [key: string]: string } = {};
-        let inDepartmentActivitySection = false;
-        let inSpecialistSpawnsSection = false;
+        let inDeptSection = false;
+        let inSpawnSection = false;
 
         const lines = text.split('\n');
         for (const line of lines) {
-          if (line.includes('## Department Activity')) {
-            inDepartmentActivitySection = true;
-            inSpecialistSpawnsSection = false;
-            continue;
-          } else if (line.includes('## Specialist Spawns')) {
-            inSpecialistSpawnsSection = true;
-            inDepartmentActivitySection = false;
-            continue;
-          } else if (line.startsWith('## ') && (inDepartmentActivitySection || inSpecialistSpawnsSection)) {
-            // End of section
-            inDepartmentActivitySection = false;
-            inSpecialistSpawnsSection = false;
-          }
+          if (line.includes('## Department Activity')) { inDeptSection = true; inSpawnSection = false; continue; }
+          else if (line.includes('## Specialist Spawns')) { inSpawnSection = true; inDeptSection = false; continue; }
+          else if (line.startsWith('## ')) { inDeptSection = false; inSpawnSection = false; }
 
-          if (inDepartmentActivitySection && line.trim().startsWith('-')) {
+          if (inDeptSection && line.trim().startsWith('-')) {
             const [key, value] = line.substring(1).split(':').map(s => s.trim());
-            if (key && value) {
-              departmentActivity[key] = value;
-            }
-          } else if (inSpecialistSpawnsSection && line.trim().startsWith('-')) {
+            if (key && value) departmentActivity[key] = value;
+          } else if (inSpawnSection && line.trim().startsWith('-')) {
             const [key, value] = line.substring(1).split(':').map(s => s.trim());
-            if (key && value) {
-              specialistSpawns[key] = value;
-            }
+            if (key && value) specialistSpawns[key] = value;
           }
         }
-        setResourceData({ departmentActivity, specialistSpawns });
+        setData({ departmentActivity, specialistSpawns });
       } catch (error) {
-        console.error('Error fetching or parsing PERFORMANCE.md:', error);
+        console.error('Error fetching PERFORMANCE.md:', error);
       }
     };
-
-    fetchResourceData();
+    fetchData();
   }, []);
 
   return (
-    <div className="bg-white shadow p-4 rounded-lg">
-      <h2 className="text-xl font-semibold mb-2">Resource Pulse</h2>
-      <div className="mb-4">
-        <h3 className="text-lg font-medium">Department Activity:</h3>
-        {Object.entries(resourceData.departmentActivity).map(([dept, activity]) => (
-          <p key={dept}>{dept}: <span className="font-bold">{activity}</span></p>
-        ))}
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 h-full">
+      <h2 className="text-lg font-semibold text-white mb-4">Resource Pulse</h2>
+
+      {/* Department Activity */}
+      <div className="mb-6">
+        <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">Department Activity</h3>
+        <div className="space-y-3">
+          {Object.entries(data.departmentActivity).map(([dept, activity]) => (
+            <div key={dept} className="flex items-center justify-between">
+              <span className="text-sm text-slate-300">{dept}</span>
+              <div className="flex items-center gap-2">
+                <div className="w-24 h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${activityColor[activity] || 'bg-slate-600'}`}
+                    style={{ width: activity === 'High' ? '90%' : activity === 'Medium' ? '55%' : '25%' }}
+                  ></div>
+                </div>
+                <span className="text-xs text-slate-500 w-14 text-right">{activity}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Specialist Spawns */}
       <div>
-        <h3 className="text-lg font-medium">Specialist Spawns (Last 24h):</h3>
-        {Object.entries(resourceData.specialistSpawns).map(([role, count]) => (
-          <p key={role}>{role}: <span className="font-bold">{count}</span></p>
-        ))}
+        <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">Specialist Spawns (24h)</h3>
+        <div className="space-y-2">
+          {Object.entries(data.specialistSpawns).map(([role, count]) => (
+            <div key={role} className="flex items-center justify-between bg-slate-800/30 rounded-lg px-3 py-2">
+              <span className="text-sm text-slate-300">{role}</span>
+              <span className={`text-sm font-semibold ${parseInt(count) > 0 ? 'text-white' : 'text-slate-600'}`}>{count}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

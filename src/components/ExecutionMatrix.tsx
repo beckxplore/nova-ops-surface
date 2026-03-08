@@ -7,6 +7,13 @@ interface Project {
   status: string;
 }
 
+const statusStyles: Record<string, string> = {
+  'In Progress': 'bg-blue-500/10 text-blue-400 ring-blue-500/20',
+  'Completed': 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20',
+  'On Hold': 'bg-amber-500/10 text-amber-400 ring-amber-500/20',
+  'Blocked': 'bg-red-500/10 text-red-400 ring-red-500/20',
+};
+
 const ExecutionMatrix: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
@@ -21,51 +28,60 @@ const ExecutionMatrix: React.FC = () => {
         let projectId = 0;
 
         for (const line of lines) {
-          if (line.startsWith('## Project ')) {
+          if (line.startsWith('## ')) {
             if (currentProject.name) {
               parsedProjects.push({ ...currentProject, id: String(projectId++) } as Project);
             }
-            currentProject = { name: line.substring(11).trim() };
+            currentProject = { name: line.substring(3).trim() };
           } else if (line.startsWith('- Owner: ')) {
             currentProject.owner = line.substring(9).trim();
           } else if (line.startsWith('- Status: ')) {
             currentProject.status = line.substring(10).trim();
           }
         }
-        // Add the last project if it exists
         if (currentProject.name) {
           parsedProjects.push({ ...currentProject, id: String(projectId++) } as Project);
         }
         setProjects(parsedProjects);
       } catch (error) {
-        console.error('Error fetching or parsing PROJECTS.md:', error);
+        console.error('Error fetching PROJECTS.md:', error);
       }
     };
-
     fetchProjects();
   }, []);
 
   return (
-    <div className="bg-white shadow p-4 rounded-lg">
-      <h2 className="text-xl font-semibold mb-2">Execution Matrix</h2>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Name</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {projects.map((project) => (
-            <tr key={project.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{project.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.owner}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.status}</td>
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 h-full">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-white">Execution Matrix</h2>
+        <span className="text-xs text-slate-500">{projects.length} projects</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-slate-800">
+              <th className="text-left py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Project</th>
+              <th className="text-left py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Owner</th>
+              <th className="text-left py-3 px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-slate-800/50">
+            {projects.map((project) => (
+              <tr key={project.id} className="hover:bg-slate-800/30 transition-colors">
+                <td className="py-3 px-4">
+                  <span className="font-medium text-white">{project.name}</span>
+                </td>
+                <td className="py-3 px-4 text-sm text-slate-400">{project.owner}</td>
+                <td className="py-3 px-4">
+                  <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ${statusStyles[project.status] || 'bg-slate-500/10 text-slate-400 ring-slate-500/20'}`}>
+                    {project.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

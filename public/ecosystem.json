@@ -1,0 +1,41 @@
+{
+  "orchestrator": {
+    "id": "nova",
+    "name": "Nova",
+    "role": "Orchestrator",
+    "status": "running",
+    "description": "CEO's personal AI assistant. Manages all projects, departments, and agents."
+  },
+  "projects": [],
+  "departments": [
+    {
+      "id": "development",
+      "name": "Development",
+      "description": "Software engineering and frontend/backend implementation",
+      "project": null,
+      "lead": {
+        "id": "dev-lead",
+        "name": "Dev Lead",
+        "status": "running",
+        "currentTask": "Building Nova Ops Surface dashboard",
+        "filesPath": "departments/development"
+      },
+      "agents": []
+    },
+    {
+      "id": "research",
+      "name": "Research",
+      "description": "AI workflow optimization and local LLM research",
+      "project": null,
+      "lead": {
+        "id": "research-lead",
+        "name": "Research Lead",
+        "status": "idle",
+        "currentTask": null,
+        "filesPath": "departments/research"
+      },
+      "agents": []
+    }
+  ],
+  "individualAgents": []
+}

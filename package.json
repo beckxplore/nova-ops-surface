@@ -5,14 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node server.js",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "css:build": "npx tailwindcss -i ./src/App.css -o ./public/output.css",
     "// Note": "This is a dummy entry to force a new Vercel build"
   },
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.13.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",

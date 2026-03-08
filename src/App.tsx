@@ -1,29 +1,26 @@
 import React from 'react';
-import './App.css'
-import ExecutiveSummary from './components/ExecutiveSummary';
-import ExecutionMatrix from './components/ExecutionMatrix';
-import ResourcePulse from './components/ResourcePulse';
-import EventStream from './components/EventStream';
-
-
-
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './App.css';
+import Sidebar from './components/Sidebar';
+import OverviewPage from './pages/OverviewPage';
+import AgentHubPage from './pages/AgentHubPage';
+import KanbanPage from './pages/KanbanPage';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <header className="bg-white shadow p-4 rounded-lg mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Operational Intelligence Surface</h1>
-      </header>
-      <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Modules will go here */}
-        <ExecutiveSummary />
-        <ExecutionMatrix />
-        <ResourcePulse />
-        <EventStream />
-      </main>
-    </div>
-  )
+    <Router>
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto">
+          <Routes>
+            <Route path="/" element={<OverviewPage />} />
+            <Route path="/agents" element={<AgentHubPage />} />
+            <Route path="/kanban" element={<KanbanPage />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  );
 }
 
-export default App
+export default App;
