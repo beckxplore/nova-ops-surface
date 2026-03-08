@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import SystemStatusWidget from './components/SystemStatusWidget';
 import RecentActivitiesWidget from './components/RecentActivitiesWidget';
+import ResourceUsageWidget from './components/ResourceUsageWidget';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <SystemStatusWidget />
           <RecentActivitiesWidget />
+          <ResourceUsageWidget />
         </div>
       </main>
       <Footer />
