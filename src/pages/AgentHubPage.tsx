@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const API = import.meta.env.DEV ? 'http://localhost:3001' : '';
+const USE_SERVERLESS = !import.meta.env.DEV; // Use /api/* on Vercel
 
 interface AgentNode {
   id: string; name: string; status: string;
@@ -48,9 +49,12 @@ const AgentHubPage: React.FC = () => {
 
   const loadFile = async (filesPath: string, file: string) => {
     try {
-      // Try API first (local dev), fall back to static files (Vercel)
       if (API) {
         const r = await fetch(`${API}/api/file?path=${filesPath}/${file}`);
+        const data = await r.json();
+        setFileContent(data.content || '');
+      } else if (USE_SERVERLESS) {
+        const r = await fetch(`/api/file?path=${filesPath}/${file}`);
         const data = await r.json();
         setFileContent(data.content || '');
       } else {
@@ -83,12 +87,17 @@ const AgentHubPage: React.FC = () => {
           }
         } catch { setAgentFiles({}); }
       } else {
-        // Deployed: fetch static files
+        // Deployed: use serverless API or static files
         const files: Record<string, string> = {};
         for (const f of ['SOUL.md', 'GOAL.md', 'MEMORY.md']) {
           try {
-            const r = await fetch(`/${item.filesPath}/${f}`);
-            if (r.ok) files[f] = await r.text();
+            const r = USE_SERVERLESS
+              ? await fetch(`/api/file?path=${item.filesPath}/${f}`)
+              : await fetch(`/${item.filesPath}/${f}`);
+            if (r.ok) {
+              const data = USE_SERVERLESS ? await r.json() : { content: await r.text() };
+              files[f] = data.content;
+            }
           } catch {}
         }
         setAgentFiles(files);
@@ -104,8 +113,9 @@ const AgentHubPage: React.FC = () => {
   const saveFile = async () => {
     if (!selected?.filesPath) return;
     setSaving(true);
+    const endpoint = API ? `${API}/api/file` : '/api/file';
     try {
-      await fetch(`${API}/api/file`, {
+      await fetch(endpoint, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: `${selected.filesPath}/${activeFile}`, content: editBuffer }),
