@@ -10,3 +10,4 @@
 - [2026-03-08 20:10 GMT+3] Fixed JSX parsing error by renaming src/main.ts to src/main.tsx and updating index.html. Local build successful.
 - [2026-03-08 21:07 GMT+3] Heartbeat check: Detected 1 stalled project (Project Gamma). Updated PERFORMANCE.md.
 - [2026-03-08 21:14 GMT+3] Debugging local build: Spawned Playwright sub-agent to verify 'http://localhost:5173/' errors.
+- [2026-03-08 21:40 GMT+3] Critical local build fix: Corrected ReactDOM.createRoot target to 'app' in src/main.tsx.
