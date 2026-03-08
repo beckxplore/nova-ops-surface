@@ -4,6 +4,7 @@ import Footer from './components/Footer';
 import SystemStatusWidget from './components/SystemStatusWidget';
 import RecentActivitiesWidget from './components/RecentActivitiesWidget';
 import ResourceUsageWidget from './components/ResourceUsageWidget';
+import NetworkActivityWidget from './components/NetworkActivityWidget';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <SystemStatusWidget />
           <RecentActivitiesWidget />
           <ResourceUsageWidget />
+          <NetworkActivityWidget />
         </div>
       </main>
       <Footer />
