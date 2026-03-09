@@ -7,6 +7,13 @@
       "content": "Chat session initialized. Nova is ready.",
       "timestamp": "2026-03-08T20:00:00Z",
       "source": "system"
+    },
+    {
+      "id": "2",
+      "role": "user",
+      "content": "hey",
+      "timestamp": "2026-03-09T09:25:31.896Z",
+      "source": "dashboard"
     }
   ]
 }
