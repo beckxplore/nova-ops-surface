@@ -6,7 +6,11 @@
       "hashtag": "#general",
       "description": "Main conversation with Nova",
       "source": "dashboard",
-      "lastMessage": null,
+      "lastMessage": {
+        "content": "hey",
+        "timestamp": "2026-03-09T09:25:31.896Z",
+        "source": "dashboard"
+      },
       "createdAt": "2026-03-08T20:00:00Z"
     },
     {
