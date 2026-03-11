@@ -38,30 +38,41 @@ const ChatPage: React.FC = () => {
   const pollRef = useRef<number | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const activeSessionRef = useRef<string | null>(activeSession);
   const currentAssistantMsgRef = useRef<string | null>(null);
+
+  // Update ref when activeSession changes
+  useEffect(() => {
+    activeSessionRef.current = activeSession;
+  }, [activeSession]);
 
   // WebSocket Connection Logic
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
     
+    console.log('[WS] Connecting to:', GATEWAY_URL);
     setStatus('connecting');
     const ws = new WebSocket(GATEWAY_URL);
     wsRef.current = ws;
 
     ws.onopen = () => {
+      console.log('[WS] Connected successfully');
       ws.send(JSON.stringify({ type: 'auth', token: AUTH_TOKEN }));
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        console.log('[WS] Message received:', data.type);
         
         if (data.type === 'auth' && data.ok) {
+          console.log('[WS] Authenticated');
           setStatus('connected');
           return;
         }
 
         if (data.type === 'auth' && !data.ok) {
+          console.error('[WS] Auth failed:', data);
           setStatus('error');
           return;
         }
@@ -97,6 +108,7 @@ const ChatPage: React.FC = () => {
         // Handle full responses
         if (data.type === 'chat:response' || data.type === 'agent:response') {
           const content = data.text || data.content || data.message || '';
+          console.log('[WS] Response complete');
           if (currentAssistantMsgRef.current) {
             setMessages(prev => prev.map(m => 
               m.id === currentAssistantMsgRef.current
@@ -114,11 +126,12 @@ const ChatPage: React.FC = () => {
           }
           currentAssistantMsgRef.current = null;
           setSending(false);
-          // Sync back to GitHub storage if needed
-          if (activeSession && content) syncNovaMessage(activeSession, content);
+          // Sync back to GitHub storage
+          if (activeSessionRef.current && content) syncNovaMessage(activeSessionRef.current, content);
         }
 
         if (data.type === 'chat:end' || data.type === 'agent:end' || data.type === 'agent:done') {
+          console.log('[WS] Stream ended');
           if (currentAssistantMsgRef.current) {
             setMessages(prev => prev.map(m =>
               m.id === currentAssistantMsgRef.current ? { ...m, streaming: false } : m
@@ -129,6 +142,7 @@ const ChatPage: React.FC = () => {
         }
 
         if (data.type === 'error') {
+          console.error('[WS] Server error:', data);
           setMessages(prev => [...prev, {
             id: `error-${Date.now()}`,
             role: 'system',
@@ -140,19 +154,27 @@ const ChatPage: React.FC = () => {
           currentAssistantMsgRef.current = null;
         }
 
-      } catch (e) { console.error('WS Error parse:', e); }
+      } catch (e) { 
+        console.error('[WS] Error parse/handle:', e);
+        console.log('[WS] Raw data:', event.data);
+      }
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
+      console.log('[WS] Closed:', event.code, event.reason);
       setStatus('disconnected');
       wsRef.current = null;
-      reconnectTimeoutRef.current = setTimeout(() => connect(), 3000);
+      // Only reconnect if not closed intentionally
+      if (event.code !== 1000) {
+        reconnectTimeoutRef.current = setTimeout(() => connect(), 3000);
+      }
     };
 
-    ws.onerror = () => {
+    ws.onerror = (err) => {
+      console.error('[WS] Error:', err);
       setStatus('error');
     };
-  }, [activeSession]);
+  }, []); // Removed activeSession from dependencies to avoid reconnects on session switch
 
   useEffect(() => {
     connect();
