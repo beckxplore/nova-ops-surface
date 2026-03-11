@@ -42,6 +42,13 @@
       "content": "Hello Nova",
       "timestamp": "2026-03-11T13:31:23.374Z",
       "source": "dashboard"
+    },
+    {
+      "id": "7",
+      "role": "user",
+      "content": "hey",
+      "timestamp": "2026-03-11T18:59:31.089Z",
+      "source": "dashboard"
     }
   ]
 }
