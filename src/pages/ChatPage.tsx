@@ -57,13 +57,19 @@ const ChatPage: React.FC = () => {
 
     ws.onopen = () => {
       console.log('[WS] Connected successfully');
-      ws.send(JSON.stringify({ type: 'auth', token: AUTH_TOKEN }));
+      // Delay auth slightly to avoid collision with initial server messages
+      setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          console.log('[WS] Sending auth...');
+          ws.send(JSON.stringify({ type: 'auth', token: AUTH_TOKEN }));
+        }
+      }, 500);
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('[WS] Message received:', data.type);
+        console.log('[WS] Message received:', data);
         
         if (data.type === 'auth' && data.ok) {
           console.log('[WS] Authenticated');
