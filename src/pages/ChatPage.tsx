@@ -57,18 +57,25 @@ const ChatPage: React.FC = () => {
 
     ws.onopen = () => {
       console.log('[WS] Connected successfully');
-      // Delay auth slightly to avoid collision with initial server messages
+      // Commented out: Manual auth might be causing 1008 if automatic auth is active
+      /*
       setTimeout(() => {
         if (ws.readyState === WebSocket.OPEN) {
           console.log('[WS] Sending auth...');
           ws.send(JSON.stringify({ type: 'auth', token: AUTH_TOKEN }));
         }
       }, 500);
+      */
+      // Assume connected if the socket opens and we don't get 1008
+      setStatus('connected');
     };
 
     ws.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
+        const data = typeof event.data === 'string' && !event.data.startsWith('{') 
+          ? { type: event.data } 
+          : JSON.parse(event.data);
+          
         console.log('[WS] Message received:', data);
         
         if (data.type === 'auth' && data.ok) {
