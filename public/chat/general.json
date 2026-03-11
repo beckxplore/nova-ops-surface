@@ -1,0 +1,40 @@
+{
+  "sessionId": "general",
+  "messages": [
+    {
+      "id": "1",
+      "role": "system",
+      "content": "Chat session initialized. Nova is ready.",
+      "timestamp": "2026-03-08T20:00:00Z",
+      "source": "system"
+    },
+    {
+      "id": "2",
+      "role": "user",
+      "content": "hey",
+      "timestamp": "2026-03-09T09:25:31.896Z",
+      "source": "dashboard"
+    },
+    {
+      "id": "3",
+      "role": "user",
+      "content": "Hey",
+      "timestamp": "2026-03-11T11:51:42.636Z",
+      "source": "dashboard"
+    },
+    {
+      "id": "4",
+      "role": "user",
+      "content": "Hey",
+      "timestamp": "2026-03-11T11:53:46.073Z",
+      "source": "dashboard"
+    },
+    {
+      "id": "5",
+      "role": "user",
+      "content": "hey",
+      "timestamp": "2026-03-11T12:02:17.174Z",
+      "source": "dashboard"
+    }
+  ]
+}

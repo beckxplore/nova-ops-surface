@@ -1,31 +1,27 @@
-import Header from './components/Header';
-import Footer from './components/Footer';
-import SystemStatusWidget from './components/SystemStatusWidget';
-import RecentActivitiesWidget from './components/RecentActivitiesWidget';
-import ResourceUsageWidget from './components/ResourceUsageWidget';
-import NetworkActivityWidget from './components/NetworkActivityWidget';
-import ServerHealthWidget from './components/ServerHealthWidget';
-import QuickLinksWidget from './components/QuickLinksWidget';
-import ChatWidget from './components/ChatWidget';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './App.css';
+import Sidebar from './components/Sidebar';
+import OverviewPage from './pages/OverviewPage';
+import AgentHubPage from './pages/AgentHubPage';
+import KanbanPage from './pages/KanbanPage';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col">
-      <Header />
-      <main className="flex-grow container mx-auto p-4">
-        <h2 className="text-2xl font-semibold text-gray-200 mb-4">Dashboard Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <SystemStatusWidget />
-          <RecentActivitiesWidget />
-          <ResourceUsageWidget />
-          <NetworkActivityWidget />
-          <ServerHealthWidget />
-          <QuickLinksWidget />
-        </div>
-      </main>
-      <Footer />
-      <ChatWidget />
-    </div>
+    <Router>
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto">
+          <Routes>
+            <Route path="/" element={<OverviewPage />} />
+            <Route path="/agents" element={<AgentHubPage />} />
+            <Route path="/kanban" element={<KanbanPage />} />
+            <Route path="/chat" element={<ChatPage />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 

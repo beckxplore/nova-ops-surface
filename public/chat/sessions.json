@@ -1,0 +1,30 @@
+{
+  "sessions": [
+    {
+      "id": "general",
+      "topic": "General",
+      "hashtag": "#general",
+      "description": "Main conversation with Nova",
+      "source": "dashboard",
+      "lastMessage": {
+        "content": "hey",
+        "timestamp": "2026-03-11T12:02:17.174Z",
+        "source": "dashboard"
+      },
+      "createdAt": "2026-03-08T20:00:00Z"
+    },
+    {
+      "id": "test",
+      "topic": "test",
+      "hashtag": "#test",
+      "description": "test test",
+      "source": "dashboard",
+      "lastMessage": {
+        "content": "Hey",
+        "timestamp": "2026-03-11T11:57:49.722Z",
+        "source": "dashboard"
+      },
+      "createdAt": "2026-03-08T20:54:42.836Z"
+    }
+  ]
+}
