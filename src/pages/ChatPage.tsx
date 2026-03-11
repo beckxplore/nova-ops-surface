@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const API_BASE = import.meta.env.DEV ? 'http://localhost:3001' : '';
+const GATEWAY_URL = 'wss://98-93-181-83.sslip.io';
+const AUTH_TOKEN = '7dd8ac893a339cb334fb2e5e644a22db16ceeed9baf0ab7a';
 
 interface Message {
   id: string; role: string; content: string;
   timestamp: string; source: string;
+  streaming?: boolean;
 }
 interface Session {
   id: string; topic: string; hashtag: string;
@@ -12,6 +15,8 @@ interface Session {
   lastMessage: { content: string; timestamp: string; source: string } | null;
   createdAt: string;
 }
+
+type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 
 const sourceIcon: Record<string, string> = {
   dashboard: '🖥️', telegram: '📱', system: '⚙️', nova: '🤖', user: '👤',
@@ -23,19 +28,146 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState<ConnectionStatus>('disconnected');
   const [showNewSession, setShowNewSession] = useState(false);
   const [newTopic, setNewTopic] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [creating, setCreating] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<number | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const currentAssistantMsgRef = useRef<string | null>(null);
+
+  // WebSocket Connection Logic
+  const connect = useCallback(() => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) return;
+    
+    setStatus('connecting');
+    const ws = new WebSocket(GATEWAY_URL);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: 'auth', token: AUTH_TOKEN }));
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'auth' && data.ok) {
+          setStatus('connected');
+          return;
+        }
+
+        if (data.type === 'auth' && !data.ok) {
+          setStatus('error');
+          return;
+        }
+
+        // Handle chat responses (streaming chunks)
+        if (data.type === 'chat:chunk' || data.type === 'agent:chunk') {
+          const text = data.text || data.content || data.delta || '';
+          if (!text) return;
+          
+          setMessages(prev => {
+            const assistantId = currentAssistantMsgRef.current;
+            if (assistantId) {
+              return prev.map(m => 
+                m.id === assistantId 
+                  ? { ...m, content: m.content + text, streaming: true }
+                  : m
+              );
+            } else {
+              const newId = `assistant-${Date.now()}`;
+              currentAssistantMsgRef.current = newId;
+              return [...prev, {
+                id: newId,
+                role: 'assistant',
+                content: text,
+                timestamp: new Date().toISOString(),
+                source: 'nova',
+                streaming: true
+              }];
+            }
+          });
+        }
+
+        // Handle full responses
+        if (data.type === 'chat:response' || data.type === 'agent:response') {
+          const content = data.text || data.content || data.message || '';
+          if (currentAssistantMsgRef.current) {
+            setMessages(prev => prev.map(m => 
+              m.id === currentAssistantMsgRef.current
+                ? { ...m, streaming: false, content: content || m.content }
+                : m
+            ));
+          } else if (content) {
+            setMessages(prev => [...prev, {
+              id: `assistant-${Date.now()}`,
+              role: 'assistant',
+              content,
+              timestamp: new Date().toISOString(),
+              source: 'nova'
+            }]);
+          }
+          currentAssistantMsgRef.current = null;
+          setSending(false);
+          // Sync back to GitHub storage if needed
+          if (activeSession && content) syncNovaMessage(activeSession, content);
+        }
+
+        if (data.type === 'chat:end' || data.type === 'agent:end' || data.type === 'agent:done') {
+          if (currentAssistantMsgRef.current) {
+            setMessages(prev => prev.map(m =>
+              m.id === currentAssistantMsgRef.current ? { ...m, streaming: false } : m
+            ));
+          }
+          currentAssistantMsgRef.current = null;
+          setSending(false);
+        }
+
+        if (data.type === 'error') {
+          setMessages(prev => [...prev, {
+            id: `error-${Date.now()}`,
+            role: 'system',
+            content: `Error: ${data.message || data.error || 'Unknown error'}`,
+            timestamp: new Date().toISOString(),
+            source: 'system'
+          }]);
+          setSending(false);
+          currentAssistantMsgRef.current = null;
+        }
+
+      } catch (e) { console.error('WS Error parse:', e); }
+    };
+
+    ws.onclose = () => {
+      setStatus('disconnected');
+      wsRef.current = null;
+      reconnectTimeoutRef.current = setTimeout(() => connect(), 3000);
+    };
+
+    ws.onerror = () => {
+      setStatus('error');
+    };
+  }, [activeSession]);
+
+  useEffect(() => {
+    connect();
+    return () => {
+      wsRef.current?.close();
+      clearTimeout(reconnectTimeoutRef.current);
+    };
+  }, [connect]);
 
   // Load sessions
   useEffect(() => {
     loadSessions();
   }, []);
 
-  // Poll messages every 5 seconds
+  // Poll messages every 5 seconds (for persistence/sync)
   useEffect(() => {
     if (!activeSession) return;
     loadMessages(activeSession);
@@ -63,24 +195,59 @@ const ChatPage: React.FC = () => {
     try {
       const r = await fetch(`${API_BASE}/api/chat?session=${sessionId}`);
       const data = await r.json();
-      setMessages(data.messages || []);
+      // Only update if we're not currently sending or receiving (to avoid overwriting stream)
+      if (!sending && !currentAssistantMsgRef.current) {
+        setMessages(data.messages || []);
+      }
     } catch (err) { console.error('Failed to load messages:', err); }
+  };
+
+  const syncNovaMessage = async (sessionId: string, content: string) => {
+    try {
+      // Small delay to ensure GitHub file is updated correctly
+      await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session: sessionId, content, source: 'nova' }),
+      });
+    } catch (err) { console.error('Failed to sync Nova msg:', err); }
   };
 
   const sendMessage = async () => {
     if (!input.trim() || !activeSession || sending) return;
+    
+    const text = input.trim();
     setSending(true);
+
+    // 1. Add locally
+    const userMsg: Message = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: text,
+      timestamp: new Date().toISOString(),
+      source: 'dashboard'
+    };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+    currentAssistantMsgRef.current = null;
+
+    // 2. Send via WebSocket for AI response
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: 'chat:message',
+        message: text,
+      }));
+    }
+
+    // 3. Save to persistence (GitHub)
     try {
       await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session: activeSession, content: input.trim(), source: 'dashboard' }),
+        body: JSON.stringify({ session: activeSession, content: text, source: 'dashboard' }),
       });
-      setInput('');
-      await loadMessages(activeSession);
-      await loadSessions();
-    } catch (err) { console.error('Failed to send:', err); }
-    setSending(false);
+      // Verification reload handled by polling or success
+    } catch (err) { console.error('Failed to persist send:', err); }
   };
 
   const createSession = async () => {
@@ -111,6 +278,13 @@ const ChatPage: React.FC = () => {
     try { return new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' }); }
     catch { return ''; }
   };
+
+  const statusColor = {
+    disconnected: 'bg-slate-400',
+    connecting: 'bg-amber-400 animate-pulse',
+    connected: 'bg-emerald-400',
+    error: 'bg-red-500',
+  }[status];
 
   return (
     <div className="flex h-screen">
@@ -200,9 +374,11 @@ const ChatPage: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Nova Online
+                  <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                    status === 'connected' ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-slate-500/10 text-slate-400 ring-slate-500/20'
+                  }`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${statusColor}`}></span>
+                    {status === 'connected' ? 'Nova Online' : status === 'connecting' ? 'Connecting...' : 'Offline'}
                   </span>
                 </div>
               </div>
@@ -213,7 +389,6 @@ const ChatPage: React.FC = () => {
               {messages.map((msg, i) => {
                 const isUser = msg.role === 'user';
                 const isSystem = msg.role === 'system';
-                const isNova = msg.role === 'assistant' || msg.source === 'nova';
                 const showDate = i === 0 || formatDate(msg.timestamp) !== formatDate(messages[i-1].timestamp);
 
                 return (
@@ -232,7 +407,7 @@ const ChatPage: React.FC = () => {
                         <div className={`max-w-[70%] ${isUser
                           ? 'bg-blue-500/10 border border-blue-500/20 rounded-2xl rounded-br-sm'
                           : 'bg-slate-800/50 border border-slate-700/50 rounded-2xl rounded-bl-sm'
-                        } px-4 py-3`}>
+                        } px-4 py-3 relative`}>
                           {/* Source badge */}
                           <div className="flex items-center gap-1.5 mb-1">
                             <span className="text-[10px]">{sourceIcon[msg.source] || '💬'}</span>
@@ -244,6 +419,9 @@ const ChatPage: React.FC = () => {
                             <span className="text-[10px] text-slate-600">{formatTime(msg.timestamp)}</span>
                           </div>
                           <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                          {msg.streaming && (
+                            <span className="inline-block w-1.5 h-4 bg-blue-400 animate-pulse ml-1 rounded-sm align-middle" />
+                          )}
                         </div>
                       </div>
                     )}
@@ -260,12 +438,13 @@ const ChatPage: React.FC = () => {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder="Message Nova..."
-                  className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 placeholder:text-slate-600"
+                  placeholder={status === 'connected' ? "Message Nova..." : "Connecting to gateway..."}
+                  disabled={sending || status !== 'connected'}
+                  className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 placeholder:text-slate-600 disabled:opacity-50"
                 />
                 <button
                   onClick={sendMessage}
-                  disabled={sending || !input.trim()}
+                  disabled={sending || !input.trim() || status !== 'connected'}
                   className="px-5 py-3 bg-blue-500 text-white rounded-xl text-sm font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {sending ? '...' : 'Send'}
