@@ -7,8 +7,8 @@
       "description": "Main conversation with Nova",
       "source": "dashboard",
       "lastMessage": {
-        "content": "hey",
-        "timestamp": "2026-03-11T12:02:17.174Z",
+        "content": "Hello Nova",
+        "timestamp": "2026-03-11T13:31:23.374Z",
         "source": "dashboard"
       },
       "createdAt": "2026-03-08T20:00:00Z"
