@@ -21,6 +21,13 @@
       "content": "Hey",
       "timestamp": "2026-03-11T11:51:42.636Z",
       "source": "dashboard"
+    },
+    {
+      "id": "4",
+      "role": "user",
+      "content": "Hey",
+      "timestamp": "2026-03-11T11:53:46.073Z",
+      "source": "dashboard"
     }
   ]
 }
