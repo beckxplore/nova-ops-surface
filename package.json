@@ -12,11 +12,14 @@
     "// Note": "This is a dummy entry to force a new Vercel build"
   },
   "dependencies": {
+    "@noble/ed25519": "^3.0.0",
+    "@noble/hashes": "^2.0.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.13.1"
+    "react-router-dom": "^7.13.1",
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",

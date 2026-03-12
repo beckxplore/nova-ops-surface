@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { getOrCreateDeviceIdentity } from '../utils/cryptoUtils';
 
 const GATEWAY_URL = 'wss://98-93-181-83.sslip.io';
 const AUTH_TOKEN = '7dd8ac893a339cb334fb2e5e644a22db16ceeed9baf0ab7a';
@@ -12,6 +13,11 @@ interface Message {
 }
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
+
+let widgetReqCounter = 0;
+function nextReqId() {
+  return `widget-${Date.now()}-${++widgetReqCounter}`;
+}
 
 export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -33,40 +39,81 @@ export default function ChatWidget() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const connect = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) return;
-    
-    setStatus('connecting');
-    const ws = new WebSocket(GATEWAY_URL);
-    wsRef.current = ws;
+  // OpenClaw Gateway message handler
+  const handleGatewayMessage = useCallback((event: MessageEvent) => {
+    try {
+      const data = JSON.parse(event.data);
 
-    ws.onopen = () => {
-      // Authenticate
-      ws.send(JSON.stringify({
-        type: 'auth',
-        token: AUTH_TOKEN
-      }));
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        
-        if (data.type === 'auth' && data.ok) {
-          setStatus('connected');
-          return;
+      // Handle connect.challenge — respond with connect RPC
+      if (data.type === 'event' && data.event === 'connect.challenge') {
+        const nonce = data.payload?.nonce;
+        const ws = wsRef.current;
+        if (ws?.readyState === WebSocket.OPEN && nonce) {
+          (async () => {
+            try {
+              const device = await getOrCreateDeviceIdentity(nonce, {
+                clientId: 'openclaw-control-ui',
+                clientMode: 'webchat',
+                platform: 'web',
+                role: 'operator',
+                scopes: ['operator.read', 'operator.write'],
+                token: AUTH_TOKEN
+              });
+              ws.send(JSON.stringify({
+                type: 'req',
+                id: nextReqId(),
+                method: 'connect',
+                params: {
+                  minProtocol: 3,
+                  maxProtocol: 3,
+                  client: {
+                    id: 'openclaw-control-ui',
+                    version: '1.0.0',
+                    platform: 'web',
+                    mode: 'webchat',
+                  },
+                  device,
+                  role: 'operator',
+                  scopes: ['operator.read', 'operator.write'],
+                  caps: [],
+                  commands: [],
+                  permissions: {},
+                  auth: { token: AUTH_TOKEN },
+                  locale: navigator.language || 'en-US',
+                  userAgent: 'nova-widget/1.0.0',
+                },
+              }));
+            } catch (err) {
+              console.error('[WS] Widget failed to prepare device identity:', err);
+              setStatus('error');
+            }
+          })();
         }
+        return;
+      }
 
-        if (data.type === 'auth' && !data.ok) {
+      // Handle connect response (hello-ok)
+      if (data.type === 'res' && data.payload?.type === 'hello-ok') {
+        setStatus('connected');
+        return;
+      }
+
+      // Handle connect error
+      if (data.type === 'res' && data.ok === false) {
+        if (data.error?.message?.includes('connect') || data.error?.message?.includes('auth')) {
           setStatus('error');
-          return;
         }
+        return;
+      }
 
-        // Handle chat responses
-        if (data.type === 'chat:chunk' || data.type === 'agent:chunk') {
-          const text = data.text || data.content || data.delta || '';
+      // Handle chat events (streaming responses)
+      if (data.type === 'event' && data.event === 'chat') {
+        const p = data.payload;
+        if (!p) return;
+
+        if (p.type === 'assistant.chunk' || p.type === 'chunk') {
+          const text = p.text || p.content || p.delta || '';
           if (!text) return;
-          
           setMessages(prev => {
             const assistantId = currentAssistantMsgRef.current;
             if (assistantId) {
@@ -79,20 +126,28 @@ export default function ChatWidget() {
               const newId = `assistant-${Date.now()}`;
               currentAssistantMsgRef.current = newId;
               return [...prev, {
-                id: newId,
-                role: 'assistant',
-                content: text,
-                timestamp: new Date(),
-                streaming: true
+                id: newId, role: 'assistant', content: text,
+                timestamp: new Date(), streaming: true
               }];
             }
           });
+          return;
         }
 
-        if (data.type === 'chat:response' || data.type === 'agent:response') {
-          const content = data.text || data.content || data.message || '';
+        if (p.type === 'assistant.end' || p.type === 'done' || p.type === 'end') {
           if (currentAssistantMsgRef.current) {
-            // Finalize streaming message
+            setMessages(prev => prev.map(m =>
+              m.id === currentAssistantMsgRef.current ? { ...m, streaming: false } : m
+            ));
+          }
+          currentAssistantMsgRef.current = null;
+          setIsSending(false);
+          return;
+        }
+
+        if (p.type === 'assistant.message' || p.type === 'message') {
+          const content = p.text || p.content || p.message || '';
+          if (currentAssistantMsgRef.current) {
             setMessages(prev => prev.map(m => 
               m.id === currentAssistantMsgRef.current
                 ? { ...m, streaming: false, content: content || m.content }
@@ -100,57 +155,109 @@ export default function ChatWidget() {
             ));
           } else if (content) {
             setMessages(prev => [...prev, {
-              id: `assistant-${Date.now()}`,
-              role: 'assistant',
-              content,
-              timestamp: new Date(),
+              id: `assistant-${Date.now()}`, role: 'assistant',
+              content, timestamp: new Date(),
             }]);
           }
           currentAssistantMsgRef.current = null;
           setIsSending(false);
+          return;
         }
 
-        if (data.type === 'chat:end' || data.type === 'agent:end' || data.type === 'agent:done') {
-          if (currentAssistantMsgRef.current) {
-            setMessages(prev => prev.map(m =>
-              m.id === currentAssistantMsgRef.current
-                ? { ...m, streaming: false }
-                : m
-            ));
-          }
-          currentAssistantMsgRef.current = null;
-          setIsSending(false);
-        }
-
-        if (data.type === 'error') {
+        if (p.type === 'error') {
           setMessages(prev => [...prev, {
-            id: `error-${Date.now()}`,
-            role: 'system',
-            content: `Error: ${data.message || data.error || 'Unknown error'}`,
+            id: `error-${Date.now()}`, role: 'system',
+            content: `Error: ${p.message || p.error || 'Unknown error'}`,
             timestamp: new Date(),
           }]);
           setIsSending(false);
           currentAssistantMsgRef.current = null;
+          return;
+        }
+      }
+
+      // Handle agent events
+      if (data.type === 'event' && data.event === 'agent') {
+        const p = data.payload;
+        if (!p) return;
+
+        if (p.type === 'text' || p.type === 'chunk' || p.type === 'assistant.chunk') {
+          const text = p.text || p.content || p.delta || '';
+          if (!text) return;
+          setMessages(prev => {
+            const assistantId = currentAssistantMsgRef.current;
+            if (assistantId) {
+              return prev.map(m => 
+                m.id === assistantId 
+                  ? { ...m, content: m.content + text, streaming: true }
+                  : m
+              );
+            } else {
+              const newId = `assistant-${Date.now()}`;
+              currentAssistantMsgRef.current = newId;
+              return [...prev, {
+                id: newId, role: 'assistant', content: text,
+                timestamp: new Date(), streaming: true
+              }];
+            }
+          });
+          return;
         }
 
-      } catch {
-        // Non-JSON message, ignore
+        if (p.type === 'end' || p.type === 'done') {
+          if (currentAssistantMsgRef.current) {
+            setMessages(prev => prev.map(m =>
+              m.id === currentAssistantMsgRef.current ? { ...m, streaming: false } : m
+            ));
+          }
+          currentAssistantMsgRef.current = null;
+          setIsSending(false);
+          return;
+        }
       }
+
+      // chat.send ack
+      if (data.type === 'res' && data.ok === true && data.payload?.status) {
+        return;
+      }
+
+      // Ignore tick/presence/health
+      if (data.type === 'event' && ['tick', 'presence', 'system-presence', 'health'].includes(data.event)) {
+        return;
+      }
+
+    } catch {
+      // Non-JSON message, ignore
+    }
+  }, []);
+
+  const connect = useCallback(() => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) return;
+    
+    setStatus('connecting');
+    const ws = new WebSocket(GATEWAY_URL);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      // Wait for connect.challenge before marking as connected
     };
 
+    ws.onmessage = handleGatewayMessage;
+
     ws.onclose = () => {
+      if (wsRef.current !== ws) return;
       setStatus('disconnected');
       wsRef.current = null;
-      // Auto-reconnect after 3s
       reconnectTimeoutRef.current = setTimeout(() => {
         if (isExpanded) connect();
       }, 3000);
     };
 
     ws.onerror = () => {
+      if (wsRef.current !== ws) return;
       setStatus('error');
     };
-  }, [isExpanded]);
+  }, [isExpanded, handleGatewayMessage]);
 
   useEffect(() => {
     if (isExpanded) {
@@ -186,9 +293,15 @@ export default function ChatWidget() {
     setIsSending(true);
     currentAssistantMsgRef.current = null;
 
+    // Send via chat.send RPC
     wsRef.current.send(JSON.stringify({
-      type: 'chat:message',
-      message: text,
+      type: 'req',
+      id: nextReqId(),
+      method: 'chat.send',
+      params: {
+        message: text,
+        idempotencyKey: `widget-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      },
     }));
   };
 
@@ -266,7 +379,7 @@ export default function ChatWidget() {
               🤖
             </div>
             <p className="text-sm font-medium text-gray-400">Nova Command Center</p>
-            <p className="text-xs mt-1">Connected to AWS Gateway</p>
+            <p className="text-xs mt-1">Connected to Gateway</p>
           </div>
         )}
         {messages.map((msg) => (

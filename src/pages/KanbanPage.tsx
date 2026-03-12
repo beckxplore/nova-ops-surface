@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useGateway } from '../context/GatewayContext';
 
 interface Task {
   id: string;
@@ -33,56 +34,20 @@ interface Column {
 const initialColumns: Column[] = [
   {
     id: 'backlog', title: 'Backlog', icon: '📥', color: 'border-slate-600',
-    tasks: [
-      { id: '1', title: 'Local LLM Research', description: 'Evaluate local LLM deployment options', assignee: 'Research', priority: 'medium', tags: ['research', 'ai'], project: 'AI Infrastructure' },
-      { id: '2', title: 'AI Workflow Optimization', description: 'Document workflow improvement proposals', assignee: 'Research', priority: 'low', tags: ['research'], project: 'AI Infrastructure' },
-    ],
+    tasks: [],
   },
   {
     id: 'in-progress', title: 'In Progress', icon: '🔄', color: 'border-blue-500',
-    tasks: [
-      { id: '3', title: 'Nova Ops Surface', description: 'Build operational intelligence dashboard', assignee: 'Development', priority: 'high', tags: ['frontend', 'dashboard'], project: 'Nova Platform', progress: 75,
-        steps: [
-          { label: 'Scaffold React+Vite project', done: true },
-          { label: 'Fix Tailwind CSS v4 styling', done: true },
-          { label: 'Build Overview page', done: true },
-          { label: 'Build Agent Hub with real data', done: true },
-          { label: 'Build Kanban board', done: true },
-          { label: 'Add cron job management', done: false },
-          { label: 'Deploy to Vercel', done: false },
-        ]},
-      { id: '4', title: 'Heartbeat Monitoring', description: 'Implement 5-min orchestration checks', assignee: 'Nova', priority: 'high', tags: ['ops', 'automation'], project: 'Nova Platform', progress: 60,
-        steps: [
-          { label: 'Create heartbeat cron job', done: true },
-          { label: 'Scan PROJECTS.md for stalled agents', done: true },
-          { label: 'Auto-intervene on stalled agents', done: false },
-          { label: 'Push status updates to dashboard', done: false },
-        ]},
-    ],
+    tasks: [],
   },
   {
     id: 'review', title: 'Review', icon: '👀', color: 'border-amber-500',
-    tasks: [
-      { id: '5', title: 'Vercel Deployment', description: 'Deploy dashboard to Vercel platform', assignee: 'Development', priority: 'high', tags: ['devops'], project: 'Nova Platform', progress: 30,
-        steps: [
-          { label: 'Create Vercel project', done: true },
-          { label: 'Fix branch mismatch (main vs master)', done: false },
-          { label: 'Successful production build', done: false },
-        ]},
-    ],
+    tasks: [],
   },
   {
     id: 'done', title: 'Done', icon: '✅', color: 'border-emerald-500',
-    tasks: [
-      { id: '6', title: 'Governance Framework', description: 'Initialize departments with SOUL/GOAL/MEMORY', assignee: 'Nova', priority: 'high', tags: ['ops'], project: 'Nova Platform', progress: 100 },
-      { id: '7', title: 'SOP Documentation', description: 'Budget-Aware Logic & Design Governance rules', assignee: 'Nova', priority: 'medium', tags: ['docs'], project: 'Nova Platform', progress: 100 },
-      { id: '8', title: 'GitHub Repository', description: 'Create and configure nova-ops-surface repo', assignee: 'Development', priority: 'medium', tags: ['devops'], project: 'Nova Platform', progress: 100 },
-    ],
+    tasks: [],
   },
-];
-
-const initialCronJobs: CronJob[] = [
-  { id: 'hb-1', name: 'Orchestration Heartbeat', schedule: 'Every 5 minutes', lastRun: '2026-03-08 22:49 GMT+3', status: 'active', target: 'Main Session' },
 ];
 
 const priorityConfig: Record<string, { color: string; label: string }> = {
@@ -92,13 +57,17 @@ const priorityConfig: Record<string, { color: string; label: string }> = {
 };
 
 const KanbanPage: React.FC = () => {
-  const [columns] = useState<Column[]>(initialColumns);
-  const [cronJobs] = useState<CronJob[]>(initialCronJobs);
+  const { eco, status } = useGateway();
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
   const [showCron, setShowCron] = useState(true);
 
-  const totalTasks = columns.reduce((sum, col) => sum + col.tasks.length, 0);
-  const projects = [...new Set(columns.flatMap(c => c.tasks.map(t => t.project).filter(Boolean)))];
+  // Map live data from ecosystem if available
+  const columns = eco?.kanban?.columns || initialColumns;
+  const cronJobs = (eco?.kanban?.cronJobs as CronJob[]) || [];
+  const isLive = status === 'connected';
+
+  const totalTasks = columns.reduce((sum: number, col: Column) => sum + col.tasks.length, 0);
+  const projects = [...new Set(columns.flatMap((c: Column) => c.tasks.map((t: Task) => t.project).filter(Boolean)))];
 
   return (
     <div className="p-6 flex flex-col h-screen">
@@ -106,10 +75,18 @@ const KanbanPage: React.FC = () => {
       <div className="flex items-center justify-between mb-4 shrink-0">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">Kanban Board</h1>
-          <p className="text-slate-400 mt-1 text-sm">{totalTasks} tasks &bull; {projects.length} projects</p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-slate-400 text-sm">{totalTasks} tasks &bull; {projects.length} projects</p>
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${
+              isLive ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+              {isLive ? 'LIVE' : 'SYNCING'}
+            </span>
+          </div>
         </div>
         <div className="flex gap-2">
-          {projects.map(p => (
+          {projects.map((p: any) => (
             <span key={p} className="px-2.5 py-1 bg-slate-800 rounded-full text-[10px] text-slate-400 font-medium">{p}</span>
           ))}
         </div>
@@ -152,7 +129,7 @@ const KanbanPage: React.FC = () => {
 
       {/* Board */}
       <div className="flex-1 flex gap-4 overflow-x-auto pb-4">
-        {columns.map(column => (
+        {columns.map((column: Column) => (
           <div key={column.id} className="w-72 shrink-0 flex flex-col">
             {/* Column Header */}
             <div className={`flex items-center justify-between px-4 py-3 bg-slate-900 border border-slate-800 rounded-t-xl border-t-2 ${column.color}`}>
@@ -165,7 +142,12 @@ const KanbanPage: React.FC = () => {
 
             {/* Column Body */}
             <div className="flex-1 bg-slate-900/50 border border-t-0 border-slate-800 rounded-b-xl p-3 space-y-3 overflow-y-auto">
-              {column.tasks.map(task => {
+              {column.tasks.length === 0 && (
+                <div className="py-8 text-center bg-slate-800/20 rounded-lg border border-dashed border-slate-800">
+                  <p className="text-[10px] text-slate-600 uppercase tracking-widest">Empty</p>
+                </div>
+              )}
+              {column.tasks.map((task: Task) => {
                 const isExpanded = expandedTask === task.id;
                 return (
                   <div
@@ -175,10 +157,10 @@ const KanbanPage: React.FC = () => {
                   >
                     {/* Priority + Tags + Project */}
                     <div className="flex items-center gap-1.5 mb-2 flex-wrap">
-                      <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ring-1 ${priorityConfig[task.priority].color}`}>
-                        {priorityConfig[task.priority].label}
+                      <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ring-1 ${priorityConfig[task.priority]?.color || priorityConfig.low.color}`}>
+                        {priorityConfig[task.priority]?.label || 'Low'}
                       </span>
-                      {task.tags.map(tag => (
+                      {task.tags.map((tag: string) => (
                         <span key={tag} className="text-[10px] text-slate-600 bg-slate-800/50 px-1.5 py-0.5 rounded">{tag}</span>
                       ))}
                     </div>
@@ -212,7 +194,7 @@ const KanbanPage: React.FC = () => {
                     {isExpanded && task.steps && (
                       <div className="mt-3 pt-3 border-t border-slate-800 space-y-1.5">
                         <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Steps</p>
-                        {task.steps.map((step, i) => (
+                        {task.steps.map((step: { label: string; done: boolean }, i: number) => (
                           <div key={i} className="flex items-center gap-2">
                             <span className={`text-xs ${step.done ? 'text-emerald-400' : 'text-slate-600'}`}>
                               {step.done ? '✓' : '○'}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useGateway } from '../context/GatewayContext';
 
 const API = import.meta.env.DEV ? 'http://localhost:3001' : '';
 const USE_SERVERLESS = !import.meta.env.DEV; // Use /api/* on Vercel
@@ -34,7 +35,7 @@ const statusCfg: Record<string, { cls: string; dot: string; label: string }> = {
 type SelectedItem = { type: 'orchestrator' | 'project' | 'department' | 'agent'; id: string; name: string; filesPath?: string };
 
 const AgentHubPage: React.FC = () => {
-  const [eco, setEco] = useState<Ecosystem | null>(null);
+  const { eco, status } = useGateway();
   const [selected, setSelected] = useState<SelectedItem | null>(null);
   const [activeFile, setActiveFile] = useState('SOUL.md');
   const [fileContent, setFileContent] = useState('');
@@ -43,9 +44,7 @@ const AgentHubPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [agentFiles, setAgentFiles] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    fetch('/ecosystem.json').then(r => r.json()).then(setEco).catch(console.error);
-  }, []);
+  const isLive = status === 'connected';
 
   const loadFile = async (filesPath: string, file: string) => {
     try {
@@ -136,7 +135,11 @@ const AgentHubPage: React.FC = () => {
     );
   };
 
-  if (!eco) return <div className="p-6 text-slate-500">Loading ecosystem...</div>;
+  if (!eco) return (
+    <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
+       <p className="text-slate-500 animate-pulse">Waiting for live data feed...</p>
+    </div>
+  );
 
   const fileIcons: Record<string, string> = { 'SOUL.md': '🧬', 'GOAL.md': '🎯', 'MEMORY.md': '🧠', 'IDENTITY.md': '🪪', 'USER.md': '👤' };
   const mdFiles = Object.keys(agentFiles).filter(f => f.endsWith('.md'));
@@ -144,9 +147,17 @@ const AgentHubPage: React.FC = () => {
 
   return (
     <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-white">Agent Hub</h1>
-        <p className="text-slate-400 mt-1 text-sm">Organizational hierarchy &bull; Projects, Departments, Agents</p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Agent Hub</h1>
+          <p className="text-slate-400 mt-1 text-sm">Organizational hierarchy &bull; Projects, Departments, Agents</p>
+        </div>
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ring-1 ${
+          isLive ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
+        }`}>
+          <span className={`h-2 w-2 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+          {isLive ? 'LIVE' : 'SYNCING'}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -181,7 +192,7 @@ const AgentHubPage: React.FC = () => {
                 <p className="text-xs text-slate-600">No active projects</p>
                 <p className="text-[10px] text-slate-700 mt-1">Nova will create projects when tasks require dedicated resources</p>
               </div>
-            ) : eco.projects.map(proj => (
+            ) : eco.projects.map((proj: Project) => (
               <button key={proj.id}
                 onClick={() => selectItem({ type: 'project', id: proj.id, name: proj.name })}
                 className={`w-full text-left bg-slate-900 border rounded-xl p-4 mb-2 transition-all ${
@@ -199,7 +210,7 @@ const AgentHubPage: React.FC = () => {
           {/* Departments */}
           <div>
             <p className="text-[10px] text-slate-600 uppercase tracking-widest font-medium mb-2">Departments</p>
-            {eco.departments.map(dept => {
+            {eco.departments.map((dept: Department) => {
               const isLocked = !!dept.project;
               return (
                 <div key={dept.id} className="mb-3">
@@ -237,7 +248,7 @@ const AgentHubPage: React.FC = () => {
                     </button>
 
                     {/* Sub-agents */}
-                    {dept.agents.map(agent => (
+                    {dept.agents.map((agent: AgentNode) => (
                       <button key={agent.id}
                         onClick={() => selectItem({ type: 'agent', id: agent.id, name: agent.name, filesPath: agent.filesPath || `departments/${dept.id}/${agent.id}` })}
                         className={`w-full text-left bg-slate-800/30 border rounded-lg p-3 transition-all ${
@@ -263,7 +274,7 @@ const AgentHubPage: React.FC = () => {
               <div className="bg-slate-900/50 border border-dashed border-slate-800 rounded-xl p-4 text-center">
                 <p className="text-xs text-slate-600">No standalone agents</p>
               </div>
-            ) : eco.individualAgents.map(agent => (
+            ) : eco.individualAgents.map((agent: AgentNode) => (
               <button key={agent.id}
                 onClick={() => selectItem({ type: 'agent', id: agent.id, name: agent.name, filesPath: agent.filesPath })}
                 className="w-full text-left bg-slate-900 border border-slate-800 rounded-xl p-4 mb-2 hover:border-slate-700">

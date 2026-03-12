@@ -1,30 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ExecutiveSummary from '../components/ExecutiveSummary';
 import ExecutionMatrix from '../components/ExecutionMatrix';
 import ResourcePulse from '../components/ResourcePulse';
 import EventStream from '../components/EventStream';
-
-interface Ecosystem {
-  orchestrator: { status: string };
-  projects: { id: string; name: string; status: string; description: string }[];
-  departments: { id: string; name: string; lead: { status: string }; agents: { status: string }[]; project: string | null }[];
-  individualAgents: { id: string; name: string; status: string }[];
-}
+import { useGateway } from '../context/GatewayContext';
 
 const OverviewPage: React.FC = () => {
-  const [eco, setEco] = useState<Ecosystem | null>(null);
+  const { eco, status } = useGateway();
 
-  useEffect(() => {
-    fetch('/ecosystem.json').then(r => r.json()).then(setEco).catch(console.error);
-  }, []);
-
-  const totalAgents = eco ? eco.departments.reduce((sum, d) => sum + 1 + d.agents.length, 0) + eco.individualAgents.length : 0;
-  const runningAgents = eco ? eco.departments.reduce((sum, d) => {
+  const totalAgents = eco ? eco.departments.reduce((sum: number, d: any) => sum + 1 + d.agents.length, 0) + eco.individualAgents.length : 0;
+  const runningAgents = eco ? eco.departments.reduce((sum: number, d: any) => {
     let c = d.lead.status === 'running' ? 1 : 0;
-    c += d.agents.filter(a => a.status === 'running').length;
+    c += d.agents.filter((a: any) => a.status === 'running').length;
     return sum + c;
-  }, 0) + eco.individualAgents.filter(a => a.status === 'running').length : 0;
+  }, 0) + eco.individualAgents.filter((a: any) => a.status === 'running').length : 0;
   const idleAgents = totalAgents - runningAgents;
+
+  const isLive = status === 'connected';
 
   return (
     <div className="p-6">
@@ -32,11 +24,15 @@ const OverviewPage: React.FC = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">Overview</h1>
-          <p className="text-slate-400 mt-1 text-sm">Real-time organizational monitoring</p>
+          <p className="text-slate-400 mt-1 text-sm">
+            {isLive ? 'Real-time organizational monitoring' : 'Offline - Connecting to gateway...'}
+          </p>
         </div>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20">
-          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          LIVE
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ring-1 ${
+          isLive ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
+        }`}>
+          <span className={`h-2 w-2 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+          {isLive ? 'LIVE' : 'SYNCING'}
         </span>
       </div>
 
@@ -57,7 +53,7 @@ const OverviewPage: React.FC = () => {
             <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Departments</p>
             <p className="text-2xl font-bold text-white">{eco.departments.length}</p>
             <p className="text-[10px] text-slate-600 mt-1">
-              {eco.departments.filter(d => d.project).length} locked to projects
+              {eco.departments.filter((d: any) => d.project).length} locked to projects
             </p>
           </div>
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
@@ -73,10 +69,18 @@ const OverviewPage: React.FC = () => {
               <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">N</div>
               <div>
                 <p className="text-sm font-bold text-white">Nova</p>
-                <p className="text-[10px] text-emerald-400">Online</p>
+                <p className={`text-[10px] ${eco.orchestrator.status === 'running' ? 'text-emerald-400' : 'text-slate-400'}`}>
+                  {eco.orchestrator.status === 'running' ? 'Online' : 'Standby'}
+                </p>
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {!eco && (
+        <div className="bg-slate-900/50 border border-dashed border-slate-800 rounded-xl p-12 text-center mb-6">
+          <p className="text-slate-500">Waiting for live data feed...</p>
         </div>
       )}
 
@@ -85,7 +89,7 @@ const OverviewPage: React.FC = () => {
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-white mb-3">Active Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {eco.projects.map(proj => (
+            {eco.projects.map((proj: any) => (
               <div key={proj.id} className="bg-slate-900 border border-slate-800 rounded-xl p-5">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium text-white">📁 {proj.name}</h3>
