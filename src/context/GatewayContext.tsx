@@ -95,6 +95,14 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, []);
 
+  // Seed eco from static ecosystem.json immediately (will be overridden by live gateway events)
+  useEffect(() => {
+    fetch('/ecosystem.json')
+      .then(r => r.json())
+      .then(data => setEco((prev: any) => prev ?? data))
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     connect();
     return () => {
