@@ -1,4 +1,4 @@
-// Vercel Serverless Function — full ecosystem state from GitHub repo files
+// Vercel Serverless Function — full ecosystem state from GitHub repo files (v1)
 const REPO_OWNER = 'beckxplore';
 const REPO_NAME = 'nova-ops-surface';
 const BRANCH = 'master';
