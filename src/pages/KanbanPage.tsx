@@ -71,6 +71,8 @@ const KanbanPage: React.FC = () => {
   const [showCron, setShowCron] = useState(true);
   const [kanbanData, setKanbanData] = useState<{ columns: Column[]; cronJobs: CronJob[] } | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState<string | null>(null); // column id
+  const [newTask, setNewTask] = useState({ title: '', description: '', assignee: 'Nova', priority: 'medium' as Task['priority'], tags: '', project: '' });
 
   React.useEffect(() => {
     if (eco?.kanban) {
@@ -118,6 +120,55 @@ const KanbanPage: React.FC = () => {
       // Auto-cancel after 3s
       setTimeout(() => setDeletingId(prev => prev === taskId ? null : prev), 3000);
     }
+  };
+
+  const handleAddTask = (columnId: string) => {
+    if (!newTask.title.trim()) return;
+    const task: Task = {
+      id: `t-${Date.now()}`,
+      title: newTask.title.trim(),
+      description: newTask.description.trim(),
+      assignee: newTask.assignee || 'Nova',
+      priority: newTask.priority,
+      tags: newTask.tags.split(',').map(t => t.trim()).filter(Boolean),
+      project: newTask.project || undefined,
+      createdAt: new Date().toISOString(),
+    };
+    setKanbanData(prev => {
+      if (!prev) return prev;
+      const updated = {
+        ...prev,
+        columns: prev.columns.map(col =>
+          col.id === columnId ? { ...col, tasks: [...col.tasks, task] } : col
+        )
+      };
+      persistKanban(updated);
+      return updated;
+    });
+    setNewTask({ title: '', description: '', assignee: 'Nova', priority: 'medium', tags: '', project: '' });
+    setShowAddForm(null);
+  };
+
+  const handleMoveTask = (taskId: string, fromColId: string, toColId: string) => {
+    setKanbanData(prev => {
+      if (!prev) return prev;
+      let movedTask: Task | undefined;
+      const updated = {
+        ...prev,
+        columns: prev.columns.map(col => {
+          if (col.id === fromColId) {
+            movedTask = col.tasks.find(t => t.id === taskId);
+            return { ...col, tasks: col.tasks.filter(t => t.id !== taskId) };
+          }
+          if (col.id === toColId && movedTask) {
+            return { ...col, tasks: [...col.tasks, movedTask] };
+          }
+          return col;
+        })
+      };
+      persistKanban(updated);
+      return updated;
+    });
   };
 
   const columns = kanbanData?.columns || fallbackColumns;
@@ -194,13 +245,44 @@ const KanbanPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="text-sm">{column.icon}</span>
                 <h3 className="text-sm font-semibold text-white">{column.title}</h3>
+                <span className="bg-slate-800 text-slate-400 text-xs font-medium px-2 py-0.5 rounded-full">{column.tasks.length}</span>
               </div>
-              <span className="bg-slate-800 text-slate-400 text-xs font-medium px-2 py-0.5 rounded-full">{column.tasks.length}</span>
+              <button
+                onClick={() => setShowAddForm(showAddForm === column.id ? null : column.id)}
+                className="h-6 w-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700 transition-colors text-sm"
+              >+</button>
             </div>
 
             {/* Column Body */}
             <div className="flex-1 bg-slate-900/50 border border-t-0 border-slate-800 rounded-b-xl p-3 space-y-3 overflow-y-auto">
-              {column.tasks.length === 0 && (
+              {/* Add Task Form */}
+              {showAddForm === column.id && (
+                <div className="bg-slate-800/60 border border-slate-700 rounded-lg p-3 space-y-2">
+                  <input value={newTask.title} onChange={e => setNewTask(p => ({ ...p, title: e.target.value }))}
+                    placeholder="Task title..." className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50" autoFocus />
+                  <input value={newTask.description} onChange={e => setNewTask(p => ({ ...p, description: e.target.value }))}
+                    placeholder="Description..." className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
+                  <div className="flex gap-2">
+                    <select value={newTask.priority} onChange={e => setNewTask(p => ({ ...p, priority: e.target.value as Task['priority'] }))}
+                      className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none">
+                      <option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
+                    </select>
+                    <input value={newTask.assignee} onChange={e => setNewTask(p => ({ ...p, assignee: e.target.value }))}
+                      placeholder="Assignee" className="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white placeholder-slate-600 focus:outline-none" />
+                  </div>
+                  <div className="flex gap-2">
+                    <input value={newTask.tags} onChange={e => setNewTask(p => ({ ...p, tags: e.target.value }))}
+                      placeholder="Tags (comma sep)" className="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white placeholder-slate-600 focus:outline-none" />
+                    <input value={newTask.project} onChange={e => setNewTask(p => ({ ...p, project: e.target.value }))}
+                      placeholder="Project" className="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white placeholder-slate-600 focus:outline-none" />
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <button onClick={() => setShowAddForm(null)} className="px-3 py-1 text-[10px] text-slate-400 bg-slate-800 rounded hover:bg-slate-700">Cancel</button>
+                    <button onClick={() => handleAddTask(column.id)} className="px-3 py-1 text-[10px] text-white bg-blue-600 rounded hover:bg-blue-500">Add Task</button>
+                  </div>
+                </div>
+              )}
+              {column.tasks.length === 0 && showAddForm !== column.id && (
                 <div className="py-8 text-center bg-slate-800/20 rounded-lg border border-dashed border-slate-800">
                   <p className="text-[10px] text-slate-600 uppercase tracking-widest">Empty</p>
                 </div>
@@ -292,6 +374,18 @@ const KanbanPage: React.FC = () => {
                         <span className="text-xs text-slate-500">{task.assignee}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
+                        {/* Move buttons */}
+                        {isExpanded && (
+                          <div className="flex gap-1">
+                            {columns.filter(c => c.id !== column.id).map(c => (
+                              <button key={c.id}
+                                onClick={(e) => { e.stopPropagation(); handleMoveTask(task.id, column.id, c.id); }}
+                                className="px-1.5 py-0.5 text-[10px] text-slate-400 bg-slate-800 rounded hover:bg-slate-700 hover:text-white transition-colors"
+                                title={`Move to ${c.title}`}
+                              >→ {c.icon}</button>
+                            ))}
+                          </div>
+                        )}
                         {column.id === 'in-progress' && (
                           <button
                             onClick={(e) => { e.stopPropagation(); }}
