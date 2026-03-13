@@ -95,17 +95,36 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, []);
 
-  // Fetch ecosystem data: try API first, fall back to static JSON
+  // Fetch ecosystem data: try API first, then static ecosystem.json
+  // Also fetch kanban.json and merge it in
   useEffect(() => {
-    fetch('/api/ecosystem')
-      .then(r => r.ok ? r.json() : Promise.reject('api'))
-      .then(data => setEco(data))
-      .catch(() => {
-        fetch('/ecosystem.json')
-          .then(r => r.json())
-          .then(data => setEco((prev: any) => prev ?? data))
-          .catch(() => {});
-      });
+    const loadData = async () => {
+      let ecoData: any = null;
+      // Try API endpoint first
+      try {
+        const r = await fetch('/api/eco');
+        if (r.ok) ecoData = await r.json();
+      } catch {}
+      // Fallback to static ecosystem.json
+      if (!ecoData) {
+        try {
+          const r = await fetch('/ecosystem.json');
+          if (r.ok) ecoData = await r.json();
+        } catch {}
+      }
+      // Always try to load kanban.json and merge
+      if (ecoData && !ecoData.kanban) {
+        try {
+          const r = await fetch('/kanban.json');
+          if (r.ok) {
+            const ct = r.headers.get('content-type') || '';
+            if (ct.includes('json')) ecoData.kanban = await r.json();
+          }
+        } catch {}
+      }
+      if (ecoData) setEco(ecoData);
+    };
+    loadData();
   }, []);
 
   useEffect(() => {
