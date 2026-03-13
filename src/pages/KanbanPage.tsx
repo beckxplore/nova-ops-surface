@@ -31,56 +31,12 @@ interface Column {
   tasks: Task[];
 }
 
-const initialColumns: Column[] = [
-  {
-    id: 'backlog', title: 'Backlog', icon: '📥', color: 'border-slate-600',
-    tasks: [
-      { id: 'b1', title: 'Local LLM Research', description: 'Evaluate local LLM deployment options for on-prem AI', assignee: 'Research', priority: 'medium', tags: ['research', 'ai'], project: 'AI Infrastructure' },
-      { id: 'b2', title: 'AI Workflow Optimization', description: 'Document workflow improvement proposals', assignee: 'Research', priority: 'low', tags: ['research'], project: 'AI Infrastructure' },
-      { id: 'b3', title: 'Elastic IP + Domain', description: 'Stable public address + HTTPS reverse proxy (nginx/caddy)', assignee: 'Nova', priority: 'medium', tags: ['infra', 'devops'], project: 'Nova Platform' },
-      { id: 'b4', title: 'Security Hardening', description: 'Firewall rules, fail2ban setup on AWS instance', assignee: 'Nova', priority: 'medium', tags: ['infra', 'security'], project: 'Nova Platform' },
-      { id: 'b5', title: 'Workspace Sync', description: 'Sync local and AWS server workspace files', assignee: 'Nova', priority: 'low', tags: ['infra'], project: 'Nova Platform' },
-      { id: 'b6', title: 'Ethiopia Landing Page', description: 'Needs real image uploads and content', assignee: 'Development', priority: 'low', tags: ['frontend'], project: 'Other' },
-    ],
-  },
-  {
-    id: 'in-progress', title: 'In Progress', icon: '🔄', color: 'border-blue-500',
-    tasks: [
-      { id: 'ip1', title: 'Nova Ops Surface Dashboard', description: 'Operational intelligence dashboard — real-time data, chat, kanban', assignee: 'Development', priority: 'high', tags: ['frontend', 'dashboard'], project: 'Nova Platform', progress: 85,
-        steps: [
-          { label: 'Scaffold React+Vite project', done: true },
-          { label: 'Fix Tailwind CSS v4 styling', done: true },
-          { label: 'Build Overview page', done: true },
-          { label: 'Build Agent Hub with real data', done: true },
-          { label: 'Build Kanban board', done: true },
-          { label: 'Connect to Gateway via WebSocket', done: true },
-          { label: 'Fix Telegram group policy', done: true },
-          { label: 'Deploy to Vercel production', done: true },
-          { label: 'Real-time live data integration', done: false },
-        ]},
-      { id: 'ip2', title: 'Heartbeat Monitoring', description: 'Every 2h orchestration check — scan for stalled agents, auto-intervene', assignee: 'Nova', priority: 'high', tags: ['ops', 'automation'], project: 'Nova Platform', progress: 70,
-        steps: [
-          { label: 'Create heartbeat cron job', done: true },
-          { label: 'Scan for stalled agents', done: true },
-          { label: 'Auto-intervene on stalled agents', done: false },
-          { label: 'Push status updates to dashboard', done: false },
-        ]},
-    ],
-  },
-  {
-    id: 'review', title: 'Review', icon: '👀', color: 'border-amber-500',
-    tasks: [],
-  },
-  {
-    id: 'done', title: 'Done', icon: '✅', color: 'border-emerald-500',
-    tasks: [
-      { id: 'd1', title: 'Governance Framework', description: 'Initialize departments with SOUL/GOAL/MEMORY', assignee: 'Nova', priority: 'high', tags: ['ops'], project: 'Nova Platform', progress: 100 },
-      { id: 'd2', title: 'SOP Documentation', description: 'Budget-Aware Logic & Design Governance rules', assignee: 'Nova', priority: 'medium', tags: ['docs'], project: 'Nova Platform', progress: 100 },
-      { id: 'd3', title: 'GitHub Repository', description: 'Create and configure nova-ops-surface repo', assignee: 'Development', priority: 'medium', tags: ['devops'], project: 'Nova Platform', progress: 100 },
-      { id: 'd4', title: 'Fix Telegram Group Policy', description: 'Set groupPolicy=open on AWS OpenClaw config', assignee: 'Nova', priority: 'high', tags: ['infra', 'telegram'], project: 'Nova Platform', progress: 100 },
-      { id: 'd5', title: 'Chat WebSocket Connection', description: 'Fix dashboard chat to use OpenClaw v3 protocol', assignee: 'Development', priority: 'high', tags: ['backend', 'websocket'], project: 'Nova Platform', progress: 100 },
-    ],
-  },
+// Kanban data is now loaded from /api/ecosystem → kanban field, or /kanban.json fallback
+const fallbackColumns: Column[] = [
+  { id: 'backlog', title: 'Backlog', icon: '📥', color: 'border-slate-600', tasks: [] },
+  { id: 'in-progress', title: 'In Progress', icon: '🔄', color: 'border-blue-500', tasks: [] },
+  { id: 'review', title: 'Review', icon: '👀', color: 'border-amber-500', tasks: [] },
+  { id: 'done', title: 'Done', icon: '✅', color: 'border-emerald-500', tasks: [] },
 ];
 
 const priorityConfig: Record<string, { color: string; label: string }> = {
@@ -93,11 +49,23 @@ const KanbanPage: React.FC = () => {
   const { eco, status } = useGateway();
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
   const [showCron, setShowCron] = useState(true);
+  const [kanbanData, setKanbanData] = useState<{ columns: Column[]; cronJobs: CronJob[] } | null>(null);
 
-  // Map live data from ecosystem if available
-  const columns = eco?.kanban?.columns || initialColumns;
-  const cronJobs = (eco?.kanban?.cronJobs as CronJob[]) || [];
-  const isLive = status === 'connected';
+  // Load kanban data: from eco API response, or fetch kanban.json directly
+  React.useEffect(() => {
+    if (eco?.kanban) {
+      setKanbanData(eco.kanban);
+    } else {
+      fetch('/kanban.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if (data) setKanbanData(data); })
+        .catch(() => {});
+    }
+  }, [eco]);
+
+  const columns = kanbanData?.columns || fallbackColumns;
+  const cronJobs = kanbanData?.cronJobs || [];
+  const isLive = status === 'connected' || !!kanbanData;
 
   const totalTasks = columns.reduce((sum: number, col: Column) => sum + col.tasks.length, 0);
   const projects = [...new Set(columns.flatMap((c: Column) => c.tasks.map((t: Task) => t.project).filter(Boolean)))];

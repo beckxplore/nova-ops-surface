@@ -95,12 +95,17 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, []);
 
-  // Seed eco from static ecosystem.json immediately (will be overridden by live gateway events)
+  // Fetch ecosystem data: try API first, fall back to static JSON
   useEffect(() => {
-    fetch('/ecosystem.json')
-      .then(r => r.json())
-      .then(data => setEco((prev: any) => prev ?? data))
-      .catch(() => {});
+    fetch('/api/ecosystem')
+      .then(r => r.ok ? r.json() : Promise.reject('api'))
+      .then(data => setEco(data))
+      .catch(() => {
+        fetch('/ecosystem.json')
+          .then(r => r.json())
+          .then(data => setEco((prev: any) => prev ?? data))
+          .catch(() => {});
+      });
   }, []);
 
   useEffect(() => {
