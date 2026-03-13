@@ -83,19 +83,33 @@ const KanbanPage: React.FC = () => {
     }
   }, [eco]);
 
+  const persistKanban = async (data: { columns: Column[]; cronJobs: CronJob[] }) => {
+    try {
+      await fetch('/api/file', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: 'kanban.json', content: JSON.stringify(data, null, 2) })
+      });
+    } catch (err) {
+      console.error('[Kanban] Failed to persist:', err);
+    }
+  };
+
   const handleDelete = (taskId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (deletingId === taskId) {
-      // Second click = confirm delete
+      // Second click = confirm delete — update state + persist
       setKanbanData(prev => {
         if (!prev) return prev;
-        return {
+        const updated = {
           ...prev,
           columns: prev.columns.map(col => ({
             ...col,
             tasks: col.tasks.filter(t => t.id !== taskId)
           }))
         };
+        persistKanban(updated);
+        return updated;
       });
       setDeletingId(null);
       setExpandedTask(null);
