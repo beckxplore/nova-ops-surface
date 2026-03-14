@@ -114,6 +114,18 @@ const ChatPage: React.FC = () => {
       if (data.type === 'res' && data.payload?.type === 'hello-ok') {
         console.log('[WS] Connected! Protocol:', data.payload.protocol);
         setStatus('connected');
+        
+        // Subscribe to chat events for streaming responses
+        const ws = wsRef.current;
+        if (ws?.readyState === WebSocket.OPEN) {
+          console.log('[WS] Subscribing to chat events...');
+          ws.send(JSON.stringify({
+            type: 'req',
+            id: nextReqId(),
+            method: 'chat.subscribe',
+            params: { sessionKey: 'main' },
+          }));
+        }
         return;
       }
 
