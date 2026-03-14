@@ -65,6 +65,27 @@ function computeProgress(task: Task): number {
   return task.progress ?? 0;
 }
 
+/** SLA thresholds per column (in days) */
+const STALE_THRESHOLDS: Record<string, number> = {
+  'backlog': 7,
+  'in-progress': 3,
+  'review': 1,
+};
+
+function isStale(task: Task, columnId: string): boolean {
+  if (columnId === 'done') return false;
+  const threshold = STALE_THRESHOLDS[columnId];
+  if (!threshold || !task.createdAt) return false;
+  const ageMs = Date.now() - new Date(task.createdAt).getTime();
+  const ageDays = ageMs / (1000 * 60 * 60 * 24);
+  return ageDays >= threshold;
+}
+
+function staleDays(task: Task): number {
+  if (!task.createdAt) return 0;
+  return Math.floor((Date.now() - new Date(task.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+}
+
 const KanbanPage: React.FC = () => {
   const { eco, status } = useGateway();
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
@@ -246,6 +267,11 @@ const KanbanPage: React.FC = () => {
                 <span className="text-sm">{column.icon}</span>
                 <h3 className="text-sm font-semibold text-white">{column.title}</h3>
                 <span className="bg-slate-800 text-slate-400 text-xs font-medium px-2 py-0.5 rounded-full">{column.tasks.length}</span>
+                {column.tasks.filter(t => isStale(t, column.id)).length > 0 && (
+                  <span className="bg-amber-500/10 text-amber-400 text-[10px] font-medium px-1.5 py-0.5 rounded-full ring-1 ring-amber-500/20">
+                    ⚠️ {column.tasks.filter(t => isStale(t, column.id)).length} stale
+                  </span>
+                )}
               </div>
               <button
                 onClick={() => setShowAddForm(showAddForm === column.id ? null : column.id)}
@@ -291,20 +317,38 @@ const KanbanPage: React.FC = () => {
                 const isExpanded = expandedTask === task.id;
                 const liveProgress = computeProgress(task);
                 const isConfirmingDelete = deletingId === task.id;
+                const stale = isStale(task, column.id);
+                const age = staleDays(task);
 
                 return (
                   <div
                     key={task.id}
                     className={`bg-slate-900 border rounded-lg p-4 transition-all duration-200 cursor-pointer group ${
-                      isConfirmingDelete ? 'border-red-500/50 bg-red-950/20' : 'border-slate-800 hover:border-slate-700'
+                      isConfirmingDelete ? 'border-red-500/50 bg-red-950/20' :
+                      stale ? 'border-amber-500/40 bg-amber-950/10' :
+                      'border-slate-800 hover:border-slate-700'
                     }`}
                     onClick={() => setExpandedTask(isExpanded ? null : task.id)}
                   >
+                    {/* Stale Warning Banner */}
+                    {stale && (
+                      <div className="flex items-center gap-1.5 mb-2 px-2 py-1 bg-amber-500/10 border border-amber-500/20 rounded text-[10px] text-amber-400">
+                        <span>⚠️</span>
+                        <span className="font-medium">Stale — {age}d in {column.title}</span>
+                        <span className="text-amber-500/60 ml-auto">SLA: {STALE_THRESHOLDS[column.id]}d</span>
+                      </div>
+                    )}
+
                     {/* Priority + Tags */}
                     <div className="flex items-center gap-1.5 mb-2 flex-wrap">
                       <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ring-1 ${priorityConfig[task.priority]?.color || priorityConfig.low.color}`}>
                         {priorityConfig[task.priority]?.label || 'Low'}
                       </span>
+                      {stale && (
+                        <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ring-1 bg-amber-500/10 text-amber-400 ring-amber-500/20">
+                          ⚠️ Stale
+                        </span>
+                      )}
                       {task.tags.map((tag: string) => (
                         <span key={tag} className="text-[10px] text-slate-600 bg-slate-800/50 px-1.5 py-0.5 rounded">{tag}</span>
                       ))}
