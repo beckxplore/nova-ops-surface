@@ -36,16 +36,17 @@ const ExecutiveSummary: React.FC = () => {
     // Project count
     const projectCount = eco.projects?.length || 0;
 
-    // Connection = system status
-    const isOnline = status === 'connected';
+    // System is "operational" if we have data (regardless of WS status)
+    const hasData = totalAgents > 0 || totalTasks > 0;
 
-    return { totalAgents, runningAgents, totalTasks, doneTasks, inProgressTasks, blockedTasks, deptCount, deptNames, projectCount, isOnline };
-  }, [eco, status]);
+    return { totalAgents, runningAgents, totalTasks, doneTasks, inProgressTasks, blockedTasks, deptCount, deptNames, projectCount, hasData };
+  }, [eco]);
 
   const now = new Date();
   const lastCheck = now.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Africa/Nairobi' }) + ' GMT+3';
 
-  const isOnline = status === 'connected';
+  const isWsConnected = status === 'connected';
+  const isOperational = stats?.hasData || isWsConnected;
 
   if (!stats) {
     return (
@@ -78,11 +79,11 @@ const ExecutiveSummary: React.FC = () => {
         {/* System Status */}
         <div className="bg-slate-800/50 rounded-lg p-4">
           <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">System State</p>
-          <p className={`text-xl font-bold ${isOnline ? 'text-emerald-400' : 'text-amber-400'}`}>
-            {isOnline ? 'Operational' : 'Syncing'}
+          <p className={`text-xl font-bold ${isOperational ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {isOperational ? 'Operational' : 'Syncing'}
           </p>
           <p className="text-[10px] text-slate-600 mt-1">
-            Gateway {isOnline ? 'connected' : 'reconnecting'}
+            {isWsConnected ? 'Gateway live' : isOperational ? 'Data loaded · WS reconnecting' : 'Connecting...'}
           </p>
         </div>
 

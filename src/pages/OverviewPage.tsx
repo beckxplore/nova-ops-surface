@@ -16,7 +16,9 @@ const OverviewPage: React.FC = () => {
   }, 0) + eco.individualAgents.filter((a: any) => a.status === 'running').length : 0;
   const idleAgents = totalAgents - runningAgents;
 
-  const isLive = status === 'connected';
+  const isWsLive = status === 'connected';
+  const hasData = !!eco;
+  const isLive = isWsLive || hasData;
 
   return (
     <div className="p-6">
@@ -25,14 +27,14 @@ const OverviewPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">Overview</h1>
           <p className="text-slate-400 mt-1 text-sm">
-            {isLive ? 'Real-time organizational monitoring' : 'Offline - Connecting to gateway...'}
+            {isLive ? 'Real-time organizational monitoring' : 'Connecting to data sources...'}
           </p>
         </div>
         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ring-1 ${
           isLive ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
         }`}>
           <span className={`h-2 w-2 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
-          {isLive ? 'LIVE' : 'SYNCING'}
+          {isWsLive ? 'LIVE' : hasData ? 'LIVE' : 'SYNCING'}
         </span>
       </div>
 
