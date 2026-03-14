@@ -16,8 +16,8 @@
       "lead": {
         "id": "dev-lead",
         "name": "Dev Lead",
-        "status": "running",
-        "currentTask": "Building Nova Ops Surface dashboard",
+        "status": "idle",
+        "currentTask": "Dashboard features (Kanban, Chat, Overview all live)",
         "filesPath": "departments/development"
       },
       "agents": []

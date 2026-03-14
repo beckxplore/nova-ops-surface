@@ -3,58 +3,303 @@
     {
       "id": "backlog",
       "title": "Backlog",
-      "icon": "📥",
+      "icon": "\ud83d\udce5",
       "color": "border-slate-600",
       "tasks": [
-        { "id": "b1", "title": "Local LLM Research", "description": "Evaluate local LLM deployment options for on-prem AI", "assignee": "Research", "priority": "medium", "tags": ["research", "ai"], "project": "AI Infrastructure", "createdAt": "2026-03-08T12:00:00Z" },
-        { "id": "b2", "title": "AI Workflow Optimization", "description": "Document workflow improvement proposals", "assignee": "Research", "priority": "low", "tags": ["research"], "project": "AI Infrastructure", "createdAt": "2026-03-08T12:00:00Z" },
-        { "id": "b3", "title": "Elastic IP + Domain", "description": "Stable public address + HTTPS reverse proxy", "assignee": "Nova", "priority": "medium", "tags": ["infra", "devops"], "project": "Nova Platform", "createdAt": "2026-03-09T08:00:00Z" },
-        { "id": "b4", "title": "Security Hardening", "description": "Firewall rules, fail2ban setup on AWS instance", "assignee": "Nova", "priority": "medium", "tags": ["infra", "security"], "project": "Nova Platform", "createdAt": "2026-03-09T08:00:00Z" },
-        { "id": "b5", "title": "Workspace Sync", "description": "Sync local and AWS server workspace files", "assignee": "Nova", "priority": "low", "tags": ["infra"], "project": "Nova Platform", "createdAt": "2026-03-09T08:00:00Z" },
-        { "id": "b6", "title": "Ethiopia Landing Page", "description": "Needs real image uploads and content", "assignee": "Development", "priority": "low", "tags": ["frontend"], "project": "Other", "createdAt": "2026-03-08T10:00:00Z" },
-        { "id": "b7", "title": "Editable MD Files", "description": "View and edit SOUL/GOAL/MEMORY files from dashboard", "assignee": "Development", "priority": "high", "tags": ["frontend", "dashboard"], "project": "Nova Platform", "createdAt": "2026-03-08T18:00:00Z" },
-        { "id": "b8", "title": "Cron Jobs Dashboard", "description": "View/edit/trigger cron jobs from the dashboard UI", "assignee": "Development", "priority": "medium", "tags": ["frontend", "dashboard"], "project": "Nova Platform", "createdAt": "2026-03-08T18:00:00Z" }
+        {
+          "id": "b3",
+          "title": "Elastic IP + Domain",
+          "description": "Stable public address + HTTPS reverse proxy",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "infra",
+            "devops"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-09T08:00:00Z"
+        },
+        {
+          "id": "b4",
+          "title": "Security Hardening",
+          "description": "Firewall rules, fail2ban setup on AWS instance",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "infra",
+            "security"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-09T08:00:00Z"
+        },
+        {
+          "id": "b6",
+          "title": "Ethiopia Landing Page",
+          "description": "Needs real image uploads and content",
+          "assignee": "Development",
+          "priority": "low",
+          "tags": [
+            "frontend"
+          ],
+          "project": "Other",
+          "createdAt": "2026-03-08T10:00:00Z"
+        },
+        {
+          "id": "b7",
+          "title": "Editable MD Files",
+          "description": "View and edit SOUL/GOAL/MEMORY files from dashboard",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "frontend",
+            "dashboard"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-08T18:00:00Z"
+        },
+        {
+          "id": "b8",
+          "title": "Cron Jobs Dashboard",
+          "description": "View/edit/trigger cron jobs from the dashboard UI",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "frontend",
+            "dashboard"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-08T18:00:00Z"
+        }
       ]
     },
     {
       "id": "in-progress",
       "title": "In Progress",
-      "icon": "🔄",
+      "icon": "\ud83d\udd04",
       "color": "border-blue-500",
-      "tasks": [
-        {
-          "id": "ip1", "title": "Live Data Integration", "description": "Connect dashboard to real workspace data via API endpoints", "assignee": "Development", "priority": "high", "tags": ["backend", "api"], "project": "Nova Platform", "createdAt": "2026-03-13T16:00:00Z",
-          "steps": [
-            { "label": "Create /api/ecosystem endpoint", "done": true },
-            { "label": "Create kanban.json data source", "done": true },
-            { "label": "Wire frontend to fetch from API", "done": true },
-            { "label": "Remove all hardcoded mock data", "done": true },
-            { "label": "Test live data flow end-to-end", "done": false }
-          ]
-        }
-      ]
+      "tasks": []
     },
     {
       "id": "review",
       "title": "Review",
-      "icon": "👀",
+      "icon": "\ud83d\udc40",
       "color": "border-amber-500",
       "tasks": []
     },
     {
       "id": "done",
       "title": "Done",
-      "icon": "✅",
+      "icon": "\u2705",
       "color": "border-emerald-500",
       "tasks": [
-        { "id": "d1", "title": "Governance Framework", "description": "Initialize departments with SOUL/GOAL/MEMORY", "assignee": "Nova", "priority": "high", "tags": ["ops"], "project": "Nova Platform", "progress": 100, "createdAt": "2026-03-08T08:00:00Z" },
-        { "id": "d2", "title": "SOP Documentation", "description": "Budget-Aware Logic & Design Governance rules", "assignee": "Nova", "priority": "medium", "tags": ["docs"], "project": "Nova Platform", "progress": 100, "createdAt": "2026-03-08T09:00:00Z" },
-        { "id": "d3", "title": "GitHub Repository", "description": "Create and configure nova-ops-surface repo", "assignee": "Development", "priority": "medium", "tags": ["devops"], "project": "Nova Platform", "progress": 100, "createdAt": "2026-03-08T10:00:00Z" },
-        { "id": "d4", "title": "Fix Telegram Group Policy", "description": "Set groupPolicy=open on AWS OpenClaw config", "assignee": "Nova", "priority": "high", "tags": ["infra", "telegram"], "project": "Nova Platform", "progress": 100, "createdAt": "2026-03-12T05:00:00Z" },
-        { "id": "d5", "title": "Chat WebSocket Connection", "description": "Fix dashboard chat to use OpenClaw v3 protocol", "assignee": "Development", "priority": "high", "tags": ["backend", "websocket"], "project": "Nova Platform", "progress": 100, "createdAt": "2026-03-11T14:00:00Z" },
-        { "id": "d6", "title": "Dashboard Multi-Page App", "description": "Overview, Kanban, Agent Hub, Chat pages deployed to Vercel", "assignee": "Development", "priority": "high", "tags": ["frontend"], "project": "Nova Platform", "progress": 100, "createdAt": "2026-03-08T12:00:00Z" },
-        { "id": "d7", "title": "OpenClaw Update", "description": "Updated from 2026.3.8 to 2026.3.11", "assignee": "Nova", "priority": "medium", "tags": ["infra"], "project": "Nova Platform", "progress": 100, "createdAt": "2026-03-13T15:00:00Z" },
-        { "id": "d8", "title": "Token Cost Optimization", "description": "Heartbeat model to Gemini Flash Lite, context pruning enabled", "assignee": "Nova", "priority": "high", "tags": ["ops", "cost"], "project": "Nova Platform", "progress": 100, "createdAt": "2026-03-13T15:00:00Z" }
+        {
+          "id": "d1",
+          "title": "Governance Framework",
+          "description": "Initialize departments with SOUL/GOAL/MEMORY",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "ops"
+          ],
+          "project": "Nova Platform",
+          "progress": 100,
+          "createdAt": "2026-03-08T08:00:00Z"
+        },
+        {
+          "id": "d2",
+          "title": "SOP Documentation",
+          "description": "Budget-Aware Logic & Design Governance rules",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "docs"
+          ],
+          "project": "Nova Platform",
+          "progress": 100,
+          "createdAt": "2026-03-08T09:00:00Z"
+        },
+        {
+          "id": "d3",
+          "title": "GitHub Repository",
+          "description": "Create and configure nova-ops-surface repo",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "devops"
+          ],
+          "project": "Nova Platform",
+          "progress": 100,
+          "createdAt": "2026-03-08T10:00:00Z"
+        },
+        {
+          "id": "d4",
+          "title": "Fix Telegram Group Policy",
+          "description": "Set groupPolicy=open on AWS OpenClaw config",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "infra",
+            "telegram"
+          ],
+          "project": "Nova Platform",
+          "progress": 100,
+          "createdAt": "2026-03-12T05:00:00Z"
+        },
+        {
+          "id": "d5",
+          "title": "Chat WebSocket Connection",
+          "description": "Fix dashboard chat to use OpenClaw v3 protocol",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "backend",
+            "websocket"
+          ],
+          "project": "Nova Platform",
+          "progress": 100,
+          "createdAt": "2026-03-11T14:00:00Z"
+        },
+        {
+          "id": "d6",
+          "title": "Dashboard Multi-Page App",
+          "description": "Overview, Kanban, Agent Hub, Chat pages deployed to Vercel",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "frontend"
+          ],
+          "project": "Nova Platform",
+          "progress": 100,
+          "createdAt": "2026-03-08T12:00:00Z"
+        },
+        {
+          "id": "d7",
+          "title": "OpenClaw Update",
+          "description": "Updated from 2026.3.8 to 2026.3.11",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "infra"
+          ],
+          "project": "Nova Platform",
+          "progress": 100,
+          "createdAt": "2026-03-13T15:00:00Z"
+        },
+        {
+          "id": "d8",
+          "title": "Token Cost Optimization",
+          "description": "Heartbeat model to Gemini Flash Lite, context pruning enabled",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "ops",
+            "cost"
+          ],
+          "project": "Nova Platform",
+          "progress": 100,
+          "createdAt": "2026-03-13T15:00:00Z"
+        },
+        {
+          "id": "ip1",
+          "title": "Live Data Integration",
+          "description": "Connect dashboard to real workspace data via API endpoints",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "backend",
+            "api"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-13T10:00:00Z",
+          "steps": [
+            {
+              "text": "Wire Executive Summary to ecosystem data",
+              "done": true
+            },
+            {
+              "text": "Wire Execution Matrix to kanban data",
+              "done": true
+            },
+            {
+              "text": "Wire Resource Pulse to live agent status",
+              "done": true
+            },
+            {
+              "text": "Wire Event Stream to real events",
+              "done": true
+            },
+            {
+              "text": "Wire Agent Hub to live gateway status",
+              "done": true
+            }
+          ]
+        },
+        {
+          "id": "d9",
+          "title": "Chat Page - Gateway Integration",
+          "description": "Wire chat page to OpenClaw gateway with real-time messaging",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "frontend",
+            "websocket"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-14T10:00:00Z",
+          "steps": [
+            {
+              "text": "WebSocket connection with device pairing",
+              "done": true
+            },
+            {
+              "text": "Real-time message streaming (delta/final)",
+              "done": true
+            },
+            {
+              "text": "Session list via sessions.list RPC",
+              "done": true
+            },
+            {
+              "text": "Chat history via chat.history RPC",
+              "done": true
+            },
+            {
+              "text": "Cross-channel sync (Telegram <-> Dashboard)",
+              "done": true
+            }
+          ]
+        },
+        {
+          "id": "d10",
+          "title": "Kanban Task CRUD",
+          "description": "Create, delete, move tasks with GitHub persistence",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "frontend",
+            "api"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-13T18:00:00Z",
+          "steps": [
+            {
+              "text": "Inline task creation per column",
+              "done": true
+            },
+            {
+              "text": "Double-click delete with confirm",
+              "done": true
+            },
+            {
+              "text": "Persist via GitHub API",
+              "done": true
+            },
+            {
+              "text": "Dynamic progress bars",
+              "done": true
+            }
+          ]
+        }
       ]
     }
   ],
