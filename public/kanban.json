@@ -33,18 +33,6 @@
           "createdAt": "2026-03-09T08:00:00Z"
         },
         {
-          "id": "b6",
-          "title": "Ethiopia Landing Page",
-          "description": "Needs real image uploads and content",
-          "assignee": "Development",
-          "priority": "low",
-          "tags": [
-            "frontend"
-          ],
-          "project": "Other",
-          "createdAt": "2026-03-08T10:00:00Z"
-        },
-        {
           "id": "b7",
           "title": "Editable MD Files",
           "description": "View and edit SOUL/GOAL/MEMORY files from dashboard",
