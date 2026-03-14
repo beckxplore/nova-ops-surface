@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useGateway } from '../context/GatewayContext';
+import { getOrCreateDeviceIdentity } from '../utils/cryptoUtils';
 
 const API = import.meta.env.DEV ? 'http://localhost:3001' : '';
 const USE_SERVERLESS = !import.meta.env.DEV;
@@ -33,7 +34,13 @@ const statusCfg: Record<string, { cls: string; dot: string; label: string }> = {
   stalled: { cls: 'bg-red-500/10 text-red-400 ring-red-500/20', dot: 'bg-red-400 animate-pulse', label: 'Stalled' },
 };
 
-type SelectedItem = { type: 'orchestrator' | 'project' | 'department' | 'agent'; id: string; name: string; filesPath?: string };
+type SelectedItem = { type: 'orchestrator' | 'project' | 'department' | 'agent'; id: string; name: string; filesPath?: string; agentId?: string };
+
+const GATEWAY_URL = 'wss://98-93-181-83.sslip.io';
+const AUTH_TOKEN = '7dd8ac893a339cb334fb2e5e644a22db16ceeed9baf0ab7a';
+
+let rpcCounter = 0;
+function nextRpcId() { return `hub-${Date.now()}-${++rpcCounter}`; }
 
 const AgentHubPage: React.FC = () => {
   const { eco, status } = useGateway();
@@ -43,11 +50,80 @@ const AgentHubPage: React.FC = () => {
   const [editing, setEditing] = useState(false);
   const [editBuffer, setEditBuffer] = useState('');
   const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [agentFiles, setAgentFiles] = useState<Record<string, string>>({});
   const [liveStatus, setLiveStatus] = useState<LiveStatus | null>(null);
   const [statusLoading, setStatusLoading] = useState(false);
+  const [wsConnected, setWsConnected] = useState(false);
+  const [filesLoading, setFilesLoading] = useState(false);
+
+  const wsRef = useRef<WebSocket | null>(null);
+  const pendingRpc = useRef<Map<string, (p: any) => void>>(new Map());
 
   const isLive = status === 'connected';
+
+  /* ─── Gateway WS for file operations ─────────────────────── */
+
+  const sendRpc = useCallback((method: string, params: any): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      const ws = wsRef.current;
+      if (!ws || ws.readyState !== WebSocket.OPEN) { reject(new Error('Not connected')); return; }
+      const id = nextRpcId();
+      pendingRpc.current.set(id, resolve);
+      ws.send(JSON.stringify({ type: 'req', id, method, params }));
+      setTimeout(() => {
+        if (pendingRpc.current.has(id)) { pendingRpc.current.delete(id); reject(new Error('Timeout')); }
+      }, 15000);
+    });
+  }, []);
+
+  useEffect(() => {
+    let ws: WebSocket;
+    let reconnectTimer: ReturnType<typeof setTimeout>;
+
+    function connect() {
+      ws = new WebSocket(GATEWAY_URL);
+      wsRef.current = ws;
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'res') {
+            const cb = pendingRpc.current.get(data.id);
+            if (cb) { pendingRpc.current.delete(data.id); cb(data.ok !== false ? data.payload : null); return; }
+            if (data.payload?.type === 'hello-ok') { setWsConnected(true); return; }
+            return;
+          }
+          if (data.type === 'event' && data.event === 'connect.challenge') {
+            const nonce = data.payload?.nonce;
+            if (!nonce) return;
+            (async () => {
+              const device = await getOrCreateDeviceIdentity(nonce, {
+                clientId: 'openclaw-control-ui', clientMode: 'webchat',
+                platform: 'web', role: 'operator',
+                scopes: ['operator.read', 'operator.write'], token: AUTH_TOKEN,
+              });
+              ws.send(JSON.stringify({
+                type: 'req', id: nextRpcId(), method: 'connect',
+                params: {
+                  minProtocol: 3, maxProtocol: 3,
+                  client: { id: 'openclaw-control-ui', version: '1.0.0', platform: 'web', mode: 'webchat' },
+                  device, role: 'operator', scopes: ['operator.read', 'operator.write'],
+                  caps: ['events'], commands: [], permissions: {},
+                  auth: { token: AUTH_TOKEN }, locale: 'en-US', userAgent: 'nova-dashboard/1.0.0',
+                },
+              }));
+            })();
+          }
+        } catch {}
+      };
+
+      ws.onclose = () => { setWsConnected(false); wsRef.current = null; reconnectTimer = setTimeout(connect, 3000); };
+    }
+
+    connect();
+    return () => { ws?.close(); clearTimeout(reconnectTimer); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch live status
   useEffect(() => {
@@ -68,39 +144,58 @@ const AgentHubPage: React.FC = () => {
   const selectItem = async (item: SelectedItem) => {
     setSelected(item);
     setEditing(false);
-    if (item.filesPath) {
-      if (API) {
-        try {
-          const r = await fetch(`${API}/api/agents`);
-          const data = await r.json();
-          const allAgents = [
-            ...data.departments.map((d: any) => ({ ...d, filesPath: d.path })),
-            ...data.individuals.map((i: any) => ({ ...i, filesPath: i.path })),
-          ];
-          const match = allAgents.find((a: any) => a.path === item.filesPath || `departments/${a.id}` === item.filesPath);
-          if (match) {
-            setAgentFiles(match.files || {});
-            const firstFile = Object.keys(match.files).find(f => f.endsWith('.md'));
-            if (firstFile) { setFileContent(match.files[firstFile]); setActiveFile(firstFile); }
-          }
-        } catch { setAgentFiles({}); }
-      } else {
+    setSaveStatus('idle');
+
+    // Use gateway RPC for file operations when WS is connected
+    if (wsConnected) {
+      try {
+        setFilesLoading(true);
+        const agentId = item.type === 'orchestrator' ? 'main' : (item.agentId || 'main');
+        const listResult = await sendRpc('agents.files.list', { agentId });
+        const fileNames: string[] = listResult?.files?.map((f: any) => f.name || f) || [];
+
         const files: Record<string, string> = {};
-        for (const f of ['SOUL.md', 'GOAL.md', 'MEMORY.md']) {
+        for (const name of fileNames) {
+          if (!name.endsWith('.md')) continue;
           try {
-            const r = USE_SERVERLESS
-              ? await fetch(`/api/file?path=${item.filesPath}/${f}`)
-              : await fetch(`/${item.filesPath}/${f}`);
-            if (r.ok) {
-              const data = USE_SERVERLESS ? await r.json() : { content: await r.text() };
-              files[f] = data.content;
+            const result = await sendRpc('agents.files.get', { agentId, name });
+            if (result?.content != null) {
+              files[name] = typeof result.content === 'string' ? result.content : JSON.stringify(result.content);
             }
           } catch {}
         }
+
         setAgentFiles(files);
         const firstFile = Object.keys(files)[0];
         if (firstFile) { setFileContent(files[firstFile]); setActiveFile(firstFile); }
+        else { setFileContent(''); setActiveFile('SOUL.md'); }
+      } catch (err) {
+        console.error('[Hub] File load failed via WS:', err);
+        setAgentFiles({});
+        setFileContent('');
+      } finally {
+        setFilesLoading(false);
       }
+      return;
+    }
+
+    // Fallback: HTTP API
+    if (item.filesPath) {
+      const files: Record<string, string> = {};
+      for (const f of ['SOUL.md', 'GOAL.md', 'MEMORY.md']) {
+        try {
+          const r = USE_SERVERLESS
+            ? await fetch(`/api/file?path=${item.filesPath}/${f}`)
+            : await fetch(`/${item.filesPath}/${f}`);
+          if (r.ok) {
+            const data = USE_SERVERLESS ? await r.json() : { content: await r.text() };
+            files[f] = data.content;
+          }
+        } catch {}
+      }
+      setAgentFiles(files);
+      const firstFile = Object.keys(files)[0];
+      if (firstFile) { setFileContent(files[firstFile]); setActiveFile(firstFile); }
     } else {
       setAgentFiles({});
       setFileContent('');
@@ -108,19 +203,35 @@ const AgentHubPage: React.FC = () => {
   };
 
   const saveFile = async () => {
-    if (!selected?.filesPath) return;
+    if (!selected) return;
     setSaving(true);
-    const endpoint = API ? `${API}/api/file` : '/api/file';
+    setSaveStatus('idle');
+
     try {
-      await fetch(endpoint, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: `${selected.filesPath}/${activeFile}`, content: editBuffer }),
-      });
+      if (wsConnected) {
+        // Save via gateway RPC
+        const agentId = selected.type === 'orchestrator' ? 'main' : (selected.agentId || 'main');
+        await sendRpc('agents.files.set', { agentId, name: activeFile, content: editBuffer });
+      } else {
+        // Fallback: HTTP API
+        const endpoint = API ? `${API}/api/file` : '/api/file';
+        const filePath = selected.type === 'orchestrator' ? activeFile : `${selected.filesPath}/${activeFile}`;
+        await fetch(endpoint, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: filePath, content: editBuffer }),
+        });
+      }
       setFileContent(editBuffer);
       agentFiles[activeFile] = editBuffer;
       setEditing(false);
-    } catch (err) { console.error('Save failed:', err); }
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (err) {
+      console.error('Save failed:', err);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 5000);
+    }
     setSaving(false);
   };
 
@@ -139,7 +250,10 @@ const AgentHubPage: React.FC = () => {
     </div>
   );
 
-  const fileIcons: Record<string, string> = { 'SOUL.md': '🧬', 'GOAL.md': '🎯', 'MEMORY.md': '🧠', 'IDENTITY.md': '🪪', 'USER.md': '👤' };
+  const fileIcons: Record<string, string> = {
+    'SOUL.md': '🧬', 'GOAL.md': '🎯', 'MEMORY.md': '🧠', 'IDENTITY.md': '🪪',
+    'USER.md': '👤', 'TOOLS.md': '🔧', 'AGENTS.md': '📋', 'HEARTBEAT.md': '💓',
+  };
   const mdFiles = Object.keys(agentFiles).filter(f => f.endsWith('.md'));
   const skillFiles = Array.isArray(agentFiles['skills']) ? agentFiles['skills'] as unknown as string[] : [];
 
@@ -478,6 +592,13 @@ const AgentHubPage: React.FC = () => {
                 );
               })()}
 
+              {/* Loading indicator */}
+              {filesLoading && (
+                <div className="mb-4 flex items-center gap-2 text-sm text-slate-500 animate-pulse">
+                  <span>⏳</span> Loading workspace files via gateway...
+                </div>
+              )}
+
               {/* File tabs — only if has files */}
               {mdFiles.length > 0 && (
                 <>
@@ -526,12 +647,14 @@ const AgentHubPage: React.FC = () => {
                   ) : (
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-xs text-slate-500 font-mono">Editing: {selected.filesPath}/{activeFile}</span>
-                        <div className="flex gap-2">
+                        <span className="text-xs text-slate-500 font-mono">Editing: {selected.type === 'orchestrator' ? `workspace/${activeFile}` : `${selected.filesPath}/${activeFile}`}</span>
+                        <div className="flex gap-2 items-center">
+                          {saveStatus === 'success' && <span className="text-[10px] text-emerald-400">✅ Saved!</span>}
+                          {saveStatus === 'error' && <span className="text-[10px] text-red-400">❌ Save failed</span>}
                           <button onClick={() => setEditing(false)} className="px-3 py-1.5 bg-slate-800 text-slate-400 rounded-lg text-xs font-medium hover:bg-slate-700">Cancel</button>
                           <button onClick={saveFile} disabled={saving}
                             className="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 rounded-lg text-xs font-medium hover:bg-emerald-500/20 disabled:opacity-50">
-                            {saving ? 'Saving...' : '💾 Save'}
+                            {saving ? 'Saving...' : '💾 Save to Workspace'}
                           </button>
                         </div>
                       </div>

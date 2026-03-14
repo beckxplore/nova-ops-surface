@@ -60,20 +60,20 @@
           "createdAt": "2026-03-08T12:00:00Z",
           "steps": [
             {
-              "text": "Add workspace root files to Agent Hub file viewer",
-              "done": false
+              "text": "Load workspace files via agents.files.list RPC",
+              "done": true
+            },
+            {
+              "text": "Read file content via agents.files.get RPC",
+              "done": true
             },
             {
               "text": "Build edit textarea + save button UI",
-              "done": false
+              "done": true
             },
             {
-              "text": "Wire save to /api/file PUT endpoint",
-              "done": false
-            },
-            {
-              "text": "Add syntax highlighting for markdown",
-              "done": false
+              "text": "Save via agents.files.set RPC (writes to live workspace)",
+              "done": true
             }
           ]
         },
