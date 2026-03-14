@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useGateway } from '../context/GatewayContext';
+import CronDashboard from '../components/CronDashboard';
 
 interface Task {
   id: string;
@@ -222,39 +223,13 @@ const KanbanPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Cron Jobs Section */}
+      {/* Cron Jobs Section — Live from Gateway */}
       <div className="mb-4 shrink-0">
         <button onClick={() => setShowCron(!showCron)} className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
           <span>{showCron ? '▼' : '▸'}</span>
-          <span>⏱️ Cron Jobs</span>
-          <span className="bg-slate-800 text-slate-400 text-[10px] font-medium px-2 py-0.5 rounded-full">{cronJobs.length}</span>
+          <span>⏱️ Scheduled Jobs</span>
         </button>
-        {showCron && (
-          <div className="space-y-2">
-            {cronJobs.length === 0 ? (
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 text-center">
-                <p className="text-sm text-slate-500">No cron jobs configured</p>
-              </div>
-            ) : cronJobs.map(job => (
-              <div key={job.id} className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 flex items-center justify-between hover:border-slate-700 transition-colors">
-                <div className="flex items-center gap-4">
-                  <span className={`h-2.5 w-2.5 rounded-full ${job.status === 'active' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}></span>
-                  <div>
-                    <p className="text-sm font-medium text-white">{job.name}</p>
-                    <p className="text-xs text-slate-500">{job.schedule} &bull; Target: {job.target}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  {job.lastRun && <span className="text-[10px] text-slate-600">Last: {job.lastRun}</span>}
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${
-                    job.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-slate-500/10 text-slate-400 ring-slate-500/20'
-                  }`}>{job.status === 'active' ? 'Active' : 'Paused'}</span>
-                  <button className="text-xs text-slate-500 hover:text-blue-400 transition-colors">⚙️</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {showCron && <CronDashboard />}
       </div>
 
       {/* Board */}

@@ -5,67 +5,139 @@
       "title": "Backlog",
       "icon": "\ud83d\udce5",
       "color": "border-slate-600",
-      "tasks": [
-        {
-          "id": "b3",
-          "title": "Elastic IP + Domain",
-          "description": "Stable public address + HTTPS reverse proxy",
-          "assignee": "Nova",
-          "priority": "medium",
-          "tags": [
-            "infra",
-            "devops"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-09T08:00:00Z"
-        },
-        {
-          "id": "b4",
-          "title": "Security Hardening",
-          "description": "Firewall rules, fail2ban setup on AWS instance",
-          "assignee": "Nova",
-          "priority": "medium",
-          "tags": [
-            "infra",
-            "security"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-09T08:00:00Z"
-        },
-        {
-          "id": "b7",
-          "title": "Editable MD Files",
-          "description": "View and edit SOUL/GOAL/MEMORY files from dashboard",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "frontend",
-            "dashboard"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-08T18:00:00Z"
-        },
-        {
-          "id": "b8",
-          "title": "Cron Jobs Dashboard",
-          "description": "View/edit/trigger cron jobs from the dashboard UI",
-          "assignee": "Development",
-          "priority": "medium",
-          "tags": [
-            "frontend",
-            "dashboard"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-08T18:00:00Z"
-        }
-      ]
+      "tasks": []
     },
     {
       "id": "in-progress",
       "title": "In Progress",
       "icon": "\ud83d\udd04",
       "color": "border-blue-500",
-      "tasks": []
+      "tasks": [
+        {
+          "title": "Cron Jobs Dashboard",
+          "description": "Wire cron UI to real OpenClaw cron.list RPC (currently shows static data)",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "frontend",
+            "websocket"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-08T12:00:00Z",
+          "steps": [
+            {
+              "text": "Call cron.list + cron.status RPC via gateway WS",
+              "done": true
+            },
+            {
+              "text": "Display real jobs with status/schedule/last run",
+              "done": true
+            },
+            {
+              "text": "Add Run Now + Pause/Enable controls",
+              "done": true
+            },
+            {
+              "text": "Show expanded job details (config, payload, errors)",
+              "done": true
+            },
+            {
+              "text": "Auto-refresh + real-time cron event updates",
+              "done": true
+            }
+          ]
+        },
+        {
+          "title": "Editable MD Files",
+          "description": "Add workspace file editor to Agent Hub (SOUL.md, MEMORY.md, etc.)",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "frontend",
+            "api"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-08T12:00:00Z",
+          "steps": [
+            {
+              "text": "Add workspace root files to Agent Hub file viewer",
+              "done": false
+            },
+            {
+              "text": "Build edit textarea + save button UI",
+              "done": false
+            },
+            {
+              "text": "Wire save to /api/file PUT endpoint",
+              "done": false
+            },
+            {
+              "text": "Add syntax highlighting for markdown",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Elastic IP + Domain",
+          "description": "Associate AWS Elastic IP so server IP survives reboots. Optional: custom domain.",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "infrastructure",
+            "aws"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-09T12:00:00Z",
+          "steps": [
+            {
+              "text": "Check AWS CLI access",
+              "done": false
+            },
+            {
+              "text": "Allocate Elastic IP",
+              "done": false
+            },
+            {
+              "text": "Associate with EC2 instance",
+              "done": false
+            },
+            {
+              "text": "Update Caddy + dashboard configs",
+              "done": false
+            }
+          ]
+        },
+        {
+          "title": "Security Hardening",
+          "description": "Firewall, fail2ban, SSH hardening. UFW inactive, no fail2ban, iptables wide open.",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "infrastructure",
+            "security"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-09T12:00:00Z",
+          "steps": [
+            {
+              "text": "Install + configure fail2ban",
+              "done": false
+            },
+            {
+              "text": "Harden SSH config (disable password auth)",
+              "done": false
+            },
+            {
+              "text": "Enable UFW with safe rules (22, 80, 443, 18789)",
+              "done": false
+            },
+            {
+              "text": "Verify no lockout \u2014 test SSH after changes",
+              "done": false
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "review",
