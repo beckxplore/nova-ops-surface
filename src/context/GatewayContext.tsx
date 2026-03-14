@@ -100,14 +100,6 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
           console.log('[Gateway] Connected! Protocol:', data.payload.protocol);
           wsConnectedRef.current = true;
           setStatus('connected');
-          
-          // Subscribe to chat events
-          ws.send(JSON.stringify({
-            type: 'req',
-            id: nextReqId(),
-            method: 'chat.subscribe',
-            params: { sessionKey: 'main' },
-          }));
           return;
         }
 
