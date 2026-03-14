@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGateway } from '../context/GatewayContext';
 
 const API = import.meta.env.DEV ? 'http://localhost:3001' : '';
-const USE_SERVERLESS = !import.meta.env.DEV; // Use /api/* on Vercel
+const USE_SERVERLESS = !import.meta.env.DEV;
 
 interface AgentNode {
   id: string; name: string; status: string;
@@ -19,11 +19,12 @@ interface Project {
   departments: string[];
   agents: string[];
 }
-interface Ecosystem {
-  orchestrator: AgentNode & { role: string; description: string };
-  projects: Project[];
-  departments: Department[];
-  individualAgents: AgentNode[];
+
+interface LiveStatus {
+  timestamp: string;
+  gateway: { reachable: boolean; latencyMs: number | null };
+  ecosystem: { departments: number; totalAgents: number; runningAgents: number; orchestratorStatus: string; projects: number } | null;
+  kanban: { total: number; backlog: number; inProgress: number; review: number; done: number } | null;
 }
 
 const statusCfg: Record<string, { cls: string; dot: string; label: string }> = {
@@ -43,34 +44,32 @@ const AgentHubPage: React.FC = () => {
   const [editBuffer, setEditBuffer] = useState('');
   const [saving, setSaving] = useState(false);
   const [agentFiles, setAgentFiles] = useState<Record<string, string>>({});
+  const [liveStatus, setLiveStatus] = useState<LiveStatus | null>(null);
+  const [statusLoading, setStatusLoading] = useState(false);
 
   const isLive = status === 'connected';
 
-  const loadFile = async (filesPath: string, file: string) => {
-    try {
-      if (API) {
-        const r = await fetch(`${API}/api/file?path=${filesPath}/${file}`);
-        const data = await r.json();
-        setFileContent(data.content || '');
-      } else if (USE_SERVERLESS) {
-        const r = await fetch(`/api/file?path=${filesPath}/${file}`);
-        const data = await r.json();
-        setFileContent(data.content || '');
-      } else {
-        const r = await fetch(`/${filesPath}/${file}`);
-        setFileContent(await r.text());
-      }
-      setActiveFile(file);
-      setEditing(false);
-    } catch { setFileContent('File not found'); }
-  };
+  // Fetch live status
+  useEffect(() => {
+    const fetchStatus = async () => {
+      setStatusLoading(true);
+      try {
+        const endpoint = API ? `${API}/api/status` : '/api/status';
+        const r = await fetch(endpoint);
+        if (r.ok) setLiveStatus(await r.json());
+      } catch {}
+      setStatusLoading(false);
+    };
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 60000); // Refresh every 60s
+    return () => clearInterval(interval);
+  }, []);
 
   const selectItem = async (item: SelectedItem) => {
     setSelected(item);
     setEditing(false);
     if (item.filesPath) {
       if (API) {
-        // Local dev: use API
         try {
           const r = await fetch(`${API}/api/agents`);
           const data = await r.json();
@@ -86,7 +85,6 @@ const AgentHubPage: React.FC = () => {
           }
         } catch { setAgentFiles({}); }
       } else {
-        // Deployed: use serverless API or static files
         const files: Record<string, string> = {};
         for (const f of ['SOUL.md', 'GOAL.md', 'MEMORY.md']) {
           try {
@@ -145,6 +143,21 @@ const AgentHubPage: React.FC = () => {
   const mdFiles = Object.keys(agentFiles).filter(f => f.endsWith('.md'));
   const skillFiles = Array.isArray(agentFiles['skills']) ? agentFiles['skills'] as unknown as string[] : [];
 
+  // Compute agent task loads from kanban
+  const getAgentTaskCount = (agentName: string) => {
+    if (!eco.kanban?.columns) return { active: 0, total: 0 };
+    let active = 0, total = 0;
+    for (const col of eco.kanban.columns) {
+      for (const task of col.tasks) {
+        if (task.assignee?.toLowerCase() === agentName.toLowerCase()) {
+          total++;
+          if (col.id === 'in-progress' || col.id === 'review') active++;
+        }
+      }
+    }
+    return { active, total };
+  };
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-8">
@@ -152,17 +165,75 @@ const AgentHubPage: React.FC = () => {
           <h1 className="text-2xl font-bold tracking-tight text-white">Agent Hub</h1>
           <p className="text-slate-400 mt-1 text-sm">Organizational hierarchy &bull; Projects, Departments, Agents</p>
         </div>
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ring-1 ${
-          isLive ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
-        }`}>
-          <span className={`h-2 w-2 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
-          {isLive ? 'LIVE' : 'SYNCING'}
-        </span>
+        <div className="flex items-center gap-3">
+          {liveStatus?.gateway && (
+            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${
+              liveStatus.gateway.reachable
+                ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
+                : 'bg-red-500/10 text-red-400 ring-red-500/20'
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${liveStatus.gateway.reachable ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
+              GW {liveStatus.gateway.reachable ? `${liveStatus.gateway.latencyMs}ms` : 'DOWN'}
+            </span>
+          )}
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ring-1 ${
+            isLive ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
+          }`}>
+            <span className={`h-2 w-2 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+            {isLive ? 'LIVE' : 'SYNCING'}
+          </span>
+        </div>
       </div>
+
+      {/* Live Status Banner */}
+      {liveStatus && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-3">
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Gateway</p>
+            <p className={`text-sm font-semibold ${liveStatus.gateway.reachable ? 'text-emerald-400' : 'text-red-400'}`}>
+              {liveStatus.gateway.reachable ? 'Online' : 'Offline'}
+            </p>
+            {liveStatus.gateway.latencyMs !== null && (
+              <p className="text-[10px] text-slate-600">{liveStatus.gateway.latencyMs}ms latency</p>
+            )}
+          </div>
+          {liveStatus.ecosystem && (
+            <>
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-3">
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Agents</p>
+                <p className="text-sm font-semibold text-white">{liveStatus.ecosystem.runningAgents} / {liveStatus.ecosystem.totalAgents}</p>
+                <p className="text-[10px] text-emerald-400">{liveStatus.ecosystem.runningAgents} active</p>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-3">
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Orchestrator</p>
+                <p className={`text-sm font-semibold ${liveStatus.ecosystem.orchestratorStatus === 'running' ? 'text-emerald-400' : 'text-slate-400'}`}>
+                  {liveStatus.ecosystem.orchestratorStatus === 'running' ? 'Online' : 'Standby'}
+                </p>
+              </div>
+            </>
+          )}
+          {liveStatus.kanban && (
+            <>
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-3">
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Active Tasks</p>
+                <p className="text-sm font-semibold text-white">{liveStatus.kanban.inProgress + liveStatus.kanban.review}</p>
+                <p className="text-[10px] text-slate-600">{liveStatus.kanban.inProgress} in progress · {liveStatus.kanban.review} review</p>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-3">
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Completion</p>
+                <p className="text-sm font-semibold text-white">
+                  {liveStatus.kanban.total > 0 ? Math.round((liveStatus.kanban.done / liveStatus.kanban.total) * 100) : 0}%
+                </p>
+                <p className="text-[10px] text-slate-600">{liveStatus.kanban.done} / {liveStatus.kanban.total} done</p>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Panel */}
-        <div className="lg:col-span-1 space-y-5 overflow-y-auto max-h-[calc(100vh-10rem)]">
+        <div className="lg:col-span-1 space-y-5 overflow-y-auto max-h-[calc(100vh-14rem)]">
 
           {/* Orchestrator */}
           <div>
@@ -212,6 +283,7 @@ const AgentHubPage: React.FC = () => {
             <p className="text-[10px] text-slate-600 uppercase tracking-widest font-medium mb-2">Departments</p>
             {eco.departments.map((dept: Department) => {
               const isLocked = !!dept.project;
+              const taskLoad = getAgentTaskCount(dept.name);
               return (
                 <div key={dept.id} className="mb-3">
                   <button
@@ -222,10 +294,19 @@ const AgentHubPage: React.FC = () => {
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-medium text-white text-sm">{dept.name}</span>
-                      {isLocked && <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded ring-1 ring-amber-500/20">🔒 {dept.project}</span>}
+                      <div className="flex items-center gap-2">
+                        {isLocked && <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded ring-1 ring-amber-500/20">🔒 {dept.project}</span>}
+                      </div>
                     </div>
                     <p className="text-xs text-slate-500 mb-2">{dept.description}</p>
-                    <div className="text-xs text-slate-600">{1 + dept.agents.length} agent{dept.agents.length !== 0 ? 's' : ''} (1 lead{dept.agents.length > 0 ? ` + ${dept.agents.length} member${dept.agents.length > 1 ? 's' : ''}` : ''})</div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-slate-600">{1 + dept.agents.length} agent{dept.agents.length !== 0 ? 's' : ''}</div>
+                      {taskLoad.total > 0 && (
+                        <span className="text-[10px] text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded ring-1 ring-blue-500/20">
+                          {taskLoad.active} active / {taskLoad.total} tasks
+                        </span>
+                      )}
+                    </div>
                   </button>
 
                   {/* Lead */}
@@ -297,9 +378,105 @@ const AgentHubPage: React.FC = () => {
                     <span className="text-xs text-slate-600 uppercase">{selected.type}</span>
                   </div>
                   <h2 className="text-xl font-bold text-white">{selected.name}</h2>
-                  {selected.filesPath && <p className="text-xs text-slate-500 font-mono mt-0.5">{selected.filesPath || 'workspace root'}</p>}
+                  {selected.filesPath !== undefined && <p className="text-xs text-slate-500 font-mono mt-0.5">{selected.filesPath || 'workspace root'}</p>}
                 </div>
               </div>
+
+              {/* Live Status Panel for Orchestrator */}
+              {selected.type === 'orchestrator' && (
+                <div className="mb-6 space-y-3">
+                  <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider">Live System Status</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-slate-800/30 rounded-lg p-4">
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Role</p>
+                      <p className="text-sm font-medium text-white">CEO's Orchestrator AI</p>
+                      <p className="text-[10px] text-slate-500 mt-1">Manages all projects, departments, and agents</p>
+                    </div>
+                    <div className="bg-slate-800/30 rounded-lg p-4">
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Status</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`h-2 w-2 rounded-full ${eco.orchestrator.status === 'running' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
+                        <p className={`text-sm font-medium ${eco.orchestrator.status === 'running' ? 'text-emerald-400' : 'text-slate-400'}`}>
+                          {eco.orchestrator.status === 'running' ? 'Online & Active' : 'Standby'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-slate-800/30 rounded-lg p-4">
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Gateway</p>
+                      {liveStatus?.gateway ? (
+                        <>
+                          <p className={`text-sm font-medium ${liveStatus.gateway.reachable ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {liveStatus.gateway.reachable ? 'Connected' : 'Unreachable'}
+                          </p>
+                          {liveStatus.gateway.latencyMs !== null && (
+                            <p className="text-[10px] text-slate-500 mt-0.5">{liveStatus.gateway.latencyMs}ms round trip</p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-sm text-slate-500 animate-pulse">Checking...</p>
+                      )}
+                    </div>
+                    <div className="bg-slate-800/30 rounded-lg p-4">
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Channels</p>
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        <span className="text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded ring-1 ring-blue-500/20">Telegram</span>
+                        <span className="text-[10px] bg-purple-500/10 text-purple-400 px-1.5 py-0.5 rounded ring-1 ring-purple-500/20">Web Chat</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Task overview for orchestrator */}
+                  {eco.kanban?.columns && (
+                    <div className="bg-slate-800/30 rounded-lg p-4">
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Task Overview (All Teams)</p>
+                      <div className="flex items-center gap-3">
+                        {eco.kanban.columns.map((col: any) => (
+                          <div key={col.id} className="flex items-center gap-1.5">
+                            <span className="text-sm">{col.icon}</span>
+                            <span className="text-xs text-slate-400">{col.title}</span>
+                            <span className="text-xs font-semibold text-white">{col.tasks.length}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Department task details */}
+              {selected.type === 'department' && eco.kanban?.columns && (() => {
+                const deptTasks: any[] = [];
+                for (const col of eco.kanban.columns) {
+                  for (const task of col.tasks) {
+                    if (task.assignee?.toLowerCase() === selected.name.toLowerCase()) {
+                      deptTasks.push({ ...task, column: col.title, columnId: col.id });
+                    }
+                  }
+                }
+                if (deptTasks.length === 0) return null;
+                return (
+                  <div className="mb-6">
+                    <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">Assigned Tasks ({deptTasks.length})</h3>
+                    <div className="space-y-2">
+                      {deptTasks.map((task: any) => (
+                        <div key={task.id} className="bg-slate-800/30 rounded-lg px-4 py-3 flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm text-white font-medium truncate">{task.title}</p>
+                            <p className="text-[10px] text-slate-500 mt-0.5">{task.description}</p>
+                          </div>
+                          <div className="flex items-center gap-2 ml-3 shrink-0">
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded ring-1 ${
+                              task.columnId === 'done' ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' :
+                              task.columnId === 'in-progress' ? 'bg-blue-500/10 text-blue-400 ring-blue-500/20' :
+                              'bg-slate-500/10 text-slate-400 ring-slate-500/20'
+                            }`}>{task.column}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* File tabs — only if has files */}
               {mdFiles.length > 0 && (
@@ -366,11 +543,10 @@ const AgentHubPage: React.FC = () => {
               )}
 
               {/* No files state */}
-              {mdFiles.length === 0 && (
+              {mdFiles.length === 0 && selected.type !== 'orchestrator' && selected.type !== 'department' && (
                 <div className="bg-slate-800/30 rounded-lg p-8 text-center">
                   <p className="text-slate-500">
                     {selected.type === 'project' ? 'Project details will appear here when Nova creates a project.' :
-                     selected.type === 'orchestrator' ? 'Nova orchestrator files are managed at the workspace root.' :
                      'Select a department or agent to view their files.'}
                   </p>
                 </div>

@@ -123,8 +123,15 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
       } catch {}
       setEco(ecoData);
+      // Mark as connected if we got data (even without WS)
+      if (ecoData && (ecoData.departments?.length > 0 || ecoData.orchestrator)) {
+        setStatus(prev => prev === 'disconnected' ? 'connected' : prev);
+      }
     };
     loadData();
+    // Refresh every 2 minutes
+    const interval = setInterval(loadData, 120000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
