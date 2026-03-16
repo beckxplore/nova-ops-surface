@@ -36,8 +36,7 @@ const statusCfg: Record<string, { cls: string; dot: string; label: string }> = {
 
 type SelectedItem = { type: 'orchestrator' | 'project' | 'department' | 'agent'; id: string; name: string; filesPath?: string; agentId?: string };
 
-const GATEWAY_URL = 'wss://3-227-84-30.sslip.io';
-const AUTH_TOKEN = '7dd8ac893a339cb334fb2e5e644a22db16ceeed9baf0ab7a';
+import { getGatewayConfig } from '../gatewayConfig';
 
 let rpcCounter = 0;
 function nextRpcId() { return `hub-${Date.now()}-${++rpcCounter}`; }
@@ -81,8 +80,9 @@ const AgentHubPage: React.FC = () => {
     let ws: WebSocket;
     let reconnectTimer: ReturnType<typeof setTimeout>;
 
-    function connect() {
-      ws = new WebSocket(GATEWAY_URL);
+    async function connect() {
+      const cfg = await getGatewayConfig();
+      ws = new WebSocket(cfg.gatewayUrl);
       wsRef.current = ws;
 
       ws.onmessage = (event) => {
@@ -98,10 +98,11 @@ const AgentHubPage: React.FC = () => {
             const nonce = data.payload?.nonce;
             if (!nonce) return;
             (async () => {
+              const cfg = await getGatewayConfig();
               const device = await getOrCreateDeviceIdentity(nonce, {
                 clientId: 'openclaw-control-ui', clientMode: 'webchat',
                 platform: 'web', role: 'operator',
-                scopes: ['operator.read', 'operator.write'], token: AUTH_TOKEN,
+                scopes: ['operator.read', 'operator.write'], token: cfg.authToken,
               });
               ws.send(JSON.stringify({
                 type: 'req', id: nextRpcId(), method: 'connect',
@@ -110,7 +111,7 @@ const AgentHubPage: React.FC = () => {
                   client: { id: 'openclaw-control-ui', version: '1.0.0', platform: 'web', mode: 'webchat' },
                   device, role: 'operator', scopes: ['operator.read', 'operator.write'],
                   caps: ['events'], commands: [], permissions: {},
-                  auth: { token: AUTH_TOKEN }, locale: 'en-US', userAgent: 'nova-dashboard/1.0.0',
+                  auth: { token: cfg.authToken }, locale: 'en-US', userAgent: 'nova-dashboard/1.0.0',
                 },
               }));
             })();

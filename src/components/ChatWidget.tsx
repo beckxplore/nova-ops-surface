@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { getOrCreateDeviceIdentity } from '../utils/cryptoUtils';
-
-const GATEWAY_URL = 'wss://3-227-84-30.sslip.io';
-const AUTH_TOKEN = '7dd8ac893a339cb334fb2e5e644a22db16ceeed9baf0ab7a';
+import { getGatewayConfig } from '../gatewayConfig';
 
 interface Message {
   id: string;
@@ -51,13 +49,14 @@ export default function ChatWidget() {
         if (ws?.readyState === WebSocket.OPEN && nonce) {
           (async () => {
             try {
+              const cfg = await getGatewayConfig();
               const device = await getOrCreateDeviceIdentity(nonce, {
                 clientId: 'openclaw-control-ui',
                 clientMode: 'webchat',
                 platform: 'web',
                 role: 'operator',
                 scopes: ['operator.read', 'operator.write'],
-                token: AUTH_TOKEN
+                token: cfg.authToken
               });
               ws.send(JSON.stringify({
                 type: 'req',
@@ -78,7 +77,7 @@ export default function ChatWidget() {
                   caps: [],
                   commands: [],
                   permissions: {},
-                  auth: { token: AUTH_TOKEN },
+                  auth: { token: cfg.authToken },
                   locale: navigator.language || 'en-US',
                   userAgent: 'nova-widget/1.0.0',
                 },
@@ -231,11 +230,12 @@ export default function ChatWidget() {
     }
   }, []);
 
-  const connect = useCallback(() => {
+  const connect = useCallback(async () => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
     
+    const cfg = await getGatewayConfig();
     setStatus('connecting');
-    const ws = new WebSocket(GATEWAY_URL);
+    const ws = new WebSocket(cfg.gatewayUrl);
     wsRef.current = ws;
 
     ws.onopen = () => {
