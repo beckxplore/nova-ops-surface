@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getOrCreateDeviceIdentity } from '../utils/cryptoUtils';
 
-const GATEWAY_URL = 'wss://98-93-181-83.sslip.io';
+const GATEWAY_URL = 'wss://3-227-84-30.sslip.io';
 const AUTH_TOKEN = '7dd8ac893a339cb334fb2e5e644a22db16ceeed9baf0ab7a';
 
 /* ─── Types ────────────────────────────────────────────────── */

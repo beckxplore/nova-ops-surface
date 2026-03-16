@@ -14,100 +14,6 @@
       "color": "border-blue-500",
       "tasks": [
         {
-          "title": "Cron Jobs Dashboard",
-          "description": "Wire cron UI to real OpenClaw cron.list RPC (currently shows static data)",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "frontend",
-            "websocket"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-08T12:00:00Z",
-          "steps": [
-            {
-              "text": "Call cron.list + cron.status RPC via gateway WS",
-              "done": true
-            },
-            {
-              "text": "Display real jobs with status/schedule/last run",
-              "done": true
-            },
-            {
-              "text": "Add Run Now + Pause/Enable controls",
-              "done": true
-            },
-            {
-              "text": "Show expanded job details (config, payload, errors)",
-              "done": true
-            },
-            {
-              "text": "Auto-refresh + real-time cron event updates",
-              "done": true
-            }
-          ]
-        },
-        {
-          "title": "Editable MD Files",
-          "description": "Add workspace file editor to Agent Hub (SOUL.md, MEMORY.md, etc.)",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "frontend",
-            "api"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-08T12:00:00Z",
-          "steps": [
-            {
-              "text": "Load workspace files via agents.files.list RPC",
-              "done": true
-            },
-            {
-              "text": "Read file content via agents.files.get RPC",
-              "done": true
-            },
-            {
-              "text": "Build edit textarea + save button UI",
-              "done": true
-            },
-            {
-              "text": "Save via agents.files.set RPC (writes to live workspace)",
-              "done": true
-            }
-          ]
-        },
-        {
-          "title": "Elastic IP + Domain",
-          "description": "Associate AWS Elastic IP so server IP survives reboots. Optional: custom domain.",
-          "assignee": "Nova",
-          "priority": "medium",
-          "tags": [
-            "infrastructure",
-            "aws"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-09T12:00:00Z",
-          "steps": [
-            {
-              "text": "Check AWS CLI access",
-              "done": false
-            },
-            {
-              "text": "Allocate Elastic IP",
-              "done": false
-            },
-            {
-              "text": "Associate with EC2 instance",
-              "done": false
-            },
-            {
-              "text": "Update Caddy + dashboard configs",
-              "done": false
-            }
-          ]
-        },
-        {
           "title": "Security Hardening",
           "description": "Firewall, fail2ban, SSH hardening. UFW inactive, no fail2ban, iptables wide open.",
           "assignee": "Nova",
@@ -356,6 +262,100 @@
             },
             {
               "text": "Dynamic progress bars",
+              "done": true
+            }
+          ]
+        },
+        {
+          "title": "Cron Jobs Dashboard",
+          "description": "Wire cron UI to real OpenClaw cron.list RPC (currently shows static data)",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "frontend",
+            "websocket"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-08T12:00:00Z",
+          "steps": [
+            {
+              "text": "Call cron.list + cron.status RPC via gateway WS",
+              "done": true
+            },
+            {
+              "text": "Display real jobs with status/schedule/last run",
+              "done": true
+            },
+            {
+              "text": "Add Run Now + Pause/Enable controls",
+              "done": true
+            },
+            {
+              "text": "Show expanded job details (config, payload, errors)",
+              "done": true
+            },
+            {
+              "text": "Auto-refresh + real-time cron event updates",
+              "done": true
+            }
+          ]
+        },
+        {
+          "title": "Editable MD Files",
+          "description": "Add workspace file editor to Agent Hub (SOUL.md, MEMORY.md, etc.)",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "frontend",
+            "api"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-08T12:00:00Z",
+          "steps": [
+            {
+              "text": "Load workspace files via agents.files.list RPC",
+              "done": true
+            },
+            {
+              "text": "Read file content via agents.files.get RPC",
+              "done": true
+            },
+            {
+              "text": "Build edit textarea + save button UI",
+              "done": true
+            },
+            {
+              "text": "Save via agents.files.set RPC (writes to live workspace)",
+              "done": true
+            }
+          ]
+        },
+        {
+          "title": "Elastic IP + Domain",
+          "description": "Associate AWS Elastic IP so server IP survives reboots. Optional: custom domain.",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "infrastructure",
+            "aws"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-09T12:00:00Z",
+          "steps": [
+            {
+              "text": "Install AWS CLI + configure credentials",
+              "done": true
+            },
+            {
+              "text": "Allocate Elastic IP",
+              "done": true
+            },
+            {
+              "text": "Associate with EC2 instance",
+              "done": true
+            },
+            {
+              "text": "Update Caddy + dashboard + gateway configs",
               "done": true
             }
           ]
