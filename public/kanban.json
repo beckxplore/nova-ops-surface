@@ -12,38 +12,7 @@
       "title": "In Progress",
       "icon": "\ud83d\udd04",
       "color": "border-blue-500",
-      "tasks": [
-        {
-          "title": "Security Hardening",
-          "description": "Firewall, fail2ban, SSH hardening. UFW inactive, no fail2ban, iptables wide open.",
-          "assignee": "Nova",
-          "priority": "medium",
-          "tags": [
-            "infrastructure",
-            "security"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-09T12:00:00Z",
-          "steps": [
-            {
-              "text": "Install + configure fail2ban",
-              "done": false
-            },
-            {
-              "text": "Harden SSH config (disable password auth)",
-              "done": false
-            },
-            {
-              "text": "Enable UFW with safe rules (22, 80, 443, 18789)",
-              "done": false
-            },
-            {
-              "text": "Verify no lockout \u2014 test SSH after changes",
-              "done": false
-            }
-          ]
-        }
-      ]
+      "tasks": []
     },
     {
       "id": "review",
@@ -356,6 +325,36 @@
             },
             {
               "text": "Update Caddy + dashboard + gateway configs",
+              "done": true
+            }
+          ]
+        },
+        {
+          "title": "Security Hardening",
+          "description": "Firewall, fail2ban, SSH hardening. UFW inactive, no fail2ban, iptables wide open.",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "infrastructure",
+            "security"
+          ],
+          "project": "Nova Platform",
+          "createdAt": "2026-03-09T12:00:00Z",
+          "steps": [
+            {
+              "text": "Install + configure fail2ban (SSH jail, 3 attempts = 2hr ban)",
+              "done": true
+            },
+            {
+              "text": "Harden SSH (no root login, no password auth, max 3 tries)",
+              "done": true
+            },
+            {
+              "text": "Enable UFW firewall (allow SSH/HTTP/HTTPS/OpenClaw only)",
+              "done": true
+            },
+            {
+              "text": "Verify all services still accessible",
               "done": true
             }
           ]
