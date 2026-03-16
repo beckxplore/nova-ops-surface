@@ -276,7 +276,7 @@ const ChatPage: React.FC = () => {
                 clientMode: 'webchat',
                 platform: 'web',
                 role: 'operator',
-                scopes: ['operator.read', 'operator.write'],
+                scopes: ['operator.read', 'operator.write', 'operator.admin'],
                 token: cfg.authToken,
               });
               ws.send(JSON.stringify({
@@ -285,7 +285,7 @@ const ChatPage: React.FC = () => {
                   minProtocol: 3, maxProtocol: 3,
                   client: { id: 'openclaw-control-ui', version: '1.0.0', platform: 'web', mode: 'webchat' },
                   device, role: 'operator',
-                  scopes: ['operator.read', 'operator.write'],
+                  scopes: ['operator.read', 'operator.write', 'operator.admin'],
                   caps: ['events'], commands: [], permissions: {},
                   auth: { token: cfg.authToken },
                   locale: navigator.language || 'en-US',

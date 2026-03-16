@@ -93,7 +93,7 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 clientMode: 'webchat',
                 platform: 'web',
                 role: 'operator',
-                scopes: ['operator.read', 'operator.write'],
+                scopes: ['operator.read', 'operator.write', 'operator.admin'],
                 token: cfg.authToken
               });
               
@@ -112,7 +112,7 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
                   },
                   device,
                   role: 'operator',
-                  scopes: ['operator.read', 'operator.write'],
+                  scopes: ['operator.read', 'operator.write', 'operator.admin'],
                   caps: [],
                   commands: [],
                   permissions: {},

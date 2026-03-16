@@ -119,7 +119,9 @@ const AgentHubPage: React.FC = () => {
     try {
       setFilesLoading(true);
       const agentId = 'main'; // All agents map to the single real OpenClaw agent
+      console.log('[Hub] Loading files for agent:', agentId);
       const listResult = await sendRpc('agents.files.list', { agentId });
+      console.log('[Hub] agents.files.list result:', listResult);
       const fileNames: string[] = (listResult?.files || [])
         .map((f: any) => typeof f === 'string' ? f : f.name)
         .filter(Boolean);
