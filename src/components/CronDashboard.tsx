@@ -180,14 +180,14 @@ const CronDashboard: React.FC = () => {
               const device = await getOrCreateDeviceIdentity(nonce, {
                 clientId: 'openclaw-control-ui', clientMode: 'webchat',
                 platform: 'web', role: 'operator',
-                scopes: ['operator.read', 'operator.write', 'operator.admin'], token: cfg.authToken,
+                scopes: ['operator.read', 'operator.write'], token: cfg.authToken,
               });
               ws.send(JSON.stringify({
                 type: 'req', id: nextReqId(), method: 'connect',
                 params: {
                   minProtocol: 3, maxProtocol: 3,
                   client: { id: 'openclaw-control-ui', version: '1.0.0', platform: 'web', mode: 'webchat' },
-                  device, role: 'operator', scopes: ['operator.read', 'operator.write', 'operator.admin'],
+                  device, role: 'operator', scopes: ['operator.read', 'operator.write'],
                   caps: ['events'], commands: [], permissions: {},
                   auth: { token: cfg.authToken }, locale: 'en-US', userAgent: 'nova-dashboard/1.0.0',
                 },

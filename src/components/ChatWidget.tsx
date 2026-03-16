@@ -55,7 +55,7 @@ export default function ChatWidget() {
                 clientMode: 'webchat',
                 platform: 'web',
                 role: 'operator',
-                scopes: ['operator.read', 'operator.write', 'operator.admin'],
+                scopes: ['operator.read', 'operator.write'],
                 token: cfg.authToken
               });
               ws.send(JSON.stringify({
@@ -73,7 +73,7 @@ export default function ChatWidget() {
                   },
                   device,
                   role: 'operator',
-                  scopes: ['operator.read', 'operator.write', 'operator.admin'],
+                  scopes: ['operator.read', 'operator.write'],
                   caps: [],
                   commands: [],
                   permissions: {},

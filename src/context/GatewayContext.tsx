@@ -48,9 +48,10 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
         // Handle RPC responses
         if (data.type === 'res') {
-          // Check if this is a pending RPC response
+          const pendingCount = pendingRpcRef.current.size;
           const pending = pendingRpcRef.current.get(data.id);
           if (pending) {
+            console.log('[Gateway] RPC response:', data.id, data.ok !== false ? 'ok' : 'error', `(${pendingCount} pending)`);
             pendingRpcRef.current.delete(data.id);
             if (data.ok === false) {
               pending.reject(new Error(data.error?.message || data.error?.code || 'RPC error'));
@@ -62,7 +63,7 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
           // Handle connect response (hello-ok)
           if (data.payload?.type === 'hello-ok') {
-            console.log('[Gateway] Connected! Protocol:', data.payload.protocol);
+            console.log('[Gateway] Connected! Protocol:', data.payload.protocol, 'scopes:', data.payload.auth?.scopes);
             wsConnectedRef.current = true;
             setStatus('connected');
             return;
@@ -72,11 +73,13 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
           if (data.ok === false) {
             console.error('[Gateway] Error:', data.error?.code, data.error?.message);
             if (data.error?.code === 'NOT_PAIRED') {
-              console.warn('[Gateway] Device not paired');
+              console.warn('[Gateway] Device not paired — needs approval');
               setStatus('error');
             }
             return;
           }
+          // Unmatched res — log it
+          console.warn('[Gateway] Unmatched res id:', data.id, 'pending IDs:', [...pendingRpcRef.current.keys()]);
           return;
         }
 
@@ -93,7 +96,7 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 clientMode: 'webchat',
                 platform: 'web',
                 role: 'operator',
-                scopes: ['operator.read', 'operator.write', 'operator.admin'],
+                scopes: ['operator.read', 'operator.write'],
                 token: cfg.authToken
               });
               
@@ -112,7 +115,7 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
                   },
                   device,
                   role: 'operator',
-                  scopes: ['operator.read', 'operator.write', 'operator.admin'],
+                  scopes: ['operator.read', 'operator.write'],
                   caps: [],
                   commands: [],
                   permissions: {},
@@ -227,11 +230,13 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       const id = nextReqId();
+      console.log('[Gateway] RPC send:', method, id, `(${pendingRpcRef.current.size} pending)`);
       pendingRpcRef.current.set(id, { resolve, reject });
       ws.send(JSON.stringify({ type: 'req', id, method, params }));
       setTimeout(() => {
         const p = pendingRpcRef.current.get(id);
         if (p) {
+          console.warn('[Gateway] RPC timeout:', method, id, `(${pendingRpcRef.current.size} still pending)`);
           pendingRpcRef.current.delete(id);
           p.reject(new Error(`RPC timeout: ${method}`));
         }
