@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useGateway } from '../context/GatewayContext';
 import { getOrCreateDeviceIdentity } from '../utils/cryptoUtils';
+import { getGatewayConfig } from '../gatewayConfig';
 
 const API = import.meta.env.DEV ? 'http://localhost:3001' : '';
-const USE_SERVERLESS = !import.meta.env.DEV;
 
 interface AgentNode {
   id: string; name: string; status: string;
@@ -28,6 +28,13 @@ interface LiveStatus {
   kanban: { total: number; backlog: number; inProgress: number; review: number; done: number } | null;
 }
 
+interface ModelInfo {
+  id: string;
+  name?: string;
+  contextWindow?: number;
+  inputTypes?: string[];
+}
+
 const statusCfg: Record<string, { cls: string; dot: string; label: string }> = {
   running: { cls: 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20', dot: 'bg-emerald-400 animate-pulse', label: 'Running' },
   idle: { cls: 'bg-slate-500/10 text-slate-400 ring-slate-500/20', dot: 'bg-slate-500', label: 'Idle' },
@@ -35,8 +42,6 @@ const statusCfg: Record<string, { cls: string; dot: string; label: string }> = {
 };
 
 type SelectedItem = { type: 'orchestrator' | 'project' | 'department' | 'agent'; id: string; name: string; filesPath?: string; agentId?: string };
-
-import { getGatewayConfig } from '../gatewayConfig';
 
 let rpcCounter = 0;
 function nextRpcId() { return `hub-${Date.now()}-${++rpcCounter}`; }
@@ -55,23 +60,29 @@ const AgentHubPage: React.FC = () => {
   const [statusLoading, setStatusLoading] = useState(false);
   const [wsConnected, setWsConnected] = useState(false);
   const [filesLoading, setFilesLoading] = useState(false);
+  const [availableModels, setAvailableModels] = useState<ModelInfo[]>([]);
+  const [currentModel, setCurrentModel] = useState<string>('');
+  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [modelSaving, setModelSaving] = useState(false);
+  const [modelStatus, setModelStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const wsRef = useRef<WebSocket | null>(null);
-  const pendingRpc = useRef<Map<string, (p: any) => void>>(new Map());
+  const pendingRpc = useRef<Map<string, { resolve: (p: any) => void; reject: (e: Error) => void }>>(new Map());
 
   const isLive = status === 'connected';
 
-  /* ─── Gateway WS for file operations ─────────────────────── */
+  /* ─── Gateway WS for file/model operations ─────────────── */
 
   const sendRpc = useCallback((method: string, params: any): Promise<any> => {
     return new Promise((resolve, reject) => {
       const ws = wsRef.current;
       if (!ws || ws.readyState !== WebSocket.OPEN) { reject(new Error('Not connected')); return; }
       const id = nextRpcId();
-      pendingRpc.current.set(id, resolve);
+      pendingRpc.current.set(id, { resolve, reject });
       ws.send(JSON.stringify({ type: 'req', id, method, params }));
       setTimeout(() => {
-        if (pendingRpc.current.has(id)) { pendingRpc.current.delete(id); reject(new Error('Timeout')); }
+        const p = pendingRpc.current.get(id);
+        if (p) { pendingRpc.current.delete(id); reject(new Error('RPC timeout')); }
       }, 15000);
     });
   }, []);
@@ -79,8 +90,10 @@ const AgentHubPage: React.FC = () => {
   useEffect(() => {
     let ws: WebSocket;
     let reconnectTimer: ReturnType<typeof setTimeout>;
+    let alive = true;
 
     async function connect() {
+      if (!alive) return;
       const cfg = await getGatewayConfig();
       ws = new WebSocket(cfg.gatewayUrl);
       wsRef.current = ws;
@@ -89,8 +102,13 @@ const AgentHubPage: React.FC = () => {
         try {
           const data = JSON.parse(event.data);
           if (data.type === 'res') {
-            const cb = pendingRpc.current.get(data.id);
-            if (cb) { pendingRpc.current.delete(data.id); cb(data.ok !== false ? data.payload : null); return; }
+            const p = pendingRpc.current.get(data.id);
+            if (p) {
+              pendingRpc.current.delete(data.id);
+              if (data.ok === false) { p.reject(new Error(data.error?.message || 'RPC error')); }
+              else { p.resolve(data.payload); }
+              return;
+            }
             if (data.payload?.type === 'hello-ok') { setWsConnected(true); return; }
             return;
           }
@@ -119,12 +137,49 @@ const AgentHubPage: React.FC = () => {
         } catch {}
       };
 
-      ws.onclose = () => { setWsConnected(false); wsRef.current = null; reconnectTimer = setTimeout(connect, 3000); };
+      ws.onclose = () => {
+        setWsConnected(false);
+        wsRef.current = null;
+        if (alive) reconnectTimer = setTimeout(connect, 3000);
+      };
     }
 
     connect();
-    return () => { ws?.close(); clearTimeout(reconnectTimer); };
+    return () => { alive = false; ws?.close(); clearTimeout(reconnectTimer); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load available models when WS connects
+  useEffect(() => {
+    if (!wsConnected) return;
+    (async () => {
+      try {
+        const result = await sendRpc('models.list', {});
+        const models = result?.models || [];
+        setAvailableModels(models.map((m: any) => ({
+          id: typeof m === 'string' ? m : m.id,
+          name: m.name || m.id,
+          contextWindow: m.contextWindow,
+          inputTypes: m.inputTypes,
+        })));
+      } catch (err) {
+        console.error('[Hub] Failed to load models:', err);
+      }
+      // Load current agent config
+      try {
+        const result = await sendRpc('agents.list', {});
+        const agents = result?.agents || result || [];
+        const mainAgent = Array.isArray(agents)
+          ? agents.find((a: any) => a.id === 'main' || a.isDefault)
+          : null;
+        if (mainAgent?.model) {
+          setCurrentModel(mainAgent.model);
+          setSelectedModel(mainAgent.model);
+        }
+      } catch (err) {
+        console.error('[Hub] Failed to load agent config:', err);
+      }
+    })();
+  }, [wsConnected, sendRpc]);
 
   // Fetch live status
   useEffect(() => {
@@ -138,7 +193,7 @@ const AgentHubPage: React.FC = () => {
       setStatusLoading(false);
     };
     fetchStatus();
-    const interval = setInterval(fetchStatus, 60000); // Refresh every 60s
+    const interval = setInterval(fetchStatus, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -146,60 +201,41 @@ const AgentHubPage: React.FC = () => {
     setSelected(item);
     setEditing(false);
     setSaveStatus('idle');
+    setAgentFiles({});
+    setFileContent('');
 
-    // Use gateway RPC for file operations when WS is connected
-    if (wsConnected) {
-      try {
-        setFilesLoading(true);
-        const agentId = item.type === 'orchestrator' ? 'main' : (item.agentId || 'main');
-        const listResult = await sendRpc('agents.files.list', { agentId });
-        const fileNames: string[] = listResult?.files?.map((f: any) => f.name || f) || [];
+    if (!wsConnected) return;
 
-        const files: Record<string, string> = {};
-        for (const name of fileNames) {
-          if (!name.endsWith('.md')) continue;
-          try {
-            const result = await sendRpc('agents.files.get', { agentId, name });
-            if (result?.content != null) {
-              files[name] = typeof result.content === 'string' ? result.content : JSON.stringify(result.content);
-            }
-          } catch {}
-        }
+    try {
+      setFilesLoading(true);
+      // All agents currently map to 'main' since that's the only real OpenClaw agent
+      const agentId = 'main';
+      const listResult = await sendRpc('agents.files.list', { agentId });
+      const fileNames: string[] = (listResult?.files || []).map((f: any) => typeof f === 'string' ? f : f.name).filter(Boolean);
 
-        setAgentFiles(files);
-        const firstFile = Object.keys(files)[0];
-        if (firstFile) { setFileContent(files[firstFile]); setActiveFile(firstFile); }
-        else { setFileContent(''); setActiveFile('SOUL.md'); }
-      } catch (err) {
-        console.error('[Hub] File load failed via WS:', err);
-        setAgentFiles({});
-        setFileContent('');
-      } finally {
-        setFilesLoading(false);
-      }
-      return;
-    }
-
-    // Fallback: HTTP API
-    if (item.filesPath) {
       const files: Record<string, string> = {};
-      for (const f of ['SOUL.md', 'GOAL.md', 'MEMORY.md']) {
-        try {
-          const r = USE_SERVERLESS
-            ? await fetch(`/api/file?path=${item.filesPath}/${f}`)
-            : await fetch(`/${item.filesPath}/${f}`);
-          if (r.ok) {
-            const data = USE_SERVERLESS ? await r.json() : { content: await r.text() };
-            files[f] = data.content;
+      // Load files in parallel (max 5 at a time)
+      const mdFileNames = fileNames.filter(n => n.endsWith('.md'));
+      for (let i = 0; i < mdFileNames.length; i += 5) {
+        const batch = mdFileNames.slice(i, i + 5);
+        const results = await Promise.allSettled(
+          batch.map(name => sendRpc('agents.files.get', { agentId, name }))
+        );
+        results.forEach((r, j) => {
+          if (r.status === 'fulfilled' && r.value?.content != null) {
+            files[batch[j]] = typeof r.value.content === 'string' ? r.value.content : JSON.stringify(r.value.content);
           }
-        } catch {}
+        });
       }
+
       setAgentFiles(files);
       const firstFile = Object.keys(files)[0];
       if (firstFile) { setFileContent(files[firstFile]); setActiveFile(firstFile); }
-    } else {
-      setAgentFiles({});
-      setFileContent('');
+      else { setFileContent(''); setActiveFile('SOUL.md'); }
+    } catch (err) {
+      console.error('[Hub] File load failed:', err);
+    } finally {
+      setFilesLoading(false);
     }
   };
 
@@ -207,22 +243,8 @@ const AgentHubPage: React.FC = () => {
     if (!selected) return;
     setSaving(true);
     setSaveStatus('idle');
-
     try {
-      if (wsConnected) {
-        // Save via gateway RPC
-        const agentId = selected.type === 'orchestrator' ? 'main' : (selected.agentId || 'main');
-        await sendRpc('agents.files.set', { agentId, name: activeFile, content: editBuffer });
-      } else {
-        // Fallback: HTTP API
-        const endpoint = API ? `${API}/api/file` : '/api/file';
-        const filePath = selected.type === 'orchestrator' ? activeFile : `${selected.filesPath}/${activeFile}`;
-        await fetch(endpoint, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path: filePath, content: editBuffer }),
-        });
-      }
+      await sendRpc('agents.files.set', { agentId: 'main', name: activeFile, content: editBuffer });
       setFileContent(editBuffer);
       agentFiles[activeFile] = editBuffer;
       setEditing(false);
@@ -236,18 +258,47 @@ const AgentHubPage: React.FC = () => {
     setSaving(false);
   };
 
-  const StatusBadge = ({ status }: { status: string }) => {
-    const s = statusCfg[status] || statusCfg.idle;
+  const saveModel = async () => {
+    if (!selectedModel || selectedModel === currentModel) return;
+    setModelSaving(true);
+    setModelStatus('idle');
+    try {
+      // Use config.get to get current config, then config.set to update model
+      const configResult = await sendRpc('config.get', {});
+      if (configResult?.raw) {
+        const cfg = typeof configResult.raw === 'string' ? JSON.parse(configResult.raw) : configResult.raw;
+        // Update the model
+        if (!cfg.agents) cfg.agents = {};
+        if (!cfg.agents.defaults) cfg.agents.defaults = {};
+        if (!cfg.agents.defaults.model) cfg.agents.defaults.model = {};
+        cfg.agents.defaults.model.primary = selectedModel;
+        
+        await sendRpc('config.set', { raw: JSON.stringify(cfg, null, 2), baseHash: configResult.hash });
+        await sendRpc('config.apply', {});
+        setCurrentModel(selectedModel);
+        setModelStatus('success');
+        setTimeout(() => setModelStatus('idle'), 3000);
+      }
+    } catch (err) {
+      console.error('Model change failed:', err);
+      setModelStatus('error');
+      setTimeout(() => setModelStatus('idle'), 5000);
+    }
+    setModelSaving(false);
+  };
+
+  const StatusBadge = ({ status: s }: { status: string }) => {
+    const cfg = statusCfg[s] || statusCfg.idle;
     return (
-      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${s.cls}`}>
-        <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`}></span>{s.label}
+      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${cfg.cls}`}>
+        <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`}></span>{cfg.label}
       </span>
     );
   };
 
   if (!eco) return (
     <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
-       <p className="text-slate-500 animate-pulse">Waiting for live data feed...</p>
+      <p className="text-slate-500 animate-pulse">Waiting for live data feed...</p>
     </div>
   );
 
@@ -256,9 +307,7 @@ const AgentHubPage: React.FC = () => {
     'USER.md': '👤', 'TOOLS.md': '🔧', 'AGENTS.md': '📋', 'HEARTBEAT.md': '💓',
   };
   const mdFiles = Object.keys(agentFiles).filter(f => f.endsWith('.md'));
-  const skillFiles = Array.isArray(agentFiles['skills']) ? agentFiles['skills'] as unknown as string[] : [];
 
-  // Compute agent task loads from kanban
   const getAgentTaskCount = (agentName: string) => {
     if (!eco.kanban?.columns) return { active: 0, total: 0 };
     let active = 0, total = 0;
@@ -281,21 +330,12 @@ const AgentHubPage: React.FC = () => {
           <p className="text-slate-400 mt-1 text-sm">Organizational hierarchy &bull; Projects, Departments, Agents</p>
         </div>
         <div className="flex items-center gap-3">
-          {liveStatus?.gateway && (
-            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${
-              liveStatus.gateway.reachable
-                ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
-                : 'bg-red-500/10 text-red-400 ring-red-500/20'
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${liveStatus.gateway.reachable ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
-              GW {liveStatus.gateway.reachable ? `${liveStatus.gateway.latencyMs}ms` : 'DOWN'}
-            </span>
-          )}
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ring-1 ${
-            isLive ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
+          {/* WS Status */}
+          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${
+            wsConnected ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
           }`}>
-            <span className={`h-2 w-2 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
-            {isLive ? 'LIVE' : 'SYNCING'}
+            <span className={`h-1.5 w-1.5 rounded-full ${wsConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+            {wsConnected ? 'LIVE' : 'CONNECTING'}
           </span>
         </div>
       </div>
@@ -349,16 +389,14 @@ const AgentHubPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Panel */}
         <div className="lg:col-span-1 space-y-5 overflow-y-auto max-h-[calc(100vh-14rem)]">
-
           {/* Orchestrator */}
           <div>
             <p className="text-[10px] text-slate-600 uppercase tracking-widest font-medium mb-2">Orchestrator</p>
             <button
-              onClick={() => selectItem({ type: 'orchestrator', id: 'nova', name: 'Nova', filesPath: '' })}
+              onClick={() => selectItem({ type: 'orchestrator', id: 'nova', name: 'Nova' })}
               className={`w-full text-left bg-slate-900 border rounded-xl p-4 transition-all ${
                 selected?.id === 'nova' ? 'border-blue-500/50 ring-1 ring-blue-500/20' : 'border-slate-800 hover:border-slate-700'
-              }`}
-            >
+              }`}>
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">N</div>
@@ -367,6 +405,7 @@ const AgentHubPage: React.FC = () => {
                 <StatusBadge status={eco.orchestrator.status} />
               </div>
               <p className="text-xs text-slate-500 ml-9">{eco.orchestrator.description}</p>
+              {currentModel && <p className="text-[10px] text-blue-400 ml-9 mt-1 font-mono">{currentModel}</p>}
             </button>
           </div>
 
@@ -376,7 +415,6 @@ const AgentHubPage: React.FC = () => {
             {eco.projects.length === 0 ? (
               <div className="bg-slate-900/50 border border-dashed border-slate-800 rounded-xl p-4 text-center">
                 <p className="text-xs text-slate-600">No active projects</p>
-                <p className="text-[10px] text-slate-700 mt-1">Nova will create projects when tasks require dedicated resources</p>
               </div>
             ) : eco.projects.map((proj: Project) => (
               <button key={proj.id}
@@ -397,7 +435,6 @@ const AgentHubPage: React.FC = () => {
           <div>
             <p className="text-[10px] text-slate-600 uppercase tracking-widest font-medium mb-2">Departments</p>
             {eco.departments.map((dept: Department) => {
-              const isLocked = !!dept.project;
               const taskLoad = getAgentTaskCount(dept.name);
               return (
                 <div key={dept.id} className="mb-3">
@@ -405,13 +442,10 @@ const AgentHubPage: React.FC = () => {
                     onClick={() => selectItem({ type: 'department', id: dept.id, name: dept.name, filesPath: `departments/${dept.id}` })}
                     className={`w-full text-left bg-slate-900 border rounded-xl p-4 transition-all ${
                       selected?.id === dept.id ? 'border-blue-500/50 ring-1 ring-blue-500/20' : 'border-slate-800 hover:border-slate-700'
-                    }`}
-                  >
+                    }`}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-medium text-white text-sm">{dept.name}</span>
-                      <div className="flex items-center gap-2">
-                        {isLocked && <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded ring-1 ring-amber-500/20">🔒 {dept.project}</span>}
-                      </div>
+                      {dept.project && <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded ring-1 ring-amber-500/20">🔒 {dept.project}</span>}
                     </div>
                     <p className="text-xs text-slate-500 mb-2">{dept.description}</p>
                     <div className="flex items-center justify-between">
@@ -423,15 +457,12 @@ const AgentHubPage: React.FC = () => {
                       )}
                     </div>
                   </button>
-
-                  {/* Lead */}
                   <div className="ml-4 mt-1 space-y-1">
                     <button
                       onClick={() => selectItem({ type: 'agent', id: dept.lead.id, name: `${dept.lead.name} (Lead)`, filesPath: dept.lead.filesPath || `departments/${dept.id}` })}
                       className={`w-full text-left bg-slate-800/40 border rounded-lg p-3 transition-all ${
                         selected?.id === dept.lead.id ? 'border-blue-500/50 ring-1 ring-blue-500/20' : 'border-slate-800 hover:border-slate-700'
-                      }`}
-                    >
+                      }`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] text-amber-400">👑</span>
@@ -440,10 +471,7 @@ const AgentHubPage: React.FC = () => {
                         </div>
                         <StatusBadge status={dept.lead.status} />
                       </div>
-                      {dept.lead.currentTask && <p className="text-[10px] text-blue-400 mt-1 ml-5 truncate">▸ {dept.lead.currentTask}</p>}
                     </button>
-
-                    {/* Sub-agents */}
                     {dept.agents.map((agent: AgentNode) => (
                       <button key={agent.id}
                         onClick={() => selectItem({ type: 'agent', id: agent.id, name: agent.name, filesPath: agent.filesPath || `departments/${dept.id}/${agent.id}` })}
@@ -454,32 +482,12 @@ const AgentHubPage: React.FC = () => {
                           <span className="text-xs text-slate-300">{agent.name}</span>
                           <StatusBadge status={agent.status} />
                         </div>
-                        {agent.currentTask && <p className="text-[10px] text-blue-400 mt-1 truncate">▸ {agent.currentTask}</p>}
                       </button>
                     ))}
                   </div>
                 </div>
               );
             })}
-          </div>
-
-          {/* Individual Agents */}
-          <div>
-            <p className="text-[10px] text-slate-600 uppercase tracking-widest font-medium mb-2">Individual Agents</p>
-            {eco.individualAgents.length === 0 ? (
-              <div className="bg-slate-900/50 border border-dashed border-slate-800 rounded-xl p-4 text-center">
-                <p className="text-xs text-slate-600">No standalone agents</p>
-              </div>
-            ) : eco.individualAgents.map((agent: AgentNode) => (
-              <button key={agent.id}
-                onClick={() => selectItem({ type: 'agent', id: agent.id, name: agent.name, filesPath: agent.filesPath })}
-                className="w-full text-left bg-slate-900 border border-slate-800 rounded-xl p-4 mb-2 hover:border-slate-700">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-white text-sm">{agent.name}</span>
-                  <StatusBadge status={agent.status} />
-                </div>
-              </button>
-            ))}
           </div>
         </div>
 
@@ -489,23 +497,74 @@ const AgentHubPage: React.FC = () => {
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-600 uppercase">{selected.type}</span>
-                  </div>
+                  <span className="text-xs text-slate-600 uppercase">{selected.type}</span>
                   <h2 className="text-xl font-bold text-white">{selected.name}</h2>
-                  {selected.filesPath !== undefined && <p className="text-xs text-slate-500 font-mono mt-0.5">{selected.filesPath || 'workspace root'}</p>}
                 </div>
+                {!wsConnected && (
+                  <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-1 rounded ring-1 ring-amber-500/20">
+                    ⏳ Connecting to gateway...
+                  </span>
+                )}
               </div>
+
+              {/* Model Selector — show for orchestrator */}
+              {selected.type === 'orchestrator' && (
+                <div className="mb-6">
+                  <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">🧠 LLM Model Configuration</h3>
+                  <div className="bg-slate-800/30 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <label className="text-[10px] text-slate-500 uppercase tracking-wider block mb-1.5">Active Model</label>
+                        <select
+                          value={selectedModel}
+                          onChange={e => setSelectedModel(e.target.value)}
+                          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                        >
+                          {availableModels.length > 0 ? (
+                            availableModels.map(m => (
+                              <option key={m.id} value={m.id}>
+                                {m.id}{m.id === currentModel ? ' ✓ (current)' : ''}
+                              </option>
+                            ))
+                          ) : (
+                            <option value={currentModel}>{currentModel || 'Loading...'}</option>
+                          )}
+                        </select>
+                      </div>
+                      <div className="pt-4">
+                        <button
+                          onClick={saveModel}
+                          disabled={modelSaving || selectedModel === currentModel}
+                          className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                            selectedModel !== currentModel
+                              ? 'bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20 hover:bg-blue-500/20'
+                              : 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                          }`}
+                        >
+                          {modelSaving ? '⏳ Applying...' : '🔄 Switch Model'}
+                        </button>
+                      </div>
+                    </div>
+                    {modelStatus === 'success' && <p className="text-[10px] text-emerald-400 mt-2">✅ Model changed! Takes effect on next message.</p>}
+                    {modelStatus === 'error' && <p className="text-[10px] text-red-400 mt-2">❌ Failed to change model. May need admin scope.</p>}
+                    {currentModel && (
+                      <div className="mt-3 flex items-center gap-4 text-[10px] text-slate-500">
+                        <span>Current: <span className="text-blue-400 font-mono">{currentModel}</span></span>
+                        {availableModels.length > 0 && <span>{availableModels.length} models available</span>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Live Status Panel for Orchestrator */}
               {selected.type === 'orchestrator' && (
                 <div className="mb-6 space-y-3">
-                  <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider">Live System Status</h3>
+                  <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider">System Status</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-slate-800/30 rounded-lg p-4">
                       <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Role</p>
                       <p className="text-sm font-medium text-white">CEO's Orchestrator AI</p>
-                      <p className="text-[10px] text-slate-500 mt-1">Manages all projects, departments, and agents</p>
                     </div>
                     <div className="bg-slate-800/30 rounded-lg p-4">
                       <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Status</p>
@@ -519,17 +578,10 @@ const AgentHubPage: React.FC = () => {
                     <div className="bg-slate-800/30 rounded-lg p-4">
                       <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Gateway</p>
                       {liveStatus?.gateway ? (
-                        <>
-                          <p className={`text-sm font-medium ${liveStatus.gateway.reachable ? 'text-emerald-400' : 'text-red-400'}`}>
-                            {liveStatus.gateway.reachable ? 'Connected' : 'Unreachable'}
-                          </p>
-                          {liveStatus.gateway.latencyMs !== null && (
-                            <p className="text-[10px] text-slate-500 mt-0.5">{liveStatus.gateway.latencyMs}ms round trip</p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="text-sm text-slate-500 animate-pulse">Checking...</p>
-                      )}
+                        <p className={`text-sm font-medium ${liveStatus.gateway.reachable ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {liveStatus.gateway.reachable ? `Connected (${liveStatus.gateway.latencyMs}ms)` : 'Unreachable'}
+                        </p>
+                      ) : <p className="text-sm text-slate-500 animate-pulse">Checking...</p>}
                     </div>
                     <div className="bg-slate-800/30 rounded-lg p-4">
                       <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Channels</p>
@@ -539,22 +591,6 @@ const AgentHubPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Task overview for orchestrator */}
-                  {eco.kanban?.columns && (
-                    <div className="bg-slate-800/30 rounded-lg p-4">
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Task Overview (All Teams)</p>
-                      <div className="flex items-center gap-3">
-                        {eco.kanban.columns.map((col: any) => (
-                          <div key={col.id} className="flex items-center gap-1.5">
-                            <span className="text-sm">{col.icon}</span>
-                            <span className="text-xs text-slate-400">{col.title}</span>
-                            <span className="text-xs font-semibold text-white">{col.tasks.length}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -579,13 +615,11 @@ const AgentHubPage: React.FC = () => {
                             <p className="text-sm text-white font-medium truncate">{task.title}</p>
                             <p className="text-[10px] text-slate-500 mt-0.5">{task.description}</p>
                           </div>
-                          <div className="flex items-center gap-2 ml-3 shrink-0">
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded ring-1 ${
-                              task.columnId === 'done' ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' :
-                              task.columnId === 'in-progress' ? 'bg-blue-500/10 text-blue-400 ring-blue-500/20' :
-                              'bg-slate-500/10 text-slate-400 ring-slate-500/20'
-                            }`}>{task.column}</span>
-                          </div>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded ring-1 ml-3 shrink-0 ${
+                            task.columnId === 'done' ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' :
+                            task.columnId === 'in-progress' ? 'bg-blue-500/10 text-blue-400 ring-blue-500/20' :
+                            'bg-slate-500/10 text-slate-400 ring-slate-500/20'
+                          }`}>{task.column}</span>
                         </div>
                       ))}
                     </div>
@@ -596,82 +630,65 @@ const AgentHubPage: React.FC = () => {
               {/* Loading indicator */}
               {filesLoading && (
                 <div className="mb-4 flex items-center gap-2 text-sm text-slate-500 animate-pulse">
-                  <span>⏳</span> Loading workspace files via gateway...
+                  <span>⏳</span> Loading workspace files...
                 </div>
               )}
 
-              {/* File tabs — only if has files */}
+              {/* File tabs */}
               {mdFiles.length > 0 && (
                 <>
+                  <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">📁 Workspace Files</h3>
                   <div className="flex gap-1 mb-4 bg-slate-800/30 rounded-lg p-1 flex-wrap">
                     {mdFiles.map(file => (
                       <button key={file}
-                        onClick={() => { setActiveFile(file); setFileContent(agentFiles[file] as string || ''); setEditing(false); }}
+                        onClick={() => { setActiveFile(file); setFileContent(agentFiles[file] || ''); setEditing(false); }}
                         className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium transition-all ${
                           activeFile === file ? 'bg-slate-700 text-white' : 'text-slate-500 hover:text-slate-300'
                         }`}>
                         <span>{fileIcons[file] || '📄'}</span><span>{file}</span>
                       </button>
                     ))}
-                    {skillFiles.length > 0 && (
-                      <button
-                        onClick={() => { setActiveFile('skills'); setEditing(false); }}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium transition-all ${
-                          activeFile === 'skills' ? 'bg-slate-700 text-white' : 'text-slate-500 hover:text-slate-300'
-                        }`}>
-                        <span>⚡</span><span>Skills</span>
-                      </button>
-                    )}
                   </div>
 
-                  {activeFile === 'skills' ? (
-                    <div className="space-y-2">
-                      {skillFiles.map((s, i) => (
-                        <div key={i} className="flex items-center gap-3 bg-slate-800/30 rounded-lg px-4 py-3">
-                          <span className="text-amber-400">⚡</span>
-                          <span className="text-sm text-slate-300 font-mono">{s}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : !editing ? (
+                  {!editing ? (
                     <div>
                       <div className="flex justify-end mb-2">
                         <button onClick={() => { setEditBuffer(fileContent); setEditing(true); }}
                           className="px-3 py-1.5 bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20 rounded-lg text-xs font-medium hover:bg-blue-500/20 transition-colors">
-                          ✏️ View & Edit
+                          ✏️ Edit
                         </button>
                       </div>
-                      <div className="bg-slate-800/30 rounded-lg p-4">
+                      <div className="bg-slate-800/30 rounded-lg p-4 max-h-[500px] overflow-y-auto">
                         <pre className="text-sm text-slate-300 whitespace-pre-wrap font-mono leading-relaxed">{fileContent || 'No content'}</pre>
                       </div>
                     </div>
                   ) : (
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-xs text-slate-500 font-mono">Editing: {selected.type === 'orchestrator' ? `workspace/${activeFile}` : `${selected.filesPath}/${activeFile}`}</span>
+                        <span className="text-xs text-slate-500 font-mono">Editing: {activeFile}</span>
                         <div className="flex gap-2 items-center">
                           {saveStatus === 'success' && <span className="text-[10px] text-emerald-400">✅ Saved!</span>}
                           {saveStatus === 'error' && <span className="text-[10px] text-red-400">❌ Save failed</span>}
                           <button onClick={() => setEditing(false)} className="px-3 py-1.5 bg-slate-800 text-slate-400 rounded-lg text-xs font-medium hover:bg-slate-700">Cancel</button>
                           <button onClick={saveFile} disabled={saving}
                             className="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 rounded-lg text-xs font-medium hover:bg-emerald-500/20 disabled:opacity-50">
-                            {saving ? 'Saving...' : '💾 Save to Workspace'}
+                            {saving ? 'Saving...' : '💾 Save'}
                           </button>
                         </div>
                       </div>
                       <textarea value={editBuffer} onChange={e => setEditBuffer(e.target.value)}
-                        className="w-full h-80 bg-slate-800/50 border border-slate-700 rounded-lg p-4 text-sm text-slate-300 font-mono leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
+                        className="w-full h-96 bg-slate-800/50 border border-slate-700 rounded-lg p-4 text-sm text-slate-300 font-mono leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
                     </div>
                   )}
                 </>
               )}
 
               {/* No files state */}
-              {mdFiles.length === 0 && selected.type !== 'orchestrator' && selected.type !== 'department' && (
+              {!filesLoading && mdFiles.length === 0 && (
                 <div className="bg-slate-800/30 rounded-lg p-8 text-center">
                   <p className="text-slate-500">
-                    {selected.type === 'project' ? 'Project details will appear here when Nova creates a project.' :
-                     'Select a department or agent to view their files.'}
+                    {!wsConnected ? 'Connecting to gateway to load files...' :
+                     'No workspace files found for this agent.'}
                   </p>
                 </div>
               )}
