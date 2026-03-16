@@ -10,6 +10,7 @@ interface GatewayContextType {
   eco: any | null;
   ws: WebSocket | null;
   sendMessage: (method: string, params: any) => void;
+  sendRpc: (method: string, params: any, timeoutMs?: number) => Promise<any>;
 }
 
 const GatewayContext = createContext<GatewayContextType | undefined>(undefined);
@@ -26,6 +27,7 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const wsConnectedRef = useRef(false);
+  const pendingRpcRef = useRef<Map<string, { resolve: (v: any) => void; reject: (e: Error) => void }>>(new Map());
 
   const connect = useCallback(async () => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
@@ -43,7 +45,40 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('[Gateway] Received:', data.type, data.event || data.method || '');
+
+        // Handle RPC responses
+        if (data.type === 'res') {
+          // Check if this is a pending RPC response
+          const pending = pendingRpcRef.current.get(data.id);
+          if (pending) {
+            pendingRpcRef.current.delete(data.id);
+            if (data.ok === false) {
+              pending.reject(new Error(data.error?.message || data.error?.code || 'RPC error'));
+            } else {
+              pending.resolve(data.payload);
+            }
+            return;
+          }
+
+          // Handle connect response (hello-ok)
+          if (data.payload?.type === 'hello-ok') {
+            console.log('[Gateway] Connected! Protocol:', data.payload.protocol);
+            wsConnectedRef.current = true;
+            setStatus('connected');
+            return;
+          }
+
+          // Handle errors
+          if (data.ok === false) {
+            console.error('[Gateway] Error:', data.error?.code, data.error?.message);
+            if (data.error?.code === 'NOT_PAIRED') {
+              console.warn('[Gateway] Device not paired');
+              setStatus('error');
+            }
+            return;
+          }
+          return;
+        }
 
         // Handle connect.challenge event
         if (data.type === 'event' && data.event === 'connect.challenge') {
@@ -94,24 +129,6 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
           return;
         }
 
-        // Handle connect response (hello-ok)
-        if (data.type === 'res' && data.payload?.type === 'hello-ok') {
-          console.log('[Gateway] Connected! Protocol:', data.payload.protocol);
-          wsConnectedRef.current = true;
-          setStatus('connected');
-          return;
-        }
-
-        // Handle connect/request errors
-        if (data.type === 'res' && data.ok === false) {
-          console.error('[Gateway] Error:', data.error?.code, data.error?.message);
-          if (data.error?.code === 'NOT_PAIRED') {
-            console.warn('[Gateway] Device not paired — needs approval via: openclaw devices approve <requestId>');
-            setStatus('error');
-          }
-          return;
-        }
-
         // Handle events once connected
         if (data.type === 'event') {
           if (data.event === 'chat' || data.event === 'agent') {
@@ -120,7 +137,6 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
           if (data.event === 'ecosystem' || data.event === 'state') {
             setEco(data.payload);
           }
-          // Ignore tick/presence/health silently
         }
       } catch (e) {
         console.error('[Gateway] Parse error:', e);
@@ -133,7 +149,11 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
       wsConnectedRef.current = false;
       setStatus('disconnected');
       wsRef.current = null;
-      // Reconnect unless intentional close
+      // Reject all pending RPCs
+      for (const [id, p] of pendingRpcRef.current) {
+        p.reject(new Error('Connection closed'));
+      }
+      pendingRpcRef.current.clear();
       if (event.code !== 1000) {
         reconnectTimeoutRef.current = setTimeout(() => connect(), 3000);
       }
@@ -188,7 +208,7 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, [connect]);
 
-  const sendMessage = (method: string, params: any) => {
+  const sendMessage = useCallback((method: string, params: any) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'req',
@@ -197,10 +217,30 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
         params
       }));
     }
-  };
+  }, []);
+
+  const sendRpc = useCallback((method: string, params: any, timeoutMs = 15000): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      const ws = wsRef.current;
+      if (!ws || ws.readyState !== WebSocket.OPEN || !wsConnectedRef.current) {
+        reject(new Error('Not connected'));
+        return;
+      }
+      const id = nextReqId();
+      pendingRpcRef.current.set(id, { resolve, reject });
+      ws.send(JSON.stringify({ type: 'req', id, method, params }));
+      setTimeout(() => {
+        const p = pendingRpcRef.current.get(id);
+        if (p) {
+          pendingRpcRef.current.delete(id);
+          p.reject(new Error(`RPC timeout: ${method}`));
+        }
+      }, timeoutMs);
+    });
+  }, []);
 
   return (
-    <GatewayContext.Provider value={{ status, events, eco, ws: wsRef.current, sendMessage }}>
+    <GatewayContext.Provider value={{ status, events, eco, ws: wsRef.current, sendMessage, sendRpc }}>
       {children}
     </GatewayContext.Provider>
   );
