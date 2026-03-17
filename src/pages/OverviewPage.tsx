@@ -3,7 +3,6 @@ import ExecutiveSummary from '../components/ExecutiveSummary';
 import ExecutionMatrix from '../components/ExecutionMatrix';
 import ResourcePulse from '../components/ResourcePulse';
 import EventStream from '../components/EventStream';
-import IntelligenceBrief from '../components/IntelligenceBrief';
 import { useGateway } from '../context/GatewayContext';
 
 const OverviewPage: React.FC = () => {
@@ -42,11 +41,6 @@ const OverviewPage: React.FC = () => {
       {/* Executive Summary */}
       <div className="mb-4 md:mb-6">
         <ExecutiveSummary />
-      </div>
-
-      {/* Intelligence Brief */}
-      <div className="mb-4 md:mb-6">
-        <IntelligenceBrief />
       </div>
 
       {/* Ecosystem Quick Stats */}
