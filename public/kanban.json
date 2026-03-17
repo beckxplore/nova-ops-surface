@@ -8,37 +8,7 @@
     {
       "id": "in-progress",
       "title": "In Progress",
-      "tasks": [
-        {
-          "id": "t-1773759650558",
-          "title": "Agent Task History in Detail Panel",
-          "description": "When clicking an agent in Agent Hub, show their task history \u2014 what they accomplished, completion rate, recent activity. Currently only department-level.",
-          "assignee": "Development",
-          "priority": "medium",
-          "tags": [
-            "agents",
-            "history",
-            "detail-panel"
-          ],
-          "steps": [
-            {
-              "text": "Track per-agent task assignments in kanban.json",
-              "done": false
-            },
-            {
-              "text": "Add task history tab to agent detail panel",
-              "done": false
-            },
-            {
-              "text": "Show completion stats and recent activity",
-              "done": false
-            }
-          ],
-          "createdAt": "2026-03-17T15:00:50.558Z",
-          "progress": 0,
-          "startedAt": "2026-03-17T16:22:01.012Z"
-        }
-      ]
+      "tasks": []
     },
     {
       "id": "review",
@@ -50,9 +20,39 @@
       "title": "Done",
       "tasks": [
         {
+          "id": "t-1773759650558",
+          "title": "Agent Task History in Detail Panel",
+          "description": "When clicking an agent in Agent Hub, show their task history — what they accomplished, completion rate, recent activity. Currently only department-level.",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "agents",
+            "history",
+            "detail-panel"
+          ],
+          "steps": [
+            {
+              "text": "Track per-agent task assignments in kanban.json",
+              "done": true
+            },
+            {
+              "text": "Add task history tab to agent detail panel",
+              "done": true
+            },
+            {
+              "text": "Show completion stats and recent activity",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.558Z",
+          "progress": 100,
+          "startedAt": "2026-03-17T16:22:01.012Z",
+          "doneAt": "2026-03-17T16:28:56.229Z"
+        },
+        {
           "id": "t-1773759650281",
           "title": "Chat-to-Kanban Task Creation",
-          "description": "Tell Nova a task via chat \u2192 task appears on Kanban board instantly. Support steps, priority, assignee.",
+          "description": "Tell Nova a task via chat → task appears on Kanban board instantly. Support steps, priority, assignee.",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -185,7 +185,7 @@
         {
           "id": "t-1773759650488",
           "title": "Org Chart Page",
-          "description": "New sidebar page: visual org chart showing CEO \u2192 Nova (Orchestrator) \u2192 Department Leads \u2192 Team Members. Clear hierarchy, roles, responsibilities, communication flow.",
+          "description": "New sidebar page: visual org chart showing CEO → Nova (Orchestrator) → Department Leads → Team Members. Clear hierarchy, roles, responsibilities, communication flow.",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -335,7 +335,7 @@
         {
           "id": "t17",
           "title": "Nova API Proxy",
-          "description": "HTTP API server (port 3001) for model/file management \u2014 bypasses WS device pairing. systemd service.",
+          "description": "HTTP API server (port 3001) for model/file management — bypasses WS device pairing. systemd service.",
           "assignee": "Nova",
           "priority": "high",
           "tags": [
@@ -393,7 +393,7 @@
         {
           "id": "t15",
           "title": "Chat Page - Gateway Integration",
-          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram \u2194 Dashboard)",
+          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram ↔ Dashboard)",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -423,7 +423,7 @@
         {
           "id": "t14",
           "title": "Runtime Gateway Config",
-          "description": "gateway-config.json loaded at runtime \u2014 no more hardcoded URLs in JS bundle",
+          "description": "gateway-config.json loaded at runtime — no more hardcoded URLs in JS bundle",
           "assignee": "Development",
           "priority": "medium",
           "tags": [

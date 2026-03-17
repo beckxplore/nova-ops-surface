@@ -51,39 +51,33 @@ const GatewaysPage: React.FC = () => {
   ]);
 
   useEffect(() => {
-    (async () => {
-      const start = Date.now();
+    const fetchHealth = async () => {
       try {
         const cfg = await getGatewayConfig();
         const wsUrl = cfg.gatewayUrl || '';
-        const httpUrl = wsUrl.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:');
-        const r = await fetch(httpUrl, { method: 'HEAD' });
-        setGwInfo(prev => ({
-          ...prev,
-          url: wsUrl,
-          status: r.ok || r.status === 426 ? 'connected' : 'error',
-          latencyMs: Date.now() - start,
-        }));
+        const base = wsUrl.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:') + '/nova-api';
+        const r = await fetch(`${base}/api/health`, {
+          headers: { Authorization: `Bearer ${cfg.authToken}` },
+        });
+        if (r.ok) {
+          const data = await r.json();
+          const gw = data?.gateway;
+          setGwInfo(prev => ({
+            ...prev,
+            url: gw?.url || wsUrl,
+            status: gw?.reachable ? 'connected' : 'error',
+            latencyMs: gw?.latencyMs ?? null,
+            version: gw?.version || '2026.3.11',
+          }));
+        } else {
+          setGwInfo(prev => ({ ...prev, status: 'error' }));
+        }
       } catch {
         setGwInfo(prev => ({ ...prev, status: 'error', latencyMs: null }));
       }
-    })();
-    const interval = setInterval(() => {
-      (async () => {
-        const start = Date.now();
-        try {
-          const cfg = await getGatewayConfig();
-          const wsUrl = cfg.gatewayUrl || '';
-          const httpUrl = wsUrl.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:');
-          const r = await fetch(httpUrl, { method: 'HEAD' });
-          setGwInfo(prev => ({
-            ...prev,
-            status: r.ok || r.status === 426 ? 'connected' : 'error',
-            latencyMs: Date.now() - start,
-          }));
-        } catch { setGwInfo(prev => ({ ...prev, status: 'error' })); }
-      })();
-    }, 30000);
+    };
+    fetchHealth();
+    const interval = setInterval(fetchHealth, 30000);
     return () => clearInterval(interval);
   }, []);
 
