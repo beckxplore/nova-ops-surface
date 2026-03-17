@@ -20,205 +20,60 @@
       "title": "Done",
       "tasks": [
         {
-          "id": "t1",
-          "title": "Governance Framework",
-          "description": "Autonomous governance framework with department structure",
-          "assignee": "Nova",
-          "priority": "high",
-          "tags": [
-            "governance",
-            "framework"
-          ],
-          "createdAt": "2026-03-08T08:00:00Z",
-          "doneAt": "2026-03-08T10:00:00Z"
-        },
-        {
-          "id": "t2",
-          "title": "SOP Documentation",
-          "description": "Standard Operating Procedures for all development workflows",
-          "assignee": "Nova",
-          "priority": "medium",
-          "tags": [
-            "docs",
-            "sop"
-          ],
-          "createdAt": "2026-03-08T09:00:00Z",
-          "doneAt": "2026-03-08T11:00:00Z"
-        },
-        {
-          "id": "t3",
-          "title": "GitHub Repository Setup",
-          "description": "Set up nova-ops-surface repo with React/Vite/Tailwind stack",
+          "id": "t22",
+          "title": "Live Data + Dynamic API",
+          "description": "New /api/ecosystem endpoint reads from GitHub API, 30s refresh, no CDN cache, proper date sorting",
           "assignee": "Development",
           "priority": "high",
           "tags": [
-            "infrastructure",
-            "github"
-          ],
-          "createdAt": "2026-03-08T10:00:00Z",
-          "doneAt": "2026-03-08T12:00:00Z"
-        },
-        {
-          "id": "t4",
-          "title": "Fix Telegram Group Policy",
-          "description": "Set bot group policy to open for Nova responses in group chats",
-          "assignee": "Nova",
-          "priority": "medium",
-          "tags": [
-            "telegram",
-            "config"
-          ],
-          "createdAt": "2026-03-12T05:00:00Z",
-          "doneAt": "2026-03-12T05:30:00Z"
-        },
-        {
-          "id": "t5",
-          "title": "Chat WebSocket Connection",
-          "description": "Fix gateway WebSocket handshake and device pairing for dashboard chat",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "websocket",
-            "chat",
-            "gateway"
-          ],
-          "createdAt": "2026-03-11T14:00:00Z",
-          "doneAt": "2026-03-12T16:00:00Z"
-        },
-        {
-          "id": "t6",
-          "title": "Dashboard Multi-Page App",
-          "description": "Overview, Kanban, Agent Hub, Chat pages with sidebar navigation",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "dashboard",
-            "ui",
-            "react"
-          ],
-          "createdAt": "2026-03-08T12:00:00Z",
-          "doneAt": "2026-03-12T10:00:00Z"
-        },
-        {
-          "id": "t7",
-          "title": "OpenClaw Update 2026.3.8",
-          "description": "Update gateway and fix breaking changes",
-          "assignee": "Nova",
-          "priority": "medium",
-          "tags": [
-            "openclaw",
-            "update"
-          ],
-          "createdAt": "2026-03-13T15:00:00Z",
-          "doneAt": "2026-03-13T16:00:00Z"
-        },
-        {
-          "id": "t8",
-          "title": "Live Data Integration",
-          "description": "Wire Overview widgets to ecosystem.json and kanban.json via GatewayContext",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "dashboard",
+            "api",
             "data",
-            "integration"
+            "performance"
           ],
-          "createdAt": "2026-03-13T10:00:00Z",
-          "doneAt": "2026-03-14T12:00:00Z"
+          "createdAt": "2026-03-17T12:45:00Z",
+          "doneAt": "2026-03-17T13:00:00Z"
         },
         {
-          "id": "t9",
-          "title": "Kanban Task CRUD",
-          "description": "Inline task creation per column, persists to GitHub API",
-          "assignee": "Development",
-          "priority": "medium",
-          "tags": [
-            "kanban",
-            "crud"
-          ],
-          "createdAt": "2026-03-13T18:00:00Z",
-          "doneAt": "2026-03-14T09:00:00Z"
-        },
-        {
-          "id": "t10",
-          "title": "Cron Jobs Dashboard",
-          "description": "View, manage, and toggle cron jobs from the dashboard",
-          "assignee": "Development",
-          "priority": "medium",
-          "tags": [
-            "cron",
-            "dashboard"
-          ],
-          "createdAt": "2026-03-08T12:00:00Z",
-          "doneAt": "2026-03-14T10:00:00Z"
-        },
-        {
-          "id": "t11",
-          "title": "Editable MD Files",
-          "description": "View and edit workspace MD files via gateway RPC from Agent Hub",
-          "assignee": "Development",
-          "priority": "medium",
-          "tags": [
-            "files",
-            "editor",
-            "agent-hub"
-          ],
-          "createdAt": "2026-03-08T12:00:00Z",
-          "doneAt": "2026-03-14T11:00:00Z"
-        },
-        {
-          "id": "t12",
-          "title": "Elastic IP + Domain",
-          "description": "Assign Elastic IP 3.227.84.30, update Caddy and all dashboard URLs",
+          "id": "t21",
+          "title": "Device Pairing + Trusted Proxies Fix",
+          "description": "Configure gateway trustedProxies, approve browser device, fix WS connection for all pages",
           "assignee": "Nova",
           "priority": "high",
           "tags": [
-            "aws",
-            "infrastructure",
-            "networking"
-          ],
-          "createdAt": "2026-03-09T12:00:00Z",
-          "doneAt": "2026-03-14T15:00:00Z"
-        },
-        {
-          "id": "t13",
-          "title": "Security Hardening",
-          "description": "fail2ban, SSH hardening, UFW firewall configuration",
-          "assignee": "Nova",
-          "priority": "high",
-          "tags": [
-            "security",
-            "infrastructure"
-          ],
-          "createdAt": "2026-03-09T12:00:00Z",
-          "doneAt": "2026-03-14T15:30:00Z"
-        },
-        {
-          "id": "t14",
-          "title": "Runtime Gateway Config",
-          "description": "gateway-config.json loaded at runtime \u2014 no more hardcoded URLs in JS bundle",
-          "assignee": "Development",
-          "priority": "medium",
-          "tags": [
-            "config",
-            "gateway"
-          ],
-          "createdAt": "2026-03-14T10:00:00Z",
-          "doneAt": "2026-03-14T12:00:00Z"
-        },
-        {
-          "id": "t15",
-          "title": "Chat Page - Gateway Integration",
-          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram \u2194 Dashboard)",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "chat",
             "gateway",
-            "realtime"
+            "websocket",
+            "security"
           ],
-          "createdAt": "2026-03-14T10:00:00Z",
-          "doneAt": "2026-03-14T14:00:00Z"
+          "createdAt": "2026-03-17T12:29:00Z",
+          "doneAt": "2026-03-17T12:32:00Z"
+        },
+        {
+          "id": "t20",
+          "title": "Alpha Stack Configuration",
+          "description": "Configure Hunter Alpha (text) + Healer Alpha (images) as zero-cost model pair",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "models",
+            "config",
+            "cost-optimization"
+          ],
+          "createdAt": "2026-03-17T11:56:00Z",
+          "doneAt": "2026-03-17T11:57:00Z"
+        },
+        {
+          "id": "t19",
+          "title": "Mobile Responsive Dashboard",
+          "description": "Hamburger menu, slide-in drawer, responsive grids, touch targets, scrollable kanban columns",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "mobile",
+            "responsive",
+            "ui"
+          ],
+          "createdAt": "2026-03-17T11:00:00Z",
+          "doneAt": "2026-03-17T11:03:00Z"
         },
         {
           "id": "t16",
@@ -262,60 +117,205 @@
           "doneAt": "2026-03-17T10:32:00Z"
         },
         {
-          "id": "t19",
-          "title": "Mobile Responsive Dashboard",
-          "description": "Hamburger menu, slide-in drawer, responsive grids, touch targets, scrollable kanban columns",
+          "id": "t13",
+          "title": "Security Hardening",
+          "description": "fail2ban, SSH hardening, UFW firewall configuration",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "security",
+            "infrastructure"
+          ],
+          "createdAt": "2026-03-09T12:00:00Z",
+          "doneAt": "2026-03-14T15:30:00Z"
+        },
+        {
+          "id": "t12",
+          "title": "Elastic IP + Domain",
+          "description": "Assign Elastic IP 3.227.84.30, update Caddy and all dashboard URLs",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "aws",
+            "infrastructure",
+            "networking"
+          ],
+          "createdAt": "2026-03-09T12:00:00Z",
+          "doneAt": "2026-03-14T15:00:00Z"
+        },
+        {
+          "id": "t15",
+          "title": "Chat Page - Gateway Integration",
+          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram \u2194 Dashboard)",
           "assignee": "Development",
           "priority": "high",
           "tags": [
-            "mobile",
-            "responsive",
-            "ui"
+            "chat",
+            "gateway",
+            "realtime"
           ],
-          "createdAt": "2026-03-17T11:00:00Z",
-          "doneAt": "2026-03-17T11:03:00Z"
+          "createdAt": "2026-03-14T10:00:00Z",
+          "doneAt": "2026-03-14T14:00:00Z"
         },
         {
-          "id": "t20",
-          "title": "Alpha Stack Configuration",
-          "description": "Configure Hunter Alpha (text) + Healer Alpha (images) as zero-cost model pair",
+          "id": "t8",
+          "title": "Live Data Integration",
+          "description": "Wire Overview widgets to ecosystem.json and kanban.json via GatewayContext",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "dashboard",
+            "data",
+            "integration"
+          ],
+          "createdAt": "2026-03-13T10:00:00Z",
+          "doneAt": "2026-03-14T12:00:00Z"
+        },
+        {
+          "id": "t14",
+          "title": "Runtime Gateway Config",
+          "description": "gateway-config.json loaded at runtime \u2014 no more hardcoded URLs in JS bundle",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "config",
+            "gateway"
+          ],
+          "createdAt": "2026-03-14T10:00:00Z",
+          "doneAt": "2026-03-14T12:00:00Z"
+        },
+        {
+          "id": "t11",
+          "title": "Editable MD Files",
+          "description": "View and edit workspace MD files via gateway RPC from Agent Hub",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "files",
+            "editor",
+            "agent-hub"
+          ],
+          "createdAt": "2026-03-08T12:00:00Z",
+          "doneAt": "2026-03-14T11:00:00Z"
+        },
+        {
+          "id": "t10",
+          "title": "Cron Jobs Dashboard",
+          "description": "View, manage, and toggle cron jobs from the dashboard",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "cron",
+            "dashboard"
+          ],
+          "createdAt": "2026-03-08T12:00:00Z",
+          "doneAt": "2026-03-14T10:00:00Z"
+        },
+        {
+          "id": "t9",
+          "title": "Kanban Task CRUD",
+          "description": "Inline task creation per column, persists to GitHub API",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "kanban",
+            "crud"
+          ],
+          "createdAt": "2026-03-13T18:00:00Z",
+          "doneAt": "2026-03-14T09:00:00Z"
+        },
+        {
+          "id": "t7",
+          "title": "OpenClaw Update 2026.3.8",
+          "description": "Update gateway and fix breaking changes",
           "assignee": "Nova",
           "priority": "medium",
           "tags": [
-            "models",
-            "config",
-            "cost-optimization"
+            "openclaw",
+            "update"
           ],
-          "createdAt": "2026-03-17T11:56:00Z",
-          "doneAt": "2026-03-17T11:57:00Z"
+          "createdAt": "2026-03-13T15:00:00Z",
+          "doneAt": "2026-03-13T16:00:00Z"
         },
         {
-          "id": "t21",
-          "title": "Device Pairing + Trusted Proxies Fix",
-          "description": "Configure gateway trustedProxies, approve browser device, fix WS connection for all pages",
-          "assignee": "Nova",
-          "priority": "high",
-          "tags": [
-            "gateway",
-            "websocket",
-            "security"
-          ],
-          "createdAt": "2026-03-17T12:29:00Z",
-          "doneAt": "2026-03-17T12:32:00Z"
-        },
-        {
-          "id": "t22",
-          "title": "Live Data + Dynamic API",
-          "description": "New /api/ecosystem endpoint reads from GitHub API, 30s refresh, no CDN cache, proper date sorting",
+          "id": "t5",
+          "title": "Chat WebSocket Connection",
+          "description": "Fix gateway WebSocket handshake and device pairing for dashboard chat",
           "assignee": "Development",
           "priority": "high",
           "tags": [
-            "api",
-            "data",
-            "performance"
+            "websocket",
+            "chat",
+            "gateway"
           ],
-          "createdAt": "2026-03-17T12:45:00Z",
-          "doneAt": "2026-03-17T13:00:00Z"
+          "createdAt": "2026-03-11T14:00:00Z",
+          "doneAt": "2026-03-12T16:00:00Z"
+        },
+        {
+          "id": "t6",
+          "title": "Dashboard Multi-Page App",
+          "description": "Overview, Kanban, Agent Hub, Chat pages with sidebar navigation",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "dashboard",
+            "ui",
+            "react"
+          ],
+          "createdAt": "2026-03-08T12:00:00Z",
+          "doneAt": "2026-03-12T10:00:00Z"
+        },
+        {
+          "id": "t4",
+          "title": "Fix Telegram Group Policy",
+          "description": "Set bot group policy to open for Nova responses in group chats",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "telegram",
+            "config"
+          ],
+          "createdAt": "2026-03-12T05:00:00Z",
+          "doneAt": "2026-03-12T05:30:00Z"
+        },
+        {
+          "id": "t3",
+          "title": "GitHub Repository Setup",
+          "description": "Set up nova-ops-surface repo with React/Vite/Tailwind stack",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "infrastructure",
+            "github"
+          ],
+          "createdAt": "2026-03-08T10:00:00Z",
+          "doneAt": "2026-03-08T12:00:00Z"
+        },
+        {
+          "id": "t2",
+          "title": "SOP Documentation",
+          "description": "Standard Operating Procedures for all development workflows",
+          "assignee": "Nova",
+          "priority": "medium",
+          "tags": [
+            "docs",
+            "sop"
+          ],
+          "createdAt": "2026-03-08T09:00:00Z",
+          "doneAt": "2026-03-08T11:00:00Z"
+        },
+        {
+          "id": "t1",
+          "title": "Governance Framework",
+          "description": "Autonomous governance framework with department structure",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "governance",
+            "framework"
+          ],
+          "createdAt": "2026-03-08T08:00:00Z",
+          "doneAt": "2026-03-08T10:00:00Z"
         }
       ]
     }
