@@ -603,6 +603,14 @@ const AgentHubPage: React.FC = () => {
                   </p>
                 </div>
               )}
+
+              {/* Task History */}
+              {selected && (
+                <div className="mt-6">
+                  <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">📊 Task History</h3>
+                  <TaskHistory agentId={selected.type === 'orchestrator' ? 'nova' : selected.id} />
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 md:p-12 flex flex-col items-center justify-center text-center h-full min-h-[300px] md:min-h-[400px]">
@@ -622,5 +630,64 @@ const AgentHubPage: React.FC = () => {
     </div>
   );
 };
+
+function TaskHistory({ agentId }: { agentId: string }) {
+  const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const cfg = await getGatewayConfig();
+        const wsUrl = cfg.gatewayUrl || '';
+        const base = wsUrl.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:') + '/nova-api';
+        const r = await fetch(`${base}/api/tasks/history?agent=${encodeURIComponent(agentId)}`, {
+          headers: { Authorization: `Bearer ${cfg.authToken}` },
+        });
+        if (r.ok) {
+          const data = await r.json();
+          if (!cancelled) setHistory(data.history || []);
+        }
+      } catch {}
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [agentId]);
+
+  if (loading) return <p className="text-xs text-slate-500 animate-pulse">Loading history...</p>;
+  if (history.length === 0) return (
+    <div className="bg-slate-800/30 rounded-lg p-4 text-center">
+      <p className="text-xs text-slate-600">No task history yet.</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-2 max-h-80 overflow-y-auto">
+      {history.map(task => (
+        <div key={task.id} className="flex items-center justify-between bg-slate-800/30 rounded-lg p-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-white truncate">{task.title}</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[10px] text-slate-500">{task.assignee}</span>
+              {task.doneAt && <span className="text-[10px] text-emerald-500">✅ {new Date(task.doneAt).toLocaleDateString()}</span>}
+              {task.startedAt && !task.doneAt && <span className="text-[10px] text-blue-400">Started {new Date(task.startedAt).toLocaleDateString()}</span>}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 ml-2">
+            <span className={`text-[10px] px-1.5 py-0.5 rounded ring-1 ${
+              task.column === 'done' ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' :
+              task.column === 'in-progress' ? 'bg-blue-500/10 text-blue-400 ring-blue-500/20' :
+              'bg-slate-500/10 text-slate-400 ring-slate-500/20'
+            }`}>{task.column === 'done' ? 'Done' : task.column === 'in-progress' ? 'In Progress' : task.column}</span>
+            <span className={`text-[10px] ${task.priority === 'high' ? 'text-red-400' : task.priority === 'medium' ? 'text-amber-400' : 'text-slate-500'}`}>
+              {task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '⚪'}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default AgentHubPage;

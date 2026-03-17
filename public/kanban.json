@@ -3,11 +3,16 @@
     {
       "id": "backlog",
       "title": "Backlog",
+      "tasks": []
+    },
+    {
+      "id": "in-progress",
+      "title": "In Progress",
       "tasks": [
         {
           "id": "t-1773759650558",
           "title": "Agent Task History in Detail Panel",
-          "description": "When clicking an agent in Agent Hub, show their task history — what they accomplished, completion rate, recent activity. Currently only department-level.",
+          "description": "When clicking an agent in Agent Hub, show their task history \u2014 what they accomplished, completion rate, recent activity. Currently only department-level.",
           "assignee": "Development",
           "priority": "medium",
           "tags": [
@@ -30,18 +35,24 @@
             }
           ],
           "createdAt": "2026-03-17T15:00:50.558Z",
-          "progress": 0
+          "progress": 0,
+          "startedAt": "2026-03-17T16:22:01.012Z"
         }
       ]
     },
     {
-      "id": "in-progress",
-      "title": "In Progress",
+      "id": "review",
+      "title": "Review",
+      "tasks": []
+    },
+    {
+      "id": "done",
+      "title": "Done",
       "tasks": [
         {
           "id": "t-1773759650281",
           "title": "Chat-to-Kanban Task Creation",
-          "description": "Tell Nova a task via chat → task appears on Kanban board instantly. Support steps, priority, assignee.",
+          "description": "Tell Nova a task via chat \u2192 task appears on Kanban board instantly. Support steps, priority, assignee.",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -56,16 +67,18 @@
             },
             {
               "text": "Nova calls POST /api/tasks when user gives a task",
-              "done": false
+              "done": true
             },
             {
               "text": "Task appears on Kanban board in real-time via SSE",
-              "done": false
+              "done": true
             }
           ],
           "createdAt": "2026-03-17T15:00:50.281Z",
-          "progress": 33,
-          "startedAt": "2026-03-17T15:02:02.344Z"
+          "progress": 100,
+          "startedAt": "2026-03-17T15:02:02.344Z",
+          "doneAt": "2026-03-17T16:22:00.963Z",
+          "agentId": "development"
         },
         {
           "id": "t-1773759650351",
@@ -81,20 +94,128 @@
           "steps": [
             {
               "text": "Query sub-agents from gateway via API",
-              "done": false
+              "done": true
             },
             {
               "text": "Display sub-agents in Agent Hub with status badges",
-              "done": false
+              "done": true
             },
             {
               "text": "Show sub-agent task assignments and progress",
-              "done": false
+              "done": true
             }
           ],
           "createdAt": "2026-03-17T15:00:50.351Z",
-          "progress": 0,
-          "startedAt": "2026-03-17T15:10:57.085Z"
+          "progress": 100,
+          "startedAt": "2026-03-17T15:10:57.085Z",
+          "doneAt": "2026-03-17T15:52:12.645Z",
+          "agentId": "development"
+        },
+        {
+          "id": "t-1773759650695",
+          "title": "Gateways Page - Gateway Management",
+          "description": "New sidebar page for gateway management: connection status, connected devices, integrations, health metrics for distributed environments.",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "gateways",
+            "management",
+            "infrastructure",
+            "ui"
+          ],
+          "steps": [
+            {
+              "text": "Design Gateways page with connection status cards",
+              "done": true
+            },
+            {
+              "text": "Show gateway health, uptime, connected devices",
+              "done": true
+            },
+            {
+              "text": "Display device pairing requests and approvals",
+              "done": true
+            },
+            {
+              "text": "Show gateway configuration and integration status",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.695Z",
+          "progress": 100,
+          "startedAt": "2026-03-17T15:10:57.392Z",
+          "doneAt": "2026-03-17T15:52:12.595Z",
+          "agentId": "development"
+        },
+        {
+          "id": "t-1773759650627",
+          "title": "Skills Page - Installed Skills Directory",
+          "description": "New sidebar page listing all installed skills with descriptions, details, and which agents can use them.",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "skills",
+            "ui",
+            "directory"
+          ],
+          "steps": [
+            {
+              "text": "Scan skills directory from gateway API",
+              "done": true
+            },
+            {
+              "text": "Display skill cards with name, description, capabilities",
+              "done": true
+            },
+            {
+              "text": "Show which agents/departments have access to each skill",
+              "done": true
+            },
+            {
+              "text": "Add skill detail view with full documentation",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.627Z",
+          "progress": 100,
+          "startedAt": "2026-03-17T15:10:57.314Z",
+          "doneAt": "2026-03-17T15:52:12.546Z",
+          "agentId": "development"
+        },
+        {
+          "id": "t-1773759650488",
+          "title": "Org Chart Page",
+          "description": "New sidebar page: visual org chart showing CEO \u2192 Nova (Orchestrator) \u2192 Department Leads \u2192 Team Members. Clear hierarchy, roles, responsibilities, communication flow.",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "org-chart",
+            "ui",
+            "hierarchy"
+          ],
+          "steps": [
+            {
+              "text": "Design org chart component with visual hierarchy",
+              "done": true
+            },
+            {
+              "text": "Populate from ecosystem.json data",
+              "done": true
+            },
+            {
+              "text": "Add role descriptions and responsibilities",
+              "done": true
+            },
+            {
+              "text": "Show communication flow arrows between levels",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.488Z",
+          "progress": 100,
+          "startedAt": "2026-03-17T15:10:57.237Z",
+          "doneAt": "2026-03-17T15:52:12.498Z",
+          "agentId": "development"
         },
         {
           "id": "t-1773759650420",
@@ -115,136 +236,27 @@
             },
             {
               "text": "Add username handles for all agents (@nova, @dev-lead, @research-lead)",
-              "done": false
+              "done": true
             },
             {
               "text": "Stream agent events from gateway WebSocket",
-              "done": false
+              "done": true
             },
             {
               "text": "Persist communication history",
-              "done": false
+              "done": true
             },
             {
               "text": "Add search and filter by agent",
-              "done": false
+              "done": true
             }
           ],
           "createdAt": "2026-03-17T15:00:50.420Z",
-          "progress": 20,
-          "startedAt": "2026-03-17T15:10:57.161Z"
+          "progress": 100,
+          "startedAt": "2026-03-17T15:10:57.161Z",
+          "doneAt": "2026-03-17T15:52:12.448Z",
+          "agentId": "development"
         },
-        {
-          "id": "t-1773759650488",
-          "title": "Org Chart Page",
-          "description": "New sidebar page: visual org chart showing CEO → Nova (Orchestrator) → Department Leads → Team Members. Clear hierarchy, roles, responsibilities, communication flow.",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "org-chart",
-            "ui",
-            "hierarchy"
-          ],
-          "steps": [
-            {
-              "text": "Design org chart component with visual hierarchy",
-              "done": true
-            },
-            {
-              "text": "Populate from ecosystem.json data",
-              "done": true
-            },
-            {
-              "text": "Add role descriptions and responsibilities",
-              "done": false
-            },
-            {
-              "text": "Show communication flow arrows between levels",
-              "done": false
-            }
-          ],
-          "createdAt": "2026-03-17T15:00:50.488Z",
-          "progress": 50,
-          "startedAt": "2026-03-17T15:10:57.237Z"
-        },
-        {
-          "id": "t-1773759650627",
-          "title": "Skills Page - Installed Skills Directory",
-          "description": "New sidebar page listing all installed skills with descriptions, details, and which agents can use them.",
-          "assignee": "Development",
-          "priority": "medium",
-          "tags": [
-            "skills",
-            "ui",
-            "directory"
-          ],
-          "steps": [
-            {
-              "text": "Scan skills directory from gateway API",
-              "done": false
-            },
-            {
-              "text": "Display skill cards with name, description, capabilities",
-              "done": false
-            },
-            {
-              "text": "Show which agents/departments have access to each skill",
-              "done": false
-            },
-            {
-              "text": "Add skill detail view with full documentation",
-              "done": false
-            }
-          ],
-          "createdAt": "2026-03-17T15:00:50.627Z",
-          "progress": 0,
-          "startedAt": "2026-03-17T15:10:57.314Z"
-        },
-        {
-          "id": "t-1773759650695",
-          "title": "Gateways Page - Gateway Management",
-          "description": "New sidebar page for gateway management: connection status, connected devices, integrations, health metrics for distributed environments.",
-          "assignee": "Development",
-          "priority": "medium",
-          "tags": [
-            "gateways",
-            "management",
-            "infrastructure",
-            "ui"
-          ],
-          "steps": [
-            {
-              "text": "Design Gateways page with connection status cards",
-              "done": false
-            },
-            {
-              "text": "Show gateway health, uptime, connected devices",
-              "done": false
-            },
-            {
-              "text": "Display device pairing requests and approvals",
-              "done": false
-            },
-            {
-              "text": "Show gateway configuration and integration status",
-              "done": false
-            }
-          ],
-          "createdAt": "2026-03-17T15:00:50.695Z",
-          "progress": 0,
-          "startedAt": "2026-03-17T15:10:57.392Z"
-        }
-      ]
-    },
-    {
-      "id": "review",
-      "title": "Review",
-      "tasks": []
-    },
-    {
-      "id": "done",
-      "title": "Done",
-      "tasks": [
         {
           "id": "t22",
           "title": "Live Data + Dynamic API",
@@ -257,7 +269,8 @@
             "performance"
           ],
           "createdAt": "2026-03-17T12:45:00Z",
-          "doneAt": "2026-03-17T13:00:00Z"
+          "doneAt": "2026-03-17T13:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t21",
@@ -271,7 +284,8 @@
             "security"
           ],
           "createdAt": "2026-03-17T12:29:00Z",
-          "doneAt": "2026-03-17T12:32:00Z"
+          "doneAt": "2026-03-17T12:32:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t20",
@@ -285,7 +299,8 @@
             "cost-optimization"
           ],
           "createdAt": "2026-03-17T11:56:00Z",
-          "doneAt": "2026-03-17T11:57:00Z"
+          "doneAt": "2026-03-17T11:57:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t19",
@@ -299,7 +314,8 @@
             "ui"
           ],
           "createdAt": "2026-03-17T11:00:00Z",
-          "doneAt": "2026-03-17T11:03:00Z"
+          "doneAt": "2026-03-17T11:03:00Z",
+          "agentId": "development"
         },
         {
           "id": "t16",
@@ -313,12 +329,13 @@
             "cost-optimization"
           ],
           "createdAt": "2026-03-17T10:30:00Z",
-          "doneAt": "2026-03-17T10:45:00Z"
+          "doneAt": "2026-03-17T10:45:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t17",
           "title": "Nova API Proxy",
-          "description": "HTTP API server (port 3001) for model/file management — bypasses WS device pairing. systemd service.",
+          "description": "HTTP API server (port 3001) for model/file management \u2014 bypasses WS device pairing. systemd service.",
           "assignee": "Nova",
           "priority": "high",
           "tags": [
@@ -327,7 +344,8 @@
             "backend"
           ],
           "createdAt": "2026-03-17T10:30:00Z",
-          "doneAt": "2026-03-17T10:35:00Z"
+          "doneAt": "2026-03-17T10:35:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t18",
@@ -340,7 +358,8 @@
             "config"
           ],
           "createdAt": "2026-03-17T10:30:00Z",
-          "doneAt": "2026-03-17T10:32:00Z"
+          "doneAt": "2026-03-17T10:32:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t13",
@@ -353,7 +372,8 @@
             "infrastructure"
           ],
           "createdAt": "2026-03-09T12:00:00Z",
-          "doneAt": "2026-03-14T15:30:00Z"
+          "doneAt": "2026-03-14T15:30:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t12",
@@ -367,12 +387,13 @@
             "networking"
           ],
           "createdAt": "2026-03-09T12:00:00Z",
-          "doneAt": "2026-03-14T15:00:00Z"
+          "doneAt": "2026-03-14T15:00:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t15",
           "title": "Chat Page - Gateway Integration",
-          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram ↔ Dashboard)",
+          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram \u2194 Dashboard)",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -381,7 +402,8 @@
             "realtime"
           ],
           "createdAt": "2026-03-14T10:00:00Z",
-          "doneAt": "2026-03-14T14:00:00Z"
+          "doneAt": "2026-03-14T14:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t8",
@@ -395,12 +417,13 @@
             "integration"
           ],
           "createdAt": "2026-03-13T10:00:00Z",
-          "doneAt": "2026-03-14T12:00:00Z"
+          "doneAt": "2026-03-14T12:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t14",
           "title": "Runtime Gateway Config",
-          "description": "gateway-config.json loaded at runtime — no more hardcoded URLs in JS bundle",
+          "description": "gateway-config.json loaded at runtime \u2014 no more hardcoded URLs in JS bundle",
           "assignee": "Development",
           "priority": "medium",
           "tags": [
@@ -408,7 +431,8 @@
             "gateway"
           ],
           "createdAt": "2026-03-14T10:00:00Z",
-          "doneAt": "2026-03-14T12:00:00Z"
+          "doneAt": "2026-03-14T12:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t11",
@@ -422,7 +446,8 @@
             "agent-hub"
           ],
           "createdAt": "2026-03-08T12:00:00Z",
-          "doneAt": "2026-03-14T11:00:00Z"
+          "doneAt": "2026-03-14T11:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t10",
@@ -435,7 +460,8 @@
             "dashboard"
           ],
           "createdAt": "2026-03-08T12:00:00Z",
-          "doneAt": "2026-03-14T10:00:00Z"
+          "doneAt": "2026-03-14T10:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t9",
@@ -448,7 +474,8 @@
             "crud"
           ],
           "createdAt": "2026-03-13T18:00:00Z",
-          "doneAt": "2026-03-14T09:00:00Z"
+          "doneAt": "2026-03-14T09:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t7",
@@ -461,7 +488,8 @@
             "update"
           ],
           "createdAt": "2026-03-13T15:00:00Z",
-          "doneAt": "2026-03-13T16:00:00Z"
+          "doneAt": "2026-03-13T16:00:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t5",
@@ -475,7 +503,8 @@
             "gateway"
           ],
           "createdAt": "2026-03-11T14:00:00Z",
-          "doneAt": "2026-03-12T16:00:00Z"
+          "doneAt": "2026-03-12T16:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t6",
@@ -489,7 +518,8 @@
             "react"
           ],
           "createdAt": "2026-03-08T12:00:00Z",
-          "doneAt": "2026-03-12T10:00:00Z"
+          "doneAt": "2026-03-12T10:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t4",
@@ -502,7 +532,8 @@
             "config"
           ],
           "createdAt": "2026-03-12T05:00:00Z",
-          "doneAt": "2026-03-12T05:30:00Z"
+          "doneAt": "2026-03-12T05:30:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t3",
@@ -515,7 +546,8 @@
             "github"
           ],
           "createdAt": "2026-03-08T10:00:00Z",
-          "doneAt": "2026-03-08T12:00:00Z"
+          "doneAt": "2026-03-08T12:00:00Z",
+          "agentId": "development"
         },
         {
           "id": "t2",
@@ -528,7 +560,8 @@
             "sop"
           ],
           "createdAt": "2026-03-08T09:00:00Z",
-          "doneAt": "2026-03-08T11:00:00Z"
+          "doneAt": "2026-03-08T11:00:00Z",
+          "agentId": "nova"
         },
         {
           "id": "t1",
@@ -541,7 +574,8 @@
             "framework"
           ],
           "createdAt": "2026-03-08T08:00:00Z",
-          "doneAt": "2026-03-08T10:00:00Z"
+          "doneAt": "2026-03-08T10:00:00Z",
+          "agentId": "nova"
         }
       ]
     }
