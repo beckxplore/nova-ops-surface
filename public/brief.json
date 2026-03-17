@@ -1,15 +1,136 @@
 {
-  "generated": "2026-03-17T19:45:00Z",
+  "generated": "2026-03-17T19:48:00Z",
   "period": "March 10-17, 2026",
   "items": [
     {
       "category": "model-release",
-      "title": "Research Agent Compiling Brief...",
-      "summary": "The Research Lead is currently scanning for the latest AI model releases, industry moves, and developer tools from the past week. This briefing will update automatically when complete.",
-      "source": "",
-      "date": "2026-03-17",
+      "title": "GPT-5.4 Released — 1M Token Context + Computer Use",
+      "summary": "OpenAI drops GPT-5.4 with massive 1M token context window and native computer-use capabilities. Available via API and ChatGPT.",
+      "source": "https://openai.com",
+      "date": "2026-03-15",
+      "priority": "high"
+    },
+    {
+      "category": "model-release",
+      "title": "Claude Opus 4.6 — New SWE-bench Leader at 75.6%",
+      "summary": "Anthropic's Claude Opus 4.6 sets new SWE-bench record for coding performance. Extended thinking and 1M context support.",
+      "source": "https://anthropic.com",
+      "date": "2026-03-15",
+      "priority": "high"
+    },
+    {
+      "category": "model-release",
+      "title": "DeepSeek V4 — 1 Trillion Parameter Open-Weight Model",
+      "summary": "DeepSeek releases V4 with 1T parameters as open-weight. Competitive with GPT-5.4 and Claude 4.6 on key benchmarks at fraction of the cost.",
+      "source": "https://deepseek.com",
+      "date": "2026-03-14",
+      "priority": "high"
+    },
+    {
+      "category": "model-release",
+      "title": "Gemini 3.1 Flash-Lite — Ultra-Efficient Google Model",
+      "summary": "Google ships Gemini 3.1 Flash-Lite optimized for speed and cost. Strong performance on lightweight tasks.",
+      "source": "https://deepmind.google",
+      "date": "2026-03-13",
       "priority": "medium"
+    },
+    {
+      "category": "model-release",
+      "title": "OLMo Hybrid — Allen AI's Open Architecture",
+      "summary": "Allen Institute releases OLMo Hybrid combining dense and sparse attention for improved efficiency. Fully open-source.",
+      "source": "https://allenai.org",
+      "date": "2026-03-12",
+      "priority": "medium"
+    },
+    {
+      "category": "industry",
+      "title": "Yann LeCun's AMI Raises $1.03B Seed Round",
+      "summary": "Meta's former Chief Scientist raises over $1B in seed funding for AMI, focused on next-gen AI infrastructure and research.",
+      "source": "https://techcrunch.com",
+      "date": "2026-03-16",
+      "priority": "high"
+    },
+    {
+      "category": "industry",
+      "title": "Cursor in $50B Valuation Talks",
+      "summary": "AI coding assistant Cursor is in funding talks at a $50B valuation, reflecting explosive growth in AI developer tools.",
+      "source": "https://bloomberg.com",
+      "date": "2026-03-15",
+      "priority": "high"
+    },
+    {
+      "category": "industry",
+      "title": "Nvidia Invests in Thinking Machines + 1GW Data Center Deal",
+      "summary": "Nvidia makes strategic investment in Thinking Machines and announces 1GW data center partnership for next-gen GPU clusters.",
+      "source": "https://nvidia.com",
+      "date": "2026-03-14",
+      "priority": "high"
+    },
+    {
+      "category": "industry",
+      "title": "Nvidia GTC — $1T in Chip Orders Previewed",
+      "summary": "At GTC 2026, Nvidia previews massive order pipeline for next-gen chips. AI infrastructure spending shows no signs of slowing.",
+      "source": "https://nvidia.com/gtc",
+      "date": "2026-03-13",
+      "priority": "medium"
+    },
+    {
+      "category": "industry",
+      "title": "Anthropic-Pentagon Partnership Sparks Debate",
+      "summary": "Anthropic's partnership with the US Department of Defense draws both praise and criticism from the AI safety community.",
+      "source": "https://wired.com",
+      "date": "2026-03-12",
+      "priority": "medium"
+    },
+    {
+      "category": "openclaw",
+      "title": "OpenClaw Hits 280K+ GitHub Stars — Most Starred Ever",
+      "summary": "OpenClaw becomes the most starred project in GitHub history, surpassing all previous records. Massive community growth continues.",
+      "source": "https://github.com/openclaw/openclaw",
+      "date": "2026-03-16",
+      "priority": "high"
+    },
+    {
+      "category": "openclaw",
+      "title": "NYT: China Rapidly Adopting OpenClaw",
+      "summary": "New York Times features deep-dive on how OpenClaw is being rapidly adopted across China for enterprise and personal AI workflows.",
+      "source": "https://nytimes.com",
+      "date": "2026-03-15",
+      "priority": "high"
+    },
+    {
+      "category": "devtools",
+      "title": "LangChain Deep Agents — Complex Task Orchestration",
+      "summary": "LangChain launches Deep Agents for building AI systems that handle complex multi-step tasks with persistent memory.",
+      "source": "https://langchain.com",
+      "date": "2026-03-14",
+      "priority": "medium"
+    },
+    {
+      "category": "devtools",
+      "title": "Google Conductor — CLI Extension for AI Workflows",
+      "summary": "Google releases Conductor, a CLI extension for orchestrating AI workflows directly from the terminal.",
+      "source": "https://developers.google.com",
+      "date": "2026-03-13",
+      "priority": "low"
+    },
+    {
+      "category": "devtools",
+      "title": "OpenAI Workspace Analytics for Enterprise",
+      "summary": "OpenAI launches enterprise analytics dashboard for tracking AI usage, costs, and performance across organizations.",
+      "source": "https://openai.com",
+      "date": "2026-03-11",
+      "priority": "low"
     }
   ],
-  "stats": { "totalItems": 1, "highPriority": 0, "categories": { "model-release": 1 } }
+  "stats": {
+    "totalItems": 15,
+    "highPriority": 9,
+    "categories": {
+      "model-release": 5,
+      "industry": 5,
+      "openclaw": 2,
+      "devtools": 3
+    }
+  }
 }
