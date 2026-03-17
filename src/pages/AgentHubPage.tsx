@@ -88,8 +88,8 @@ const AgentHubPage: React.FC = () => {
         if (cancelled) return;
         const models = Array.isArray(data) ? data : (data?.models || []);
         setAvailableModels(models.map((m: any) => ({
-          id: typeof m === 'string' ? m : m.id,
-          name: m.name || m.alias || m.id,
+          id: typeof m === 'string' ? m : (m.key || m.id),
+          name: m.name || m.alias || m.key || m.id,
         })));
       } catch (err) {
         console.warn('[Hub] models fetch failed:', err);
@@ -421,7 +421,7 @@ const AgentHubPage: React.FC = () => {
                         >
                           {availableModels.length > 0 ? availableModels.map(m => (
                             <option key={m.id} value={m.id}>
-                              {m.id}{m.id === currentModel ? ' ✓' : ''}
+                              {m.name || m.id}{m.id === currentModel ? ' ✓' : ''}
                             </option>
                           )) : (
                             <option value={currentModel}>{currentModel || 'Loading...'}</option>
