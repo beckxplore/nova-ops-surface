@@ -4,7 +4,7 @@
 const REPO_OWNER = 'beckxplore';
 const REPO_NAME = 'nova-ops-surface';
 const BRANCH = 'master';
-const GATEWAY_URL = 'https://98-93-181-83.sslip.io';
+const GATEWAY_URL = 'https://3-227-84-30.sslip.io';
 
 async function getFileContent(path, token) {
   const headers = { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' };

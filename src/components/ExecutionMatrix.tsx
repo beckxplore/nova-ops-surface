@@ -68,12 +68,16 @@ const ExecutionMatrix: React.FC = () => {
     return rows;
   }, [eco]);
 
-  // Group by project
+  // Group by project, sorted by priority (high > medium > low)
   const projects = useMemo(() => {
     const groups: Record<string, TaskRow[]> = {};
     for (const task of tasks) {
       if (!groups[task.project]) groups[task.project] = [];
       groups[task.project].push(task);
+    }
+    const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+    for (const key of Object.keys(groups)) {
+      groups[key].sort((a, b) => (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1));
     }
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [tasks]);

@@ -169,37 +169,24 @@ export const GatewayProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, []);
 
-  // Fetch ecosystem data from static files + API
+  // Fetch ecosystem data from dynamic API (live from GitHub, no static cache)
   useEffect(() => {
     const loadData = async () => {
-      let ecoData: any = null;
       try {
-        const r = await fetch('/ecosystem.json');
-        if (r.ok) ecoData = await r.json();
-      } catch {}
-      if (!ecoData) ecoData = { departments: [], individualAgents: [], projects: [] };
-      
-      try {
-        const r = await fetch('/api/agents');
+        const r = await fetch('/api/ecosystem');
         if (r.ok) {
-          const agents = await r.json();
-          if (agents.departments) ecoData.departments = agents.departments;
-          if (agents.individuals) ecoData.individualAgents = agents.individuals;
+          const data = await r.json();
+          if (data.ecosystem) {
+            data.ecosystem.kanban = data.kanban;
+            setEco(data.ecosystem);
+          }
         }
-      } catch {}
-      
-      try {
-        const r = await fetch('/kanban.json');
-        if (r.ok) {
-          const ct = r.headers.get('content-type') || '';
-          if (ct.includes('json')) ecoData.kanban = await r.json();
-        }
-      } catch {}
-      
-      setEco(ecoData);
+      } catch (err) {
+        console.error('[Gateway] Failed to fetch ecosystem:', err);
+      }
     };
     loadData();
-    const interval = setInterval(loadData, 120000);
+    const interval = setInterval(loadData, 30000); // 30s — faster refresh
     return () => clearInterval(interval);
   }, []);
 

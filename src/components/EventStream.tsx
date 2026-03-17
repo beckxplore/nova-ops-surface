@@ -93,12 +93,19 @@ const EventStream: React.FC = () => {
     }));
   }, [wsEvents]);
 
-  // Merge all events, dedup by message similarity, sort by timestamp desc
+  // Merge all events, sort by timestamp desc (newest first), take latest 50
   const allEvents = useMemo(() => {
     const merged = [...liveEvents, ...kanbanEvents, ...logEvents];
-    // Sort newest first
-    merged.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-    // Take latest 50
+    // Sort newest first — parse dates for proper chronological ordering
+    merged.sort((a, b) => {
+      const da = new Date(a.timestamp).getTime();
+      const db = new Date(b.timestamp).getTime();
+      // If either date is invalid, push to end
+      if (isNaN(da) && isNaN(db)) return 0;
+      if (isNaN(da)) return 1;
+      if (isNaN(db)) return -1;
+      return db - da; // newest first
+    });
     return merged.slice(0, 50);
   }, [liveEvents, kanbanEvents, logEvents]);
 
