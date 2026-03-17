@@ -7,8 +7,9 @@ interface FeedEvent {
   id: string;
   agent: string;
   message: string;
-  type: 'Task' | 'Status' | 'Deploy' | 'System';
+  type: 'Task' | 'Status' | 'Deploy' | 'System' | 'Delegation' | 'Update' | 'Completion' | 'Message';
   timestamp: string;
+  to?: string;
 }
 
 interface Task {
@@ -41,6 +42,15 @@ const TYPE_BADGE: Record<string, string> = {
   Status: 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20',
   Deploy: 'bg-amber-500/10 text-amber-400 ring-amber-500/20',
   System: 'bg-slate-500/10 text-slate-400 ring-slate-500/20',
+  Message: 'bg-slate-500/10 text-slate-300 ring-slate-500/20',
+  Delegation: 'bg-purple-500/10 text-purple-400 ring-purple-500/20',
+  Update: 'bg-cyan-500/10 text-cyan-400 ring-cyan-500/20',
+  Completion: 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20',
+};
+
+const TYPE_ICONS: Record<string, string> = {
+  Task: '📋', Status: '✅', Deploy: '🚀', System: '⚙️',
+  Message: '💬', Delegation: '👉', Update: '📢', Completion: '🏁',
 };
 
 const AGENT_ICONS: Record<string, string> = {
@@ -279,6 +289,31 @@ const LiveFeedPage: React.FC = () => {
     };
   }, [authToken, fetchTasks, addEvent]);
 
+  // Fetch agent communications (natural language inter-agent messages)
+  useEffect(() => {
+    const fetchComms = async () => {
+      try {
+        const r = await fetch('/api/comms');
+        if (!r.ok) return;
+        const data = await r.json();
+        const msgs = data.messages || [];
+        for (const msg of msgs) {
+          addEvent({
+            id: msg.id || `comms-${msg.timestamp}`,
+            agent: msg.from || '@nova',
+            message: msg.to && msg.to !== '@all' ? `→ ${msg.to} ${msg.message}` : msg.message,
+            type: (msg.type === 'delegation' ? 'Delegation' : msg.type === 'completion' ? 'Completion' : msg.type === 'update' ? 'Update' : 'Message') as FeedEvent['type'],
+            timestamp: msg.timestamp,
+            to: msg.to,
+          });
+        }
+      } catch {}
+    };
+    fetchComms();
+    const interval = setInterval(fetchComms, 60000);
+    return () => clearInterval(interval);
+  }, [addEvent]);
+
   // Connection status dot
   const statusDot =
     connectionStatus === 'LIVE'
@@ -377,8 +412,9 @@ const LiveFeedPage: React.FC = () => {
                     {evt.agent}
                   </span>
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ring-1 ring-inset ${TYPE_BADGE[evt.type] || TYPE_BADGE.System}`}
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ring-1 ring-inset ${TYPE_BADGE[evt.type] || TYPE_BADGE.System}`}
                   >
+                    <span>{TYPE_ICONS[evt.type] || '📋'}</span>
                     {evt.type}
                   </span>
                   <span className="text-[11px] text-slate-600 ml-auto shrink-0">
