@@ -122,7 +122,12 @@ const LiveFeedPage: React.FC = () => {
       });
       if (!res.ok) return;
       const data = await res.json();
-      const tasks: Task[] = Array.isArray(data) ? data : data.tasks || [];
+      // Flatten columns { backlog: [...], in-progress: [...], ... } into single array
+      const tasks: Task[] = data.columns
+        ? Object.entries(data.columns).flatMap(([colId, colTasks]: [string, any]) =>
+            (Array.isArray(colTasks) ? colTasks : []).map((t: any) => ({ ...t, column: colId }))
+          )
+        : Array.isArray(data) ? data : data.tasks || [];
 
       // Build current task map and generate events for new/changed tasks
       const currentMap = new Map<string, Task>();

@@ -56,14 +56,10 @@ const OrgChartPage: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        const cfg = await getGatewayConfig();
-        const httpUrl = cfg.gatewayUrl.replace('wss://', 'https://').replace('ws://', 'http://');
-        const res = await fetch(`${httpUrl}/api/ecosystem`, {
-          headers: cfg.authToken ? { Authorization: `Bearer ${cfg.authToken}` } : {},
-        });
+        const res = await fetch('/api/ecosystem');
         if (res.ok && !cancelled) {
           const data = await res.json();
-          setEco(data);
+          setEco(data.ecosystem || data);
         }
       } catch (e) {
         console.error('Failed to load ecosystem:', e);
