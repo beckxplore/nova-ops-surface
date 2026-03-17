@@ -8,6 +8,16 @@
     {
       "id": "in-progress",
       "title": "In Progress",
+      "tasks": []
+    },
+    {
+      "id": "review",
+      "title": "Review",
+      "tasks": []
+    },
+    {
+      "id": "done",
+      "title": "Done",
       "tasks": [
         {
           "id": "t-1773776628247",
@@ -23,36 +33,26 @@
           "steps": [
             {
               "text": "Create IntelligenceBrief component with news card layout",
-              "done": false
+              "done": true
             },
             {
               "text": "Add /api/brief endpoint to Nova API",
-              "done": false
+              "done": true
             },
             {
               "text": "Style with category badges and priority indicators",
-              "done": false
+              "done": true
             },
             {
               "text": "Add to Overview page and deploy",
-              "done": false
+              "done": true
             }
           ],
           "createdAt": "2026-03-17T19:43:48.247Z",
-          "progress": 0,
-          "startedAt": "2026-03-17T19:43:48.598Z"
-        }
-      ]
-    },
-    {
-      "id": "review",
-      "title": "Review",
-      "tasks": []
-    },
-    {
-      "id": "done",
-      "title": "Done",
-      "tasks": [
+          "progress": 100,
+          "startedAt": "2026-03-17T19:43:48.598Z",
+          "doneAt": "2026-03-17T20:21:12.306Z"
+        },
         {
           "id": "t-1773776628199",
           "title": "Research: AI/ML Intelligence Brief",
@@ -67,19 +67,19 @@
           "steps": [
             {
               "text": "Scan latest AI model releases (last 7 days)",
-              "done": false
+              "done": true
             },
             {
               "text": "Find key industry moves and funding rounds",
-              "done": false
+              "done": true
             },
             {
               "text": "Check OpenClaw ecosystem updates",
-              "done": false
+              "done": true
             },
             {
               "text": "Compile structured briefing JSON",
-              "done": false
+              "done": true
             }
           ],
           "createdAt": "2026-03-17T19:43:48.199Z",
@@ -90,7 +90,7 @@
         {
           "id": "t-1773759650558",
           "title": "Agent Task History in Detail Panel",
-          "description": "When clicking an agent in Agent Hub, show their task history — what they accomplished, completion rate, recent activity. Currently only department-level.",
+          "description": "When clicking an agent in Agent Hub, show their task history \u2014 what they accomplished, completion rate, recent activity. Currently only department-level.",
           "assignee": "Development",
           "priority": "medium",
           "tags": [
@@ -120,7 +120,7 @@
         {
           "id": "t-1773759650281",
           "title": "Chat-to-Kanban Task Creation",
-          "description": "Tell Nova a task via chat → task appears on Kanban board instantly. Support steps, priority, assignee.",
+          "description": "Tell Nova a task via chat \u2192 task appears on Kanban board instantly. Support steps, priority, assignee.",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -253,7 +253,7 @@
         {
           "id": "t-1773759650488",
           "title": "Org Chart Page",
-          "description": "New sidebar page: visual org chart showing CEO → Nova (Orchestrator) → Department Leads → Team Members. Clear hierarchy, roles, responsibilities, communication flow.",
+          "description": "New sidebar page: visual org chart showing CEO \u2192 Nova (Orchestrator) \u2192 Department Leads \u2192 Team Members. Clear hierarchy, roles, responsibilities, communication flow.",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -338,7 +338,8 @@
           ],
           "createdAt": "2026-03-17T12:45:00Z",
           "doneAt": "2026-03-17T13:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t21",
@@ -353,7 +354,8 @@
           ],
           "createdAt": "2026-03-17T12:29:00Z",
           "doneAt": "2026-03-17T12:32:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t20",
@@ -368,7 +370,8 @@
           ],
           "createdAt": "2026-03-17T11:56:00Z",
           "doneAt": "2026-03-17T11:57:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t19",
@@ -383,7 +386,8 @@
           ],
           "createdAt": "2026-03-17T11:00:00Z",
           "doneAt": "2026-03-17T11:03:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t16",
@@ -398,12 +402,13 @@
           ],
           "createdAt": "2026-03-17T10:30:00Z",
           "doneAt": "2026-03-17T10:45:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t17",
           "title": "Nova API Proxy",
-          "description": "HTTP API server (port 3001) for model/file management — bypasses WS device pairing. systemd service.",
+          "description": "HTTP API server (port 3001) for model/file management \u2014 bypasses WS device pairing. systemd service.",
           "assignee": "Nova",
           "priority": "high",
           "tags": [
@@ -413,7 +418,8 @@
           ],
           "createdAt": "2026-03-17T10:30:00Z",
           "doneAt": "2026-03-17T10:35:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t18",
@@ -427,7 +433,8 @@
           ],
           "createdAt": "2026-03-17T10:30:00Z",
           "doneAt": "2026-03-17T10:32:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t13",
@@ -441,7 +448,8 @@
           ],
           "createdAt": "2026-03-09T12:00:00Z",
           "doneAt": "2026-03-14T15:30:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t12",
@@ -456,12 +464,13 @@
           ],
           "createdAt": "2026-03-09T12:00:00Z",
           "doneAt": "2026-03-14T15:00:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t15",
           "title": "Chat Page - Gateway Integration",
-          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram ↔ Dashboard)",
+          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram \u2194 Dashboard)",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -471,7 +480,8 @@
           ],
           "createdAt": "2026-03-14T10:00:00Z",
           "doneAt": "2026-03-14T14:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t8",
@@ -486,12 +496,13 @@
           ],
           "createdAt": "2026-03-13T10:00:00Z",
           "doneAt": "2026-03-14T12:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t14",
           "title": "Runtime Gateway Config",
-          "description": "gateway-config.json loaded at runtime — no more hardcoded URLs in JS bundle",
+          "description": "gateway-config.json loaded at runtime \u2014 no more hardcoded URLs in JS bundle",
           "assignee": "Development",
           "priority": "medium",
           "tags": [
@@ -500,7 +511,8 @@
           ],
           "createdAt": "2026-03-14T10:00:00Z",
           "doneAt": "2026-03-14T12:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t11",
@@ -515,7 +527,8 @@
           ],
           "createdAt": "2026-03-08T12:00:00Z",
           "doneAt": "2026-03-14T11:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t10",
@@ -529,7 +542,8 @@
           ],
           "createdAt": "2026-03-08T12:00:00Z",
           "doneAt": "2026-03-14T10:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t9",
@@ -543,7 +557,8 @@
           ],
           "createdAt": "2026-03-13T18:00:00Z",
           "doneAt": "2026-03-14T09:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t7",
@@ -557,7 +572,8 @@
           ],
           "createdAt": "2026-03-13T15:00:00Z",
           "doneAt": "2026-03-13T16:00:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t5",
@@ -572,7 +588,8 @@
           ],
           "createdAt": "2026-03-11T14:00:00Z",
           "doneAt": "2026-03-12T16:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t6",
@@ -587,7 +604,8 @@
           ],
           "createdAt": "2026-03-08T12:00:00Z",
           "doneAt": "2026-03-12T10:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t4",
@@ -601,7 +619,8 @@
           ],
           "createdAt": "2026-03-12T05:00:00Z",
           "doneAt": "2026-03-12T05:30:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t3",
@@ -615,7 +634,8 @@
           ],
           "createdAt": "2026-03-08T10:00:00Z",
           "doneAt": "2026-03-08T12:00:00Z",
-          "agentId": "development"
+          "agentId": "development",
+          "progress": 100
         },
         {
           "id": "t2",
@@ -629,7 +649,8 @@
           ],
           "createdAt": "2026-03-08T09:00:00Z",
           "doneAt": "2026-03-08T11:00:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         },
         {
           "id": "t1",
@@ -643,7 +664,8 @@
           ],
           "createdAt": "2026-03-08T08:00:00Z",
           "doneAt": "2026-03-08T10:00:00Z",
-          "agentId": "nova"
+          "agentId": "nova",
+          "progress": 100
         }
       ]
     }
