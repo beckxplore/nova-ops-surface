@@ -201,13 +201,13 @@ const KanbanPage: React.FC = () => {
   const projects = [...new Set(columns.flatMap((c: Column) => c.tasks.map((t: Task) => t.project).filter(Boolean)))];
 
   return (
-    <div className="p-6 flex flex-col h-screen">
+    <div className="p-4 md:p-6 flex flex-col h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-4 shrink-0 gap-2">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Kanban Board</h1>
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white">Kanban Board</h1>
           <div className="flex items-center gap-2 mt-1">
-            <p className="text-slate-400 text-sm">{totalTasks} tasks &bull; {projects.length} projects</p>
+            <p className="text-slate-400 text-xs md:text-sm">{totalTasks} tasks &bull; {projects.length} projects</p>
             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${
               isLive ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
             }`}>
@@ -216,16 +216,18 @@ const KanbanPage: React.FC = () => {
             </span>
           </div>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {projects.map((p: any) => (
-            <span key={p} className="px-2.5 py-1 bg-slate-800 rounded-full text-[10px] text-slate-400 font-medium">{p}</span>
-          ))}
-        </div>
+        {projects.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {projects.map((p: any) => (
+              <span key={p} className="px-2.5 py-1 bg-slate-800 rounded-full text-[10px] text-slate-400 font-medium">{p}</span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Cron Jobs Section — Live from Gateway */}
-      <div className="mb-4 shrink-0">
-        <button onClick={() => setShowCron(!showCron)} className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
+      <div className="mb-3 md:mb-4 shrink-0">
+        <button onClick={() => setShowCron(!showCron)} className="flex items-center gap-2 text-sm font-semibold text-white mb-2 min-h-[44px] md:min-h-0">
           <span>{showCron ? '▼' : '▸'}</span>
           <span>⏱️ Scheduled Jobs</span>
         </button>
@@ -233,9 +235,9 @@ const KanbanPage: React.FC = () => {
       </div>
 
       {/* Board */}
-      <div className="flex-1 flex gap-4 overflow-x-auto pb-4">
+      <div className="flex-1 flex gap-3 md:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:snap-none">
         {columns.map((column: Column) => (
-          <div key={column.id} className="w-72 shrink-0 flex flex-col">
+          <div key={column.id} className="w-72 md:w-72 shrink-0 flex flex-col snap-start">
             {/* Column Header */}
             <div className={`flex items-center justify-between px-4 py-3 bg-slate-900 border border-slate-800 rounded-t-xl border-t-2 ${column.color}`}>
               <div className="flex items-center gap-2">
@@ -250,7 +252,7 @@ const KanbanPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowAddForm(showAddForm === column.id ? null : column.id)}
-                className="h-6 w-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700 transition-colors text-sm"
+                className="h-8 w-8 md:h-6 md:w-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700 transition-colors text-sm min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
               >+</button>
             </div>
 

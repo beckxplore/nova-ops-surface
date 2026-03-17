@@ -103,11 +103,11 @@ const EventStream: React.FC = () => {
   }, [liveEvents, kanbanEvents, logEvents]);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-white">Event Stream</h2>
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-4 gap-1">
+        <h2 className="text-base md:text-lg font-semibold text-white">Event Stream</h2>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">{allEvents.length} events</span>
+          <span className="text-[10px] md:text-xs text-slate-500">{allEvents.length} events</span>
           {liveEvents.length > 0 && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>

@@ -77,8 +77,8 @@ const ResourcePulse: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 h-full">
-      <h2 className="text-lg font-semibold text-white mb-4">Resource Pulse</h2>
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-6 h-full">
+      <h2 className="text-base md:text-lg font-semibold text-white mb-3 md:mb-4">Resource Pulse</h2>
 
       {/* Orchestrator */}
       <div className="mb-5">

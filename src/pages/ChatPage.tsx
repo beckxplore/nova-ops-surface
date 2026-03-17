@@ -507,9 +507,9 @@ const ChatPage: React.FC = () => {
   /* ─── Render ─────────────────────────────────────────────── */
 
   return (
-    <div className="flex h-screen">
-      {/* ─── Session Sidebar ─────────────────────────────────── */}
-      <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-3.5rem)] md:h-screen">
+      {/* ─── Session Sidebar — hidden on mobile, shown as sidebar on desktop ─ */}
+      <div className="hidden md:flex w-72 bg-slate-900 border-r border-slate-800 flex-col shrink-0">
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-white">Sessions</h2>
           {sessionsLoading ? (
@@ -571,55 +571,87 @@ const ChatPage: React.FC = () => {
         </div>
       </div>
 
+      {/* ─── Mobile: Horizontal session bar ───────────────────── */}
+      <div className="md:hidden bg-slate-900 border-b border-slate-800 overflow-x-auto shrink-0">
+        <div className="flex items-center gap-1 p-2 min-w-max">
+          {sessionsLoading && (
+            <span className="text-[10px] text-slate-500 animate-pulse px-2">Loading...</span>
+          )}
+          {sessions.map(session => {
+            const isActive = session.key === activeSessionKey;
+            return (
+              <button
+                key={session.key}
+                onClick={() => switchSession(session.key)}
+                className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs transition-colors min-h-[44px] ${
+                  isActive
+                    ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
+                    : 'text-slate-400 border border-transparent hover:bg-slate-800/50'
+                }`}
+              >
+                <span className="mr-1">{session.icon}</span>
+                <span className="font-medium">{session.label}</span>
+                {isActive && <span className={`ml-1.5 h-1.5 w-1.5 rounded-full inline-block ${statusColor}`}></span>}
+              </button>
+            );
+          })}
+          {sessions.length === 0 && !sessionsLoading && (
+            <span className="text-[10px] text-slate-600 px-2">
+              {status === 'connected' ? 'No sessions' : 'Connecting...'}
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* ─── Chat Area ───────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 bg-slate-900/50">
+        <div className="px-3 md:px-6 py-3 md:py-4 border-b border-slate-800 bg-slate-900/50 shrink-0">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-white">
+            <div className="min-w-0">
+              <h2 className="text-base md:text-lg font-semibold text-white truncate">
                 {activeSession?.icon || '💬'} {activeSession?.label || 'Nova Chat'}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-[10px] md:text-xs text-slate-500 truncate">
                 {activeSession?.model?.split('/').pop() || 'Direct session'} · {activeSession?.source || 'gateway'}
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3 shrink-0 ml-2">
               {loadingHistory && (
-                <span className="text-[10px] text-slate-500 animate-pulse">Loading history...</span>
+                <span className="text-[10px] text-slate-500 animate-pulse hidden sm:inline">Loading...</span>
               )}
               <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ${
                 status === 'connected' ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20' : 'bg-slate-500/10 text-slate-400 ring-1 ring-slate-500/20'
               }`}>
                 <span className={`h-1.5 w-1.5 rounded-full ${statusColor}`}></span>
-                {status === 'connected' ? 'Nova Online' : status === 'connecting' ? 'Connecting...' : status === 'error' ? 'Error' : 'Offline'}
+                <span className="hidden sm:inline">{status === 'connected' ? 'Nova Online' : status === 'connecting' ? 'Connecting...' : status === 'error' ? 'Error' : 'Offline'}</span>
               </span>
             </div>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-3 md:px-6 py-3 md:py-4 space-y-3 md:space-y-4">
           {messages.length === 0 && !loadingHistory && canChat && (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <span className="text-4xl mb-4">🤖</span>
-              <h3 className="text-lg font-medium text-white mb-2">Nova is ready</h3>
-              <p className="text-sm text-slate-500">Type a message to start chatting · History loads automatically</p>
+              <span className="text-3xl md:text-4xl mb-4">🤖</span>
+              <h3 className="text-base md:text-lg font-medium text-white mb-2">Nova is ready</h3>
+              <p className="text-xs md:text-sm text-slate-500">Type a message to start chatting · History loads automatically</p>
             </div>
           )}
           {messages.length === 0 && loadingHistory && (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <span className="text-4xl mb-4 animate-bounce">⏳</span>
-              <h3 className="text-lg font-medium text-white mb-2">Loading conversation...</h3>
+              <span className="text-3xl md:text-4xl mb-4 animate-bounce">⏳</span>
+              <h3 className="text-base md:text-lg font-medium text-white mb-2">Loading conversation...</h3>
             </div>
           )}
           {messages.length === 0 && !canChat && !loadingHistory && (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <span className="text-4xl mb-4">🔌</span>
-              <h3 className="text-lg font-medium text-white mb-2">
+              <span className="text-3xl md:text-4xl mb-4">🔌</span>
+              <h3 className="text-base md:text-lg font-medium text-white mb-2">
                 {status === 'connecting' ? 'Connecting to Nova...' : 'Disconnected'}
               </h3>
-              <p className="text-sm text-slate-500">Will reconnect automatically</p>
+              <p className="text-xs md:text-sm text-slate-500">Will reconnect automatically</p>
             </div>
           )}
 
@@ -643,10 +675,10 @@ const ChatPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[70%] ${isUser
+                    <div className={`max-w-[85%] md:max-w-[70%] ${isUser
                       ? 'bg-blue-500/10 border border-blue-500/20 rounded-2xl rounded-br-sm'
                       : 'bg-slate-800/50 border border-slate-700/50 rounded-2xl rounded-bl-sm'
-                    } px-4 py-3`}>
+                    } px-3 md:px-4 py-2.5 md:py-3`}>
                       <div className="flex items-center gap-1.5 mb-1">
                         <span className="text-[10px]">
                           {sourceIcon[msg.source] || '💬'}
@@ -656,7 +688,7 @@ const ChatPage: React.FC = () => {
                         </span>
                         <span className="text-[10px] text-slate-600">{formatTime(msg.timestamp)}</span>
                       </div>
-                      <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                      <p className="text-xs md:text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
                         {msg.content}
                       </p>
                       {msg.streaming && (
@@ -672,32 +704,32 @@ const ChatPage: React.FC = () => {
         </div>
 
         {/* Input */}
-        <div className="px-6 py-4 border-t border-slate-800 bg-slate-900/50">
-          <div className="flex gap-3">
+        <div className="px-3 md:px-6 py-3 md:py-4 border-t border-slate-800 bg-slate-900/50 shrink-0">
+          <div className="flex gap-2 md:gap-3">
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => {
                 if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
               }}
-              placeholder={canChat ? `Message in ${activeSession?.label || 'Nova Chat'}...` : 'Connecting to gateway...'}
+              placeholder={canChat ? `Message in ${activeSession?.label || 'Nova Chat'}...` : 'Connecting...'}
               disabled={sending || !canChat}
-              className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 placeholder:text-slate-600 disabled:opacity-50"
+              className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 placeholder:text-slate-600 disabled:opacity-50 min-h-[44px]"
             />
             <button
               onClick={sendMessage}
               disabled={sending || !input.trim() || !canChat}
-              className="px-5 py-3 bg-blue-500 text-white rounded-xl text-sm font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 md:px-5 py-2.5 md:py-3 bg-blue-500 text-white rounded-xl text-xs md:text-sm font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] shrink-0"
             >
               {sending ? (
                 <span className="flex items-center gap-2">
                   <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Thinking</span>
+                  <span className="hidden sm:inline">Thinking</span>
                 </span>
               ) : 'Send'}
             </button>
           </div>
-          <p className="text-[10px] text-slate-600 mt-2">
+          <p className="text-[10px] text-slate-600 mt-1.5 md:mt-2 hidden sm:block">
             Session: {activeSessionKey} · Real-time sync across all channels
           </p>
         </div>

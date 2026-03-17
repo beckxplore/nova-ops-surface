@@ -232,11 +232,11 @@ const CronDashboard: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Status Bar */}
-      <div className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-5 py-3">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-4 md:px-5 py-3 gap-2">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4">
           <div className="flex items-center gap-2">
             <span className={`h-2.5 w-2.5 rounded-full ${cronStatus?.enabled ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
-            <span className="text-sm font-medium text-white">Cron Scheduler</span>
+            <span className="text-xs md:text-sm font-medium text-white">Cron Scheduler</span>
           </div>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ring-1 ${
             cronStatus?.enabled ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-slate-500/10 text-slate-400 ring-slate-500/20'
@@ -250,7 +250,7 @@ const CronDashboard: React.FC = () => {
           <button
             onClick={loadCronData}
             disabled={loading || !connected}
-            className="px-3 py-1 text-[10px] text-slate-400 bg-slate-800 rounded-lg hover:bg-slate-700 hover:text-white transition-colors disabled:opacity-50"
+            className="px-3 py-1.5 md:py-1 text-[10px] text-slate-400 bg-slate-800 rounded-lg hover:bg-slate-700 hover:text-white transition-colors disabled:opacity-50 min-h-[44px] md:min-h-0"
           >
             {loading ? '⏳' : '🔄'} Refresh
           </button>
@@ -286,69 +286,71 @@ const CronDashboard: React.FC = () => {
                 onClick={() => setExpandedJob(isExpanded ? null : job.id)}
               >
                 {/* Job Header */}
-                <div className="px-5 py-4 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className={`h-3 w-3 rounded-full ${job.enabled ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-medium text-white">{job.name}</h3>
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ring-1 ${statusBadge(lastStatus)}`}>
-                          {lastStatus}
-                        </span>
-                        {hasErrors && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium ring-1 bg-red-500/10 text-red-400 ring-red-500/20">
-                            ⚠️ {job.state.consecutiveErrors} errors
+                <div className="px-4 md:px-5 py-3 md:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className={`h-3 w-3 rounded-full shrink-0 ${job.enabled ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-xs md:text-sm font-medium text-white truncate">{job.name}</h3>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ring-1 shrink-0 ${statusBadge(lastStatus)}`}>
+                            {lastStatus}
                           </span>
-                        )}
+                          {hasErrors && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-medium ring-1 bg-red-500/10 text-red-400 ring-red-500/20 shrink-0">
+                              ⚠️ {job.state.consecutiveErrors} errors
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-0.5 truncate">
+                          {formatSchedule(job.schedule)} · Agent: {job.agentId} · Target: {job.sessionTarget}
+                        </p>
                       </div>
-                      <p className="text-[10px] text-slate-500 mt-0.5">
-                        {formatSchedule(job.schedule)} · Agent: {job.agentId} · Target: {job.sessionTarget}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    {/* Next / Last run */}
-                    <div className="text-right">
-                      <p className="text-[10px] text-slate-400">
-                        Next: <span className="text-blue-400">{job.state?.nextRunAtMs ? relativeTime(job.state.nextRunAtMs) : '—'}</span>
-                      </p>
-                      <p className="text-[10px] text-slate-600">
-                        Last: {job.state?.lastRunAtMs ? relativeTime(job.state.lastRunAtMs) : 'never'}
-                        {job.state?.lastDurationMs ? ` (${job.state.lastDurationMs}ms)` : ''}
-                      </p>
                     </div>
 
-                    {/* Actions */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleRunNow(job.id); }}
-                      disabled={isRunning || !connected}
-                      className={`px-3 py-1.5 text-[10px] font-medium rounded-lg transition-colors ${
-                        isRunning
-                          ? 'bg-blue-500/20 text-blue-300 animate-pulse'
-                          : 'bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20 hover:bg-blue-500/20'
-                      } disabled:opacity-50`}
-                    >
-                      {isRunning ? '⏳ Running...' : '▶️ Run Now'}
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleToggle(job); }}
-                      disabled={!connected}
-                      className={`px-3 py-1.5 text-[10px] font-medium rounded-lg transition-colors ring-1 ${
-                        job.enabled
-                          ? 'bg-amber-500/10 text-amber-400 ring-amber-500/20 hover:bg-amber-500/20'
-                          : 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20 hover:bg-emerald-500/20'
-                      } disabled:opacity-50`}
-                    >
-                      {job.enabled ? '⏸️ Pause' : '▶️ Enable'}
-                    </button>
+                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                      {/* Next / Last run */}
+                      <div className="text-right hidden sm:block">
+                        <p className="text-[10px] text-slate-400">
+                          Next: <span className="text-blue-400">{job.state?.nextRunAtMs ? relativeTime(job.state.nextRunAtMs) : '—'}</span>
+                        </p>
+                        <p className="text-[10px] text-slate-600">
+                          Last: {job.state?.lastRunAtMs ? relativeTime(job.state.lastRunAtMs) : 'never'}
+                          {job.state?.lastDurationMs ? ` (${job.state.lastDurationMs}ms)` : ''}
+                        </p>
+                      </div>
+
+                      {/* Actions */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleRunNow(job.id); }}
+                        disabled={isRunning || !connected}
+                        className={`px-3 py-2 md:py-1.5 text-[10px] font-medium rounded-lg transition-colors min-h-[44px] md:min-h-0 ${
+                          isRunning
+                            ? 'bg-blue-500/20 text-blue-300 animate-pulse'
+                            : 'bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20 hover:bg-blue-500/20'
+                        } disabled:opacity-50`}
+                      >
+                        {isRunning ? '⏳...' : '▶️ Run'}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleToggle(job); }}
+                        disabled={!connected}
+                        className={`px-3 py-2 md:py-1.5 text-[10px] font-medium rounded-lg transition-colors ring-1 min-h-[44px] md:min-h-0 ${
+                          job.enabled
+                            ? 'bg-amber-500/10 text-amber-400 ring-amber-500/20 hover:bg-amber-500/20'
+                            : 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20 hover:bg-emerald-500/20'
+                        } disabled:opacity-50`}
+                      >
+                        {job.enabled ? '⏸️' : '▶️'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {/* Expanded Details */}
                 {isExpanded && (
-                  <div className="px-5 pb-4 pt-0 border-t border-slate-800 mt-0">
-                    <div className="grid grid-cols-2 gap-4 pt-4">
+                  <div className="px-4 md:px-5 pb-4 pt-0 border-t border-slate-800 mt-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
                       <div>
                         <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Configuration</p>
                         <div className="space-y-1.5">

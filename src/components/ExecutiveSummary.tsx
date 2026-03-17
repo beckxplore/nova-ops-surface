@@ -50,16 +50,16 @@ const ExecutiveSummary: React.FC = () => {
 
   if (!stats) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">Executive Summary</h2>
-          <span className="text-xs text-slate-500 animate-pulse">Loading live data...</span>
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-6">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
+          <h2 className="text-base md:text-lg font-semibold text-white">Executive Summary</h2>
+          <span className="text-[10px] md:text-xs text-slate-500 animate-pulse">Loading live data...</span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-slate-800/50 rounded-lg p-4 animate-pulse">
-              <div className="h-3 bg-slate-700 rounded w-20 mb-3"></div>
-              <div className="h-6 bg-slate-700 rounded w-12"></div>
+            <div key={i} className="bg-slate-800/50 rounded-lg p-3 md:p-4 animate-pulse">
+              <div className="h-3 bg-slate-700 rounded w-16 md:w-20 mb-3"></div>
+              <div className="h-5 md:h-6 bg-slate-700 rounded w-10 md:w-12"></div>
             </div>
           ))}
         </div>
@@ -70,29 +70,29 @@ const ExecutiveSummary: React.FC = () => {
   const completionRate = stats.totalTasks > 0 ? Math.round((stats.doneTasks / stats.totalTasks) * 100) : 0;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-white">Executive Summary</h2>
-        <span className="text-xs text-slate-500">Live · {lastCheck}</span>
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-4 gap-1">
+        <h2 className="text-base md:text-lg font-semibold text-white">Executive Summary</h2>
+        <span className="text-[10px] md:text-xs text-slate-500">Live · {lastCheck}</span>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {/* System Status */}
-        <div className="bg-slate-800/50 rounded-lg p-4">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">System State</p>
-          <p className={`text-xl font-bold ${isOperational ? 'text-emerald-400' : 'text-amber-400'}`}>
+        <div className="bg-slate-800/50 rounded-lg p-3 md:p-4">
+          <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider mb-1">System State</p>
+          <p className={`text-lg md:text-xl font-bold ${isOperational ? 'text-emerald-400' : 'text-amber-400'}`}>
             {isOperational ? 'Operational' : 'Syncing'}
           </p>
-          <p className="text-[10px] text-slate-600 mt-1">
+          <p className="text-[10px] text-slate-600 mt-1 hidden sm:block">
             {isWsConnected ? 'Gateway live' : isOperational ? 'Data loaded · WS reconnecting' : 'Connecting...'}
           </p>
         </div>
 
         {/* Agents Online */}
-        <div className="bg-slate-800/50 rounded-lg p-4">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Agents</p>
+        <div className="bg-slate-800/50 rounded-lg p-3 md:p-4">
+          <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider mb-1">Agents</p>
           <div className="flex items-baseline gap-1">
-            <p className="text-xl font-bold text-white">{stats.runningAgents}</p>
-            <p className="text-sm text-slate-500">/ {stats.totalAgents}</p>
+            <p className="text-lg md:text-xl font-bold text-white">{stats.runningAgents}</p>
+            <p className="text-xs md:text-sm text-slate-500">/ {stats.totalAgents}</p>
           </div>
           <div className="flex items-center gap-1.5 mt-1">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -101,11 +101,11 @@ const ExecutiveSummary: React.FC = () => {
         </div>
 
         {/* Task Progress */}
-        <div className="bg-slate-800/50 rounded-lg p-4">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Tasks</p>
+        <div className="bg-slate-800/50 rounded-lg p-3 md:p-4">
+          <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider mb-1">Tasks</p>
           <div className="flex items-baseline gap-1">
-            <p className="text-xl font-bold text-white">{stats.doneTasks}</p>
-            <p className="text-sm text-slate-500">/ {stats.totalTasks}</p>
+            <p className="text-lg md:text-xl font-bold text-white">{stats.doneTasks}</p>
+            <p className="text-xs md:text-sm text-slate-500">/ {stats.totalTasks}</p>
           </div>
           <div className="w-full h-1.5 bg-slate-700 rounded-full mt-2 overflow-hidden">
             <div
@@ -113,14 +113,14 @@ const ExecutiveSummary: React.FC = () => {
               style={{ width: `${completionRate}%` }}
             ></div>
           </div>
-          <p className="text-[10px] text-slate-600 mt-1">{completionRate}% complete · {stats.inProgressTasks} in progress</p>
+          <p className="text-[10px] text-slate-600 mt-1">{completionRate}% done · {stats.inProgressTasks} in progress</p>
         </div>
 
         {/* Departments */}
-        <div className="bg-slate-800/50 rounded-lg p-4">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Departments</p>
-          <p className="text-xl font-bold text-white">{stats.deptCount}</p>
-          <p className="text-xs text-slate-500 mt-1">{stats.deptNames}</p>
+        <div className="bg-slate-800/50 rounded-lg p-3 md:p-4">
+          <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider mb-1">Departments</p>
+          <p className="text-lg md:text-xl font-bold text-white">{stats.deptCount}</p>
+          <p className="text-[10px] md:text-xs text-slate-500 mt-1 truncate">{stats.deptNames}</p>
         </div>
       </div>
     </div>

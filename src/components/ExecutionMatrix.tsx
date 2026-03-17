@@ -81,13 +81,13 @@ const ExecutionMatrix: React.FC = () => {
   const activeTasks = tasks.filter(t => t.status !== 'Done');
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-white">Execution Matrix</h2>
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-6 h-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-4 gap-1">
+        <h2 className="text-base md:text-lg font-semibold text-white">Execution Matrix</h2>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">{activeTasks.length} active</span>
+          <span className="text-[10px] md:text-xs text-slate-500">{activeTasks.length} active</span>
           <span className="text-xs text-slate-600">·</span>
-          <span className="text-xs text-slate-500">{tasks.length} total</span>
+          <span className="text-[10px] md:text-xs text-slate-500">{tasks.length} total</span>
         </div>
       </div>
 
