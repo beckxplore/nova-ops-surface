@@ -92,7 +92,7 @@
         {
           "id": "t17",
           "title": "Nova API Proxy",
-          "description": "HTTP API server (port 3001) for model/file management \u2014 bypasses WS device pairing. systemd service.",
+          "description": "HTTP API server (port 3001) for model/file management — bypasses WS device pairing. systemd service.",
           "assignee": "Nova",
           "priority": "high",
           "tags": [
@@ -146,7 +146,7 @@
         {
           "id": "t15",
           "title": "Chat Page - Gateway Integration",
-          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram \u2194 Dashboard)",
+          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram ↔ Dashboard)",
           "assignee": "Development",
           "priority": "high",
           "tags": [
@@ -174,7 +174,7 @@
         {
           "id": "t14",
           "title": "Runtime Gateway Config",
-          "description": "gateway-config.json loaded at runtime \u2014 no more hardcoded URLs in JS bundle",
+          "description": "gateway-config.json loaded at runtime — no more hardcoded URLs in JS bundle",
           "assignee": "Development",
           "priority": "medium",
           "tags": [
