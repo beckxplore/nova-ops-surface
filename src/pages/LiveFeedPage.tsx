@@ -109,8 +109,10 @@ const LiveFeedPage: React.FC = () => {
 
   const addEvent = useCallback((evt: FeedEvent) => {
     setEvents((prev) => {
-      const next = [evt, ...prev];
-      return next.length > MAX_EVENTS ? next.slice(0, MAX_EVENTS) : next;
+      // Insert sorted by timestamp (newest first), dedup by id
+      const next = [evt, ...prev.filter(e => e.id !== evt.id)];
+      next.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      return next.slice(0, MAX_EVENTS);
     });
   }, []);
 
@@ -221,10 +223,18 @@ const LiveFeedPage: React.FC = () => {
                 if (line.startsWith('data:')) {
                   try {
                     const data = JSON.parse(line.slice(5).trim());
+                    // Skip init event (full state dump — handled by fetchTasks)
+                    if (data.type === 'init') continue;
+                    // Skip column-level events
+                    if (data.columns && !data.title) continue;
+
                     const agent = normalizeAssignee(data.assignee || data.agent || 'nova');
                     const message = data.title
-                      ? `Task update: "${data.title}"`
-                      : data.message || JSON.stringify(data);
+                      ? `Task updated: "${data.title}"`
+                      : data.message || null;
+                    // Skip if no meaningful message
+                    if (!message) continue;
+
                     const type: FeedEvent['type'] = data.doneAt
                       ? 'Status'
                       : data.startedAt
@@ -287,8 +297,9 @@ const LiveFeedPage: React.FC = () => {
       ? 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
       : 'bg-red-500/10 text-red-400 ring-red-500/20';
 
-  const filteredEvents =
-    filter === 'All' ? events : events.filter((e) => e.agent === filter);
+  const filteredEvents = (filter === 'All' ? events : events.filter((e) => e.agent === filter))
+    .slice()
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
