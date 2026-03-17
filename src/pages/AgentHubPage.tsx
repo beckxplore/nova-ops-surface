@@ -121,6 +121,18 @@ const AgentHubPage: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Map selected item to agent ID for API calls
+  const getAgentId = (item: SelectedItem): string => {
+    if (item.type === 'orchestrator') return 'nova';
+    if (item.type === 'department') return item.id; // 'development' or 'research'
+    if (item.type === 'agent') {
+      // Map lead agents to their department
+      const map: Record<string, string> = { 'dev-lead': 'development', 'research-lead': 'research' };
+      return map[item.id] || item.id;
+    }
+    return 'nova';
+  };
+
   const selectItem = useCallback(async (item: SelectedItem) => {
     setSelected(item);
     setEditing(false);
@@ -130,7 +142,8 @@ const AgentHubPage: React.FC = () => {
 
     try {
       setFilesLoading(true);
-      const data = await novaFetch('/api/files');
+      const agentId = getAgentId(item);
+      const data = await novaFetch(`/api/files?agent=${encodeURIComponent(agentId)}`);
       const files: Record<string, string> = data?.files || {};
       setAgentFiles(files);
       const firstFile = Object.keys(files)[0];
@@ -148,7 +161,8 @@ const AgentHubPage: React.FC = () => {
     setSaving(true);
     setSaveStatus('idle');
     try {
-      await novaFetch(`/api/files/${encodeURIComponent(activeFile)}`, {
+      const agentId = getAgentId(selected);
+      await novaFetch(`/api/files/${encodeURIComponent(activeFile)}?agent=${encodeURIComponent(agentId)}`, {
         method: 'PUT',
         body: JSON.stringify({ content: editBuffer }),
       });
