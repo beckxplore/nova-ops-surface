@@ -22,19 +22,27 @@ interface Task {
   doneAt?: string;
 }
 
-const AGENTS = ['All', '@nova', '@dev-lead', '@research-lead'] as const;
+const AGENTS = ['All', '@nova', '@kai', '@sage'] as const;
 type AgentFilter = typeof AGENTS[number];
 
+const AGENT_NAMES: Record<string, string> = {
+  '@nova': 'Nova', '@kai': 'Kai (Dev Lead)', '@sage': 'Sage (Research)',
+  '@dev-lead': 'Kai', '@research-lead': 'Sage',
+};
+
+const AGENT_AVATARS: Record<string, string> = {
+  '@nova': '/avatars/nova.jpg', '@kai': '/avatars/kai.jpg', '@sage': '/avatars/sage.jpg',
+  '@dev-lead': '/avatars/kai.jpg', '@research-lead': '/avatars/sage.jpg',
+};
+
 const AGENT_COLORS: Record<string, string> = {
-  '@nova': 'text-blue-400',
-  '@dev-lead': 'text-emerald-400',
-  '@research-lead': 'text-purple-400',
+  '@nova': 'text-blue-400', '@kai': 'text-emerald-400', '@sage': 'text-purple-400',
+  '@dev-lead': 'text-emerald-400', '@research-lead': 'text-purple-400',
 };
 
 const AGENT_BG: Record<string, string> = {
-  '@nova': 'bg-blue-500/20',
-  '@dev-lead': 'bg-emerald-500/20',
-  '@research-lead': 'bg-purple-500/20',
+  '@nova': 'bg-blue-500/20', '@kai': 'bg-emerald-500/20', '@sage': 'bg-purple-500/20',
+  '@dev-lead': 'bg-emerald-500/20', '@research-lead': 'bg-purple-500/20',
 };
 
 const TYPE_BADGE: Record<string, string> = {
@@ -400,16 +408,20 @@ const LiveFeedPage: React.FC = () => {
             <div className="flex items-start gap-3">
               {/* Avatar */}
               <div
-                className={`h-9 w-9 rounded-lg ${AGENT_BG[evt.agent] || 'bg-slate-700'} flex items-center justify-center text-base shrink-0`}
+                className={`h-9 w-9 rounded-lg overflow-hidden shrink-0 ${AGENT_BG[evt.agent] || 'bg-slate-700'} flex items-center justify-center`}
               >
-                {AGENT_ICONS[evt.agent] || '❓'}
+                {AGENT_AVATARS[evt.agent] ? (
+                  <img src={AGENT_AVATARS[evt.agent]} alt={evt.agent} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-base">{AGENT_ICONS[evt.agent] || '❓'}</span>
+                )}
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className={`text-sm font-semibold ${AGENT_COLORS[evt.agent] || 'text-slate-300'}`}>
-                    {evt.agent}
+                    {AGENT_NAMES[evt.agent] || evt.agent}
                   </span>
                   <span
                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ring-1 ring-inset ${TYPE_BADGE[evt.type] || TYPE_BADGE.System}`}

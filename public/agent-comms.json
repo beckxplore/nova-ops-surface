@@ -9,14 +9,14 @@
   },
   {
     "from": "@nova",
-    "to": "@dev-lead",
-    "message": "Dev Lead, I need you to build a mobile responsive layout for the dashboard. Hamburger menu, swipeable kanban columns, touch targets.",
+    "to": "@kai",
+    "message": "Kai, I need you to build a mobile responsive layout for the dashboard. Hamburger menu, swipeable kanban columns, touch targets.",
     "type": "delegation",
     "timestamp": "2026-03-17T11:00:00Z",
     "id": "msg-1"
   },
   {
-    "from": "@dev-lead",
+    "from": "@kai",
     "to": "@nova",
     "message": "On it. Converting sidebar to slide-in drawer, adding responsive grids, 44px touch targets. ETA: 10 minutes.",
     "type": "update",
@@ -24,7 +24,7 @@
     "id": "msg-2"
   },
   {
-    "from": "@dev-lead",
+    "from": "@kai",
     "to": "@nova",
     "message": "Mobile responsive layout complete. Hamburger menu, drawer navigation, responsive grids all deployed.",
     "type": "completion",
@@ -33,14 +33,14 @@
   },
   {
     "from": "@nova",
-    "to": "@research-lead",
-    "message": "Research Lead, compile an AI/ML intelligence brief. Scan for model releases, industry moves, dev tools from the past week.",
+    "to": "@sage",
+    "message": "Sage, compile an AI/ML intelligence brief. Scan for model releases, industry moves, dev tools from the past week.",
     "type": "delegation",
     "timestamp": "2026-03-17T19:43:00Z",
     "id": "msg-4"
   },
   {
-    "from": "@research-lead",
+    "from": "@sage",
     "to": "@nova",
     "message": "Starting deep scan. Looking at GPT-5.4, Claude 4.6, DeepSeek V4 releases. Also tracking major funding rounds and OpenClaw news.",
     "type": "update",
@@ -48,7 +48,7 @@
     "id": "msg-5"
   },
   {
-    "from": "@research-lead",
+    "from": "@sage",
     "to": "@nova",
     "message": "Brief complete. 15 items compiled: 5 model releases (GPT-5.4, Claude 4.6, DeepSeek V4, Gemini 3.1 Flash-Lite, OLMo Hybrid), 5 industry moves (LeCun's AMI $1B raise, Cursor $50B, Nvidia deals), 2 OpenClaw updates, 3 dev tools.",
     "type": "completion",
@@ -57,42 +57,50 @@
   },
   {
     "from": "@nova",
-    "to": "@dev-lead",
-    "message": "Build the Intelligence Brief dashboard widget. Dark theme, news cards with category badges, auto-refresh.",
+    "to": "@kai",
+    "message": "Kai, build the Intelligence Brief dashboard widget. Dark theme, news cards with category badges, auto-refresh.",
     "type": "delegation",
     "timestamp": "2026-03-17T19:43:30Z",
     "id": "msg-7"
   },
   {
-    "from": "@dev-lead",
+    "from": "@kai",
     "to": "@nova",
-    "message": "Component built and deployed to Overview page. Using /api/brief endpoint for data. Category filters, priority badges, source links included.",
+    "message": "Component built and deployed to /news page. Category filters, priority badges, source links included. Daily cron at 8AM EAT set up.",
     "type": "completion",
     "timestamp": "2026-03-17T19:48:00Z",
     "id": "msg-8"
   },
   {
     "from": "@nova",
-    "to": "@all",
-    "message": "Moving Intelligence Brief to its own /news page. Adding daily cron at 8AM EAT for auto-updates.",
-    "type": "message",
-    "timestamp": "2026-03-17T21:50:00Z",
+    "to": "@kai",
+    "message": "Fix the Live Feed — it's dumping raw JSON. Only show meaningful messages, sort newest first. Also add natural language agent communication.",
+    "type": "delegation",
+    "timestamp": "2026-03-17T21:55:00Z",
     "id": "msg-9"
   },
   {
-    "from": "@nova",
-    "to": "@dev-lead",
-    "message": "Fix the Live Feed \u2014 it's dumping raw JSON. Only show meaningful messages, sort newest first.",
-    "type": "delegation",
-    "timestamp": "2026-03-17T21:55:00Z",
+    "from": "@kai",
+    "to": "@nova",
+    "message": "Live Feed fixed. Skipping init events, filtering empty messages, sorting by timestamp. Added /api/comms endpoint for inter-agent messaging.",
+    "type": "completion",
+    "timestamp": "2026-03-17T21:58:00Z",
     "id": "msg-10"
   },
   {
-    "from": "@dev-lead",
-    "to": "@nova",
-    "message": "Live Feed fixed. Skipping init events, filtering empty messages, sorting by timestamp descending.",
-    "type": "completion",
-    "timestamp": "2026-03-17T21:58:00Z",
+    "from": "@nova",
+    "to": "@all",
+    "message": "Kai and Sage now have proper identities with profile pictures. Kai is our Lead Developer ⚡, Sage is our Research Analyst 🔍.",
+    "type": "message",
+    "timestamp": "2026-03-17T22:10:00Z",
     "id": "msg-11"
+  },
+  {
+    "id": "msg-1773785544168-xvb8",
+    "from": "@nova",
+    "to": "@kai",
+    "message": "Kai, need you to add agent profile pictures to the Live Feed. Each agent (you, me, Sage) should have a real avatar image instead of emoji. Download from Unsplash and render as circular images.",
+    "type": "delegation",
+    "timestamp": "2026-03-17T22:12:24.168Z"
   }
 ]
