@@ -18,6 +18,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const token = process.env.GITHUB_TOKEN;
@@ -42,15 +43,37 @@ export default async function handler(req, res) {
 
     // Nova orchestrator
     const nova = {
-      id: 'nova-orchestrator',
+      id: 'nova',
       name: 'Nova (Orchestrator)',
-      type: 'individual',
+      type: 'orchestrator',
       path: '',
       status: 'running',
       files: {},
     };
 
-    return res.status(200).json({ departments, individuals: [nova] });
+    // Read kanban for task counts per agent
+    let kanbanRaw;
+    try { kanbanRaw = await getFileContent('kanban.json', token); } catch {}
+    const kanban = kanbanRaw ? JSON.parse(kanbanRaw) : null;
+    const taskCounts = {};
+    if (kanban?.columns) {
+      for (const col of kanban.columns) {
+        for (const task of (col.tasks || [])) {
+          const assignee = (task.assignee || 'Unassigned').toLowerCase();
+          if (!taskCounts[assignee]) taskCounts[assignee] = { active: 0, done: 0, total: 0 };
+          taskCounts[assignee].total++;
+          if (col.id === 'done') taskCounts[assignee].done++;
+          else taskCounts[assignee].active++;
+        }
+      }
+    }
+
+    return res.status(200).json({
+      departments,
+      individuals: [nova],
+      taskCounts,
+      timestamp: new Date().toISOString(),
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
