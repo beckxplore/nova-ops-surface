@@ -8,7 +8,41 @@
     {
       "id": "in-progress",
       "title": "In Progress",
-      "tasks": []
+      "tasks": [
+        {
+          "id": "t-1773776628247",
+          "title": "Build: Intelligence Brief Dashboard Widget",
+          "description": "Development Lead: build a sleek Intelligence Brief component for the Overview page. Dark theme, news cards, category badges, auto-refresh. Displays research data from /api/brief endpoint.",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "dashboard",
+            "widget",
+            "ui"
+          ],
+          "steps": [
+            {
+              "text": "Create IntelligenceBrief component with news card layout",
+              "done": false
+            },
+            {
+              "text": "Add /api/brief endpoint to Nova API",
+              "done": false
+            },
+            {
+              "text": "Style with category badges and priority indicators",
+              "done": false
+            },
+            {
+              "text": "Add to Overview page and deploy",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T19:43:48.247Z",
+          "progress": 0,
+          "startedAt": "2026-03-17T19:43:48.598Z"
+        }
+      ]
     },
     {
       "id": "review",
@@ -19,6 +53,40 @@
       "id": "done",
       "title": "Done",
       "tasks": [
+        {
+          "id": "t-1773776628199",
+          "title": "Research: AI/ML Intelligence Brief",
+          "description": "Research Lead: gather latest AI model releases, key industry moves, and OpenClaw ecosystem updates from the past week. Compile into structured briefing data.",
+          "assignee": "Research",
+          "priority": "high",
+          "tags": [
+            "research",
+            "intelligence",
+            "briefing"
+          ],
+          "steps": [
+            {
+              "text": "Scan latest AI model releases (last 7 days)",
+              "done": false
+            },
+            {
+              "text": "Find key industry moves and funding rounds",
+              "done": false
+            },
+            {
+              "text": "Check OpenClaw ecosystem updates",
+              "done": false
+            },
+            {
+              "text": "Compile structured briefing JSON",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T19:43:48.199Z",
+          "progress": 100,
+          "startedAt": "2026-03-17T19:43:48.480Z",
+          "doneAt": "2026-03-17T19:46:44.480Z"
+        },
         {
           "id": "t-1773759650558",
           "title": "Agent Task History in Detail Panel",
