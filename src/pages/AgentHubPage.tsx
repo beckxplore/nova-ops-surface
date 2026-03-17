@@ -162,7 +162,7 @@ const AgentHubPage: React.FC = () => {
     setSaveStatus('idle');
     try {
       const agentId = getAgentId(selected);
-      await novaFetch(`/api/files/${encodeURIComponent(activeFile)}?agent=${encodeURIComponent(agentId)}`, {
+      await novaFetch(`/api/files?agent=${encodeURIComponent(agentId)}&name=${encodeURIComponent(activeFile)}`, {
         method: 'PUT',
         body: JSON.stringify({ content: editBuffer }),
       });
