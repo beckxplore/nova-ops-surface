@@ -1,7 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGateway } from '../context/GatewayContext';
+import { getGatewayConfig } from '../gatewayConfig';
 
-const API = import.meta.env.DEV ? 'http://localhost:3001' : '';
+// Nova API proxy lives at the same host as the gateway, under /nova-api
+async function novaFetch(path: string, opts: RequestInit = {}): Promise<any> {
+  let base: string;
+  let token: string;
+  if (import.meta.env.DEV) {
+    base = 'http://localhost:3001';
+    token = '';
+  } else {
+    const cfg = await getGatewayConfig();
+    const wsUrl = cfg.gatewayUrl || '';
+    base = wsUrl.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:') + '/nova-api';
+    token = cfg.authToken || '';
+  }
+  const res = await fetch(`${base}${path}`, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...(opts.headers as Record<string,string> || {}) },
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
+  return res.json();
+}
 
 interface AgentNode {
   id: string; name: string; status: string;
@@ -40,7 +60,7 @@ const statusCfg: Record<string, { cls: string; dot: string; label: string }> = {
 type SelectedItem = { type: 'orchestrator' | 'project' | 'department' | 'agent'; id: string; name: string; filesPath?: string; agentId?: string };
 
 const AgentHubPage: React.FC = () => {
-  const { eco, status: gwStatus, sendRpc } = useGateway();
+  const { eco, status: gwStatus } = useGateway();
   const [selected, setSelected] = useState<SelectedItem | null>(null);
   const [activeFile, setActiveFile] = useState('SOUL.md');
   const [fileContent, setFileContent] = useState('');
@@ -59,46 +79,40 @@ const AgentHubPage: React.FC = () => {
 
   const isConnected = gwStatus === 'connected';
 
-  // Load available models + current agent config when connected
+  // Load available models + current model via Nova API (no WS dependency)
   useEffect(() => {
-    if (!isConnected) return;
     let cancelled = false;
     (async () => {
       try {
-        const result = await sendRpc('models.list', {});
+        const data = await novaFetch('/api/models');
         if (cancelled) return;
-        const models = result?.models || [];
+        const models = Array.isArray(data) ? data : (data?.models || []);
         setAvailableModels(models.map((m: any) => ({
           id: typeof m === 'string' ? m : m.id,
-          name: m.name || m.id,
+          name: m.name || m.alias || m.id,
         })));
       } catch (err) {
-        console.warn('[Hub] models.list failed:', err);
+        console.warn('[Hub] models fetch failed:', err);
       }
       try {
-        const result = await sendRpc('agents.list', {});
+        const data = await novaFetch('/api/model');
         if (cancelled) return;
-        const agents = result?.agents || result || [];
-        const mainAgent = Array.isArray(agents)
-          ? agents.find((a: any) => a.id === 'main' || a.isDefault)
-          : null;
-        if (mainAgent?.model) {
-          setCurrentModel(mainAgent.model);
-          setSelectedModel(mainAgent.model);
+        if (data?.model) {
+          setCurrentModel(data.model);
+          setSelectedModel(data.model);
         }
       } catch (err) {
-        console.warn('[Hub] agents.list failed:', err);
+        console.warn('[Hub] current model fetch failed:', err);
       }
     })();
     return () => { cancelled = true; };
-  }, [isConnected, sendRpc]);
+  }, []);
 
   // Fetch live status from API
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const endpoint = API ? `${API}/api/status` : '/api/status';
-        const r = await fetch(endpoint);
+        const r = await fetch('/api/status');
         if (r.ok) setLiveStatus(await r.json());
       } catch {}
     };
@@ -114,33 +128,10 @@ const AgentHubPage: React.FC = () => {
     setAgentFiles({});
     setFileContent('');
 
-    if (!isConnected) return;
-
     try {
       setFilesLoading(true);
-      const agentId = 'main'; // All agents map to the single real OpenClaw agent
-      console.log('[Hub] Loading files for agent:', agentId);
-      const listResult = await sendRpc('agents.files.list', { agentId });
-      console.log('[Hub] agents.files.list result:', listResult);
-      const fileNames: string[] = (listResult?.files || [])
-        .map((f: any) => typeof f === 'string' ? f : f.name)
-        .filter(Boolean);
-
-      const files: Record<string, string> = {};
-      const mdFileNames = fileNames.filter(n => n.endsWith('.md'));
-      // Load in parallel batches of 5
-      for (let i = 0; i < mdFileNames.length; i += 5) {
-        const batch = mdFileNames.slice(i, i + 5);
-        const results = await Promise.allSettled(
-          batch.map(name => sendRpc('agents.files.get', { agentId, name }))
-        );
-        results.forEach((r, j) => {
-          if (r.status === 'fulfilled' && r.value?.content != null) {
-            files[batch[j]] = typeof r.value.content === 'string' ? r.value.content : JSON.stringify(r.value.content);
-          }
-        });
-      }
-
+      const data = await novaFetch('/api/files');
+      const files: Record<string, string> = data?.files || {};
       setAgentFiles(files);
       const firstFile = Object.keys(files)[0];
       if (firstFile) { setFileContent(files[firstFile]); setActiveFile(firstFile); }
@@ -150,14 +141,17 @@ const AgentHubPage: React.FC = () => {
     } finally {
       setFilesLoading(false);
     }
-  }, [isConnected, sendRpc]);
+  }, []);
 
   const saveFile = async () => {
     if (!selected) return;
     setSaving(true);
     setSaveStatus('idle');
     try {
-      await sendRpc('agents.files.set', { agentId: 'main', name: activeFile, content: editBuffer });
+      await novaFetch(`/api/files/${encodeURIComponent(activeFile)}`, {
+        method: 'PUT',
+        body: JSON.stringify({ content: editBuffer }),
+      });
       setFileContent(editBuffer);
       setAgentFiles(prev => ({ ...prev, [activeFile]: editBuffer }));
       setEditing(false);
@@ -176,19 +170,13 @@ const AgentHubPage: React.FC = () => {
     setModelSaving(true);
     setModelStatus('idle');
     try {
-      const configResult = await sendRpc('config.get', {});
-      if (configResult?.raw) {
-        const cfg = typeof configResult.raw === 'string' ? JSON.parse(configResult.raw) : configResult.raw;
-        if (!cfg.agents) cfg.agents = {};
-        if (!cfg.agents.defaults) cfg.agents.defaults = {};
-        if (!cfg.agents.defaults.model) cfg.agents.defaults.model = {};
-        cfg.agents.defaults.model.primary = selectedModel;
-        await sendRpc('config.set', { raw: JSON.stringify(cfg, null, 2), baseHash: configResult.hash });
-        await sendRpc('config.apply', {});
-        setCurrentModel(selectedModel);
-        setModelStatus('success');
-        setTimeout(() => setModelStatus('idle'), 3000);
-      }
+      await novaFetch('/api/model', {
+        method: 'PUT',
+        body: JSON.stringify({ model: selectedModel }),
+      });
+      setCurrentModel(selectedModel);
+      setModelStatus('success');
+      setTimeout(() => setModelStatus('idle'), 3000);
     } catch (err) {
       console.error('Model change failed:', err);
       setModelStatus('error');
@@ -455,7 +443,7 @@ const AgentHubPage: React.FC = () => {
                       </div>
                     </div>
                     {modelStatus === 'success' && <p className="text-[10px] text-emerald-400 mt-2">✅ Model changed! Takes effect on next message.</p>}
-                    {modelStatus === 'error' && <p className="text-[10px] text-red-400 mt-2">❌ Failed — may need operator.admin scope.</p>}
+                    {modelStatus === 'error' && <p className="text-[10px] text-red-400 mt-2">❌ Failed to save model.</p>}
                     {currentModel && (
                       <p className="mt-2 text-[10px] text-slate-500">
                         Current: <span className="text-blue-400 font-mono">{currentModel}</span>
