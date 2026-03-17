@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 const navItems = [
   { path: '/', label: 'Overview', icon: '📊' },
   { path: '/agents', label: 'Agent Hub', icon: '🤖' },
+  { path: '/live-feed', label: 'Live Feed', icon: '📡' },
   { path: '/kanban', label: 'Kanban', icon: '📋' },
   { path: '/chat', label: 'Chat', icon: '💬' },
 ];

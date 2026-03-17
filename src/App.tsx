@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import OverviewPage from './pages/OverviewPage';
 import AgentHubPage from './pages/AgentHubPage';
 import KanbanPage from './pages/KanbanPage';
+import LiveFeedPage from './pages/LiveFeedPage';
 import ChatPage from './pages/ChatPage';
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <Routes>
             <Route path="/" element={<OverviewPage />} />
             <Route path="/agents" element={<AgentHubPage />} />
+            <Route path="/live-feed" element={<LiveFeedPage />} />
             <Route path="/kanban" element={<KanbanPage />} />
             <Route path="/chat" element={<ChatPage />} />
           </Routes>

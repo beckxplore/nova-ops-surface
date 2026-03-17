@@ -1,0 +1,382 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { getGatewayConfig } from '../gatewayConfig';
+
+const NOVA_API = 'https://3-227-84-30.sslip.io/nova-api';
+
+interface FeedEvent {
+  id: string;
+  agent: string;
+  message: string;
+  type: 'Task' | 'Status' | 'Deploy' | 'System';
+  timestamp: string;
+}
+
+interface Task {
+  id: string;
+  title: string;
+  assignee: string;
+  description?: string;
+  createdAt?: string;
+  startedAt?: string;
+  doneAt?: string;
+}
+
+const AGENTS = ['All', '@nova', '@dev-lead', '@research-lead'] as const;
+type AgentFilter = typeof AGENTS[number];
+
+const AGENT_COLORS: Record<string, string> = {
+  '@nova': 'text-blue-400',
+  '@dev-lead': 'text-emerald-400',
+  '@research-lead': 'text-purple-400',
+};
+
+const AGENT_BG: Record<string, string> = {
+  '@nova': 'bg-blue-500/20',
+  '@dev-lead': 'bg-emerald-500/20',
+  '@research-lead': 'bg-purple-500/20',
+};
+
+const TYPE_BADGE: Record<string, string> = {
+  Task: 'bg-blue-500/10 text-blue-400 ring-blue-500/20',
+  Status: 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20',
+  Deploy: 'bg-amber-500/10 text-amber-400 ring-amber-500/20',
+  System: 'bg-slate-500/10 text-slate-400 ring-slate-500/20',
+};
+
+const AGENT_ICONS: Record<string, string> = {
+  '@nova': '🤖',
+  '@dev-lead': '👨‍💻',
+  '@research-lead': '🔬',
+};
+
+const MAX_EVENTS = 100;
+
+function timeAgo(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  if (isNaN(then)) return dateStr;
+  const diff = now - then;
+  const secs = Math.floor(diff / 1000);
+  if (secs < 60) return `${secs}s ago`;
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+function normalizeAssignee(raw: string): string {
+  const lower = (raw || '').toLowerCase().replace(/^@/, '');
+  if (lower === 'nova' || lower === '@nova') return '@nova';
+  if (lower === 'dev-lead' || lower === 'dev_lead' || lower === 'devlead') return '@dev-lead';
+  if (lower === 'research-lead' || lower === 'research_lead' || lower === 'researchlead') return '@research-lead';
+  return `@${lower}`;
+}
+
+function eventTypeFor(task: Task, column: string): FeedEvent['type'] {
+  if (column === 'done') return 'Status';
+  if (task.startedAt && !task.doneAt) return 'Task';
+  return 'Task';
+}
+
+function makeEventId(): string {
+  return `evt-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+const LiveFeedPage: React.FC = () => {
+  const [events, setEvents] = useState<FeedEvent[]>([]);
+  const [filter, setFilter] = useState<AgentFilter>('All');
+  const [connectionStatus, setConnectionStatus] = useState<'LIVE' | 'POLLING' | 'DISCONNECTED'>('POLLING');
+  const [authToken, setAuthToken] = useState<string>('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const esRef = useRef<EventSource | null>(null);
+  const prevTasksRef = useRef<Map<string, Task>>(new Map());
+
+  // Load gateway config for auth
+  useEffect(() => {
+    getGatewayConfig().then((cfg) => {
+      setAuthToken(cfg.authToken);
+    });
+  }, []);
+
+  // Auto-scroll to bottom on new events
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [events]);
+
+  const addEvent = useCallback((evt: FeedEvent) => {
+    setEvents((prev) => {
+      const next = [evt, ...prev];
+      return next.length > MAX_EVENTS ? next.slice(0, MAX_EVENTS) : next;
+    });
+  }, []);
+
+  // Fetch initial tasks and generate synthetic events
+  const fetchTasks = useCallback(async (token: string) => {
+    try {
+      const res = await fetch(`${NOVA_API}/api/tasks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const tasks: Task[] = Array.isArray(data) ? data : data.tasks || [];
+
+      // Build current task map and generate events for new/changed tasks
+      const currentMap = new Map<string, Task>();
+      const newEvents: FeedEvent[] = [];
+
+      for (const task of tasks) {
+        currentMap.set(task.id, task);
+        const prev = prevTasksRef.current.get(task.id);
+
+        if (!prev) {
+          // New task
+          newEvents.push({
+            id: makeEventId(),
+            agent: normalizeAssignee(task.assignee),
+            message: `Task created: "${task.title}"`,
+            type: 'Task',
+            timestamp: task.createdAt || new Date().toISOString(),
+          });
+        } else if (prev.doneAt !== task.doneAt && task.doneAt) {
+          newEvents.push({
+            id: makeEventId(),
+            agent: normalizeAssignee(task.assignee),
+            message: `Task completed: "${task.title}"`,
+            type: 'Status',
+            timestamp: task.doneAt,
+          });
+        } else if (prev.startedAt !== task.startedAt && task.startedAt) {
+          newEvents.push({
+            id: makeEventId(),
+            agent: normalizeAssignee(task.assignee),
+            message: `Task started: "${task.title}"`,
+            type: 'Status',
+            timestamp: task.startedAt,
+          });
+        }
+      }
+
+      if (newEvents.length > 0) {
+        setEvents((prev) => {
+          const combined = [...newEvents.reverse(), ...prev];
+          return combined.length > MAX_EVENTS ? combined.slice(0, MAX_EVENTS) : combined;
+        });
+      }
+
+      prevTasksRef.current = currentMap;
+    } catch {
+      // silently fail
+    }
+  }, []);
+
+  // SSE connection for real-time updates
+  useEffect(() => {
+    if (!authToken) return;
+
+    // Initial fetch
+    fetchTasks(authToken);
+
+    const sseUrl = `${NOVA_API}/api/tasks/stream`;
+
+    const connectSSE = () => {
+      try {
+        // Use fetch-based SSE for Bearer auth support
+        const controller = new AbortController();
+
+        fetch(sseUrl, {
+          headers: { Authorization: `Bearer ${authToken}` },
+          signal: controller.signal,
+        })
+          .then(async (res) => {
+            if (!res.ok) {
+              setConnectionStatus('POLLING');
+              return;
+            }
+            setConnectionStatus('LIVE');
+
+            const reader = res.body?.getReader();
+            if (!reader) return;
+
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || '';
+
+              for (const line of lines) {
+                if (line.startsWith('data:')) {
+                  try {
+                    const data = JSON.parse(line.slice(5).trim());
+                    const agent = normalizeAssignee(data.assignee || data.agent || 'nova');
+                    const message = data.title
+                      ? `Task update: "${data.title}"`
+                      : data.message || JSON.stringify(data);
+                    const type: FeedEvent['type'] = data.doneAt
+                      ? 'Status'
+                      : data.startedAt
+                      ? 'Task'
+                      : 'System';
+
+                    addEvent({
+                      id: makeEventId(),
+                      agent,
+                      message,
+                      type,
+                      timestamp: data.updatedAt || data.doneAt || data.startedAt || data.createdAt || new Date().toISOString(),
+                    });
+                  } catch {
+                    // non-JSON data line
+                  }
+                }
+              }
+            }
+          })
+          .catch(() => {
+            setConnectionStatus('DISCONNECTED');
+          });
+
+        return () => controller.abort();
+      } catch {
+        setConnectionStatus('POLLING');
+      }
+    };
+
+    const cleanup = connectSSE();
+
+    // Polling fallback: refresh tasks every 30s
+    const pollInterval = setInterval(() => {
+      fetchTasks(authToken);
+    }, 30000);
+
+    return () => {
+      cleanup?.();
+      clearInterval(pollInterval);
+      esRef.current?.close();
+    };
+  }, [authToken, fetchTasks, addEvent]);
+
+  // Connection status dot
+  const statusDot =
+    connectionStatus === 'LIVE'
+      ? 'bg-emerald-400 animate-pulse'
+      : connectionStatus === 'POLLING'
+      ? 'bg-amber-400'
+      : 'bg-red-400';
+
+  const statusText =
+    connectionStatus === 'LIVE' ? 'LIVE' : connectionStatus === 'POLLING' ? 'POLLING' : 'OFFLINE';
+
+  const statusBadgeClass =
+    connectionStatus === 'LIVE'
+      ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
+      : connectionStatus === 'POLLING'
+      ? 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
+      : 'bg-red-500/10 text-red-400 ring-red-500/20';
+
+  const filteredEvents =
+    filter === 'All' ? events : events.filter((e) => e.agent === filter);
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur border-b border-slate-800">
+        <div className="px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-white tracking-tight">📡 Live Feed</h1>
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ring-inset ${statusBadgeClass}`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${statusDot}`} />
+                {statusText}
+              </span>
+            </div>
+            <div className="text-xs text-slate-500">
+              {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
+            </div>
+          </div>
+
+          {/* Filter bar */}
+          <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1">
+            {AGENTS.map((agent) => (
+              <button
+                key={agent}
+                onClick={() => setFilter(agent)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-150 min-h-[44px] ${
+                  filter === agent
+                    ? 'bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/30'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                }`}
+              >
+                {agent !== 'All' && (
+                  <span className="text-sm">{AGENT_ICONS[agent]}</span>
+                )}
+                {agent}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Event stream */}
+      <div
+        ref={scrollRef}
+        className="px-4 sm:px-6 py-4 space-y-2 overflow-y-auto"
+        style={{ minHeight: 'calc(100vh - 160px)' }}
+      >
+        {filteredEvents.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-slate-600">
+            <span className="text-4xl mb-3">📡</span>
+            <p className="text-sm">No events yet</p>
+            <p className="text-xs mt-1">Waiting for agent activity...</p>
+          </div>
+        )}
+
+        {filteredEvents.map((evt) => (
+          <div
+            key={evt.id}
+            className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 hover:bg-slate-800/40 transition-colors"
+          >
+            <div className="flex items-start gap-3">
+              {/* Avatar */}
+              <div
+                className={`h-9 w-9 rounded-lg ${AGENT_BG[evt.agent] || 'bg-slate-700'} flex items-center justify-center text-base shrink-0`}
+              >
+                {AGENT_ICONS[evt.agent] || '❓'}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`text-sm font-semibold ${AGENT_COLORS[evt.agent] || 'text-slate-300'}`}>
+                    {evt.agent}
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ring-1 ring-inset ${TYPE_BADGE[evt.type] || TYPE_BADGE.System}`}
+                  >
+                    {evt.type}
+                  </span>
+                  <span className="text-[11px] text-slate-600 ml-auto shrink-0">
+                    {timeAgo(evt.timestamp)}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-300 mt-1 break-words">{evt.message}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default LiveFeedPage;

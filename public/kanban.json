@@ -3,12 +3,233 @@
     {
       "id": "backlog",
       "title": "Backlog",
-      "tasks": []
+      "tasks": [
+        {
+          "id": "t-1773759650351",
+          "title": "Sub-Agents in Agent Hub",
+          "description": "Show all spawned sub-agents in the Agent Hub with their status, tasks, and activity",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "agents",
+            "hub",
+            "subagents"
+          ],
+          "steps": [
+            {
+              "text": "Query sub-agents from gateway via API",
+              "done": false
+            },
+            {
+              "text": "Display sub-agents in Agent Hub with status badges",
+              "done": false
+            },
+            {
+              "text": "Show sub-agent task assignments and progress",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.351Z",
+          "progress": 0
+        },
+        {
+          "id": "t-1773759650420",
+          "title": "Live Feed - Agent Communication",
+          "description": "New sidebar page showing real-time feed of all agent communications. Username handles (@nova, @dev-lead, etc). Full history. Search/filter by agent.",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "live-feed",
+            "agents",
+            "realtime",
+            "ui"
+          ],
+          "steps": [
+            {
+              "text": "Design Live Feed page layout with message stream",
+              "done": false
+            },
+            {
+              "text": "Add username handles for all agents (@nova, @dev-lead, @research-lead)",
+              "done": false
+            },
+            {
+              "text": "Stream agent events from gateway WebSocket",
+              "done": false
+            },
+            {
+              "text": "Persist communication history",
+              "done": false
+            },
+            {
+              "text": "Add search and filter by agent",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.420Z",
+          "progress": 0
+        },
+        {
+          "id": "t-1773759650488",
+          "title": "Org Chart Page",
+          "description": "New sidebar page: visual org chart showing CEO → Nova (Orchestrator) → Department Leads → Team Members. Clear hierarchy, roles, responsibilities, communication flow.",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "org-chart",
+            "ui",
+            "hierarchy"
+          ],
+          "steps": [
+            {
+              "text": "Design org chart component with visual hierarchy",
+              "done": false
+            },
+            {
+              "text": "Populate from ecosystem.json data",
+              "done": false
+            },
+            {
+              "text": "Add role descriptions and responsibilities",
+              "done": false
+            },
+            {
+              "text": "Show communication flow arrows between levels",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.488Z",
+          "progress": 0
+        },
+        {
+          "id": "t-1773759650558",
+          "title": "Agent Task History in Detail Panel",
+          "description": "When clicking an agent in Agent Hub, show their task history — what they accomplished, completion rate, recent activity. Currently only department-level.",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "agents",
+            "history",
+            "detail-panel"
+          ],
+          "steps": [
+            {
+              "text": "Track per-agent task assignments in kanban.json",
+              "done": false
+            },
+            {
+              "text": "Add task history tab to agent detail panel",
+              "done": false
+            },
+            {
+              "text": "Show completion stats and recent activity",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.558Z",
+          "progress": 0
+        },
+        {
+          "id": "t-1773759650627",
+          "title": "Skills Page - Installed Skills Directory",
+          "description": "New sidebar page listing all installed skills with descriptions, details, and which agents can use them.",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "skills",
+            "ui",
+            "directory"
+          ],
+          "steps": [
+            {
+              "text": "Scan skills directory from gateway API",
+              "done": false
+            },
+            {
+              "text": "Display skill cards with name, description, capabilities",
+              "done": false
+            },
+            {
+              "text": "Show which agents/departments have access to each skill",
+              "done": false
+            },
+            {
+              "text": "Add skill detail view with full documentation",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.627Z",
+          "progress": 0
+        },
+        {
+          "id": "t-1773759650695",
+          "title": "Gateways Page - Gateway Management",
+          "description": "New sidebar page for gateway management: connection status, connected devices, integrations, health metrics for distributed environments.",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "gateways",
+            "management",
+            "infrastructure",
+            "ui"
+          ],
+          "steps": [
+            {
+              "text": "Design Gateways page with connection status cards",
+              "done": false
+            },
+            {
+              "text": "Show gateway health, uptime, connected devices",
+              "done": false
+            },
+            {
+              "text": "Display device pairing requests and approvals",
+              "done": false
+            },
+            {
+              "text": "Show gateway configuration and integration status",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.695Z",
+          "progress": 0
+        }
+      ]
     },
     {
       "id": "in-progress",
       "title": "In Progress",
-      "tasks": []
+      "tasks": [
+        {
+          "id": "t-1773759650281",
+          "title": "Chat-to-Kanban Task Creation",
+          "description": "Tell Nova a task via chat → task appears on Kanban board instantly. Support steps, priority, assignee.",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "kanban",
+            "chat",
+            "integration"
+          ],
+          "steps": [
+            {
+              "text": "Add task creation intent parsing to Nova chat",
+              "done": true
+            },
+            {
+              "text": "Nova calls POST /api/tasks when user gives a task",
+              "done": false
+            },
+            {
+              "text": "Task appears on Kanban board in real-time via SSE",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-17T15:00:50.281Z",
+          "progress": 33,
+          "startedAt": "2026-03-17T15:02:02.344Z"
+        }
+      ]
     },
     {
       "id": "review",
