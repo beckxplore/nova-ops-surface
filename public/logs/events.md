@@ -1,13 +1,19 @@
-- [2026-03-08 19:00 GMT+3] System initialized.
-- [2026-03-08 19:05 GMT+3] User 'Beck' logged in.
-- [2026-03-08 19:08 GMT+3] New project 'nova-ops-surface' created.
-- [2026-03-08 19:15 GMT+3] Module 'Executive Summary' updated.
-- [2026-03-08 19:22 GMT+3] Module 'Execution Matrix' data refreshed.
-- [2026-03-08 19:25 GMT+3] Module 'Resource Pulse' data refreshed.
-- [2026-03-08 19:33 GMT+3] Fix applied to src/main.ts to resolve Vercel deployment error.
-- [2026-03-08 19:34 GMT+3] Vercel deployment issue persists: deploying an older commit.
-- [2026-03-08 19:54 GMT+3] Vercel deployment still building old commit (d94c76c), issue requires manual intervention on Vercel platform.
-- [2026-03-08 20:10 GMT+3] Fixed JSX parsing error by renaming src/main.ts to src/main.tsx and updating index.html. Local build successful.
-- [2026-03-08 21:07 GMT+3] Heartbeat check: Detected 1 stalled project (Project Gamma). Updated PERFORMANCE.md.
-- [2026-03-08 21:14 GMT+3] Debugging local build: Spawned Playwright sub-agent to verify 'http://localhost:5173/' errors.
-- [2026-03-08 21:40 GMT+3] Critical local build fix: Corrected ReactDOM.createRoot target to 'app' in src/main.tsx.
+- [2026-03-17 13:00] Dashboard: Live data refresh — dynamic API endpoint, 30s auto-refresh
+- [2026-03-17 12:32] Gateway: Device pairing fixed, trustedProxies configured, all pages online
+- [2026-03-17 12:00] Dashboard: Mobile responsive redesign deployed (hamburger menu, touch targets)
+- [2026-03-17 11:57] Config: Alpha Stack configured — Hunter Alpha (text) + Healer Alpha (images)
+- [2026-03-17 11:00] Dashboard: 12 new models added to dropdown selector
+- [2026-03-17 10:45] Config: Default model switched from Claude Opus 4.6 to Hunter Alpha
+- [2026-03-17 10:35] Infrastructure: Nova API Proxy deployed as systemd service (port 3001)
+- [2026-03-17 10:30] Dashboard: File loading refactored to use Nova API (no WS device pairing)
+- [2026-03-14 15:30] Security: fail2ban, SSH hardening, UFW firewall configured
+- [2026-03-14 15:00] Infrastructure: Elastic IP 3.227.84.30 assigned, all URLs updated
+- [2026-03-14 14:00] Dashboard: Chat page with real-time streaming, session list, cross-channel sync
+- [2026-03-14 12:00] Dashboard: Runtime gateway config, editable MD files, live data integration
+- [2026-03-14 10:00] Dashboard: Kanban task CRUD, cron jobs dashboard deployed
+- [2026-03-13 16:00] OpenClaw: Updated to 2026.3.8, fixed breaking changes
+- [2026-03-12 16:00] Dashboard: WebSocket handshake fix, device pairing resolved
+- [2026-03-12 10:00] Dashboard: Multi-page app deployed — Overview, Kanban, Agent Hub, Chat
+- [2026-03-08 12:00] Dashboard: Initial React + Vite + Tailwind v4 setup
+- [2026-03-08 10:00] Nova: Autonomous governance framework established
+- [2026-03-08 08:00] Nova: Bootstrapped — identity, soul, protocols defined

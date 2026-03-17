@@ -3,374 +3,322 @@
     {
       "id": "backlog",
       "title": "Backlog",
-      "icon": "\ud83d\udce5",
-      "color": "border-slate-600",
       "tasks": []
     },
     {
       "id": "in-progress",
       "title": "In Progress",
-      "icon": "\ud83d\udd04",
-      "color": "border-blue-500",
       "tasks": []
     },
     {
       "id": "review",
       "title": "Review",
-      "icon": "\ud83d\udc40",
-      "color": "border-amber-500",
       "tasks": []
     },
     {
       "id": "done",
       "title": "Done",
-      "icon": "\u2705",
-      "color": "border-emerald-500",
       "tasks": [
         {
-          "id": "d1",
+          "id": "t1",
           "title": "Governance Framework",
-          "description": "Initialize departments with SOUL/GOAL/MEMORY",
+          "description": "Autonomous governance framework with department structure",
           "assignee": "Nova",
           "priority": "high",
           "tags": [
-            "ops"
+            "governance",
+            "framework"
           ],
-          "project": "Nova Platform",
-          "progress": 100,
-          "createdAt": "2026-03-08T08:00:00Z"
+          "createdAt": "2026-03-08T08:00:00Z",
+          "doneAt": "2026-03-08T10:00:00Z"
         },
         {
-          "id": "d2",
+          "id": "t2",
           "title": "SOP Documentation",
-          "description": "Budget-Aware Logic & Design Governance rules",
+          "description": "Standard Operating Procedures for all development workflows",
           "assignee": "Nova",
           "priority": "medium",
           "tags": [
-            "docs"
+            "docs",
+            "sop"
           ],
-          "project": "Nova Platform",
-          "progress": 100,
-          "createdAt": "2026-03-08T09:00:00Z"
+          "createdAt": "2026-03-08T09:00:00Z",
+          "doneAt": "2026-03-08T11:00:00Z"
         },
         {
-          "id": "d3",
-          "title": "GitHub Repository",
-          "description": "Create and configure nova-ops-surface repo",
+          "id": "t3",
+          "title": "GitHub Repository Setup",
+          "description": "Set up nova-ops-surface repo with React/Vite/Tailwind stack",
           "assignee": "Development",
-          "priority": "medium",
+          "priority": "high",
           "tags": [
-            "devops"
+            "infrastructure",
+            "github"
           ],
-          "project": "Nova Platform",
-          "progress": 100,
-          "createdAt": "2026-03-08T10:00:00Z"
+          "createdAt": "2026-03-08T10:00:00Z",
+          "doneAt": "2026-03-08T12:00:00Z"
         },
         {
-          "id": "d4",
+          "id": "t4",
           "title": "Fix Telegram Group Policy",
-          "description": "Set groupPolicy=open on AWS OpenClaw config",
+          "description": "Set bot group policy to open for Nova responses in group chats",
           "assignee": "Nova",
-          "priority": "high",
+          "priority": "medium",
           "tags": [
-            "infra",
-            "telegram"
+            "telegram",
+            "config"
           ],
-          "project": "Nova Platform",
-          "progress": 100,
-          "createdAt": "2026-03-12T05:00:00Z"
+          "createdAt": "2026-03-12T05:00:00Z",
+          "doneAt": "2026-03-12T05:30:00Z"
         },
         {
-          "id": "d5",
+          "id": "t5",
           "title": "Chat WebSocket Connection",
-          "description": "Fix dashboard chat to use OpenClaw v3 protocol",
+          "description": "Fix gateway WebSocket handshake and device pairing for dashboard chat",
           "assignee": "Development",
           "priority": "high",
           "tags": [
-            "backend",
-            "websocket"
+            "websocket",
+            "chat",
+            "gateway"
           ],
-          "project": "Nova Platform",
-          "progress": 100,
-          "createdAt": "2026-03-11T14:00:00Z"
+          "createdAt": "2026-03-11T14:00:00Z",
+          "doneAt": "2026-03-12T16:00:00Z"
         },
         {
-          "id": "d6",
+          "id": "t6",
           "title": "Dashboard Multi-Page App",
-          "description": "Overview, Kanban, Agent Hub, Chat pages deployed to Vercel",
+          "description": "Overview, Kanban, Agent Hub, Chat pages with sidebar navigation",
           "assignee": "Development",
           "priority": "high",
           "tags": [
-            "frontend"
+            "dashboard",
+            "ui",
+            "react"
           ],
-          "project": "Nova Platform",
-          "progress": 100,
-          "createdAt": "2026-03-08T12:00:00Z"
+          "createdAt": "2026-03-08T12:00:00Z",
+          "doneAt": "2026-03-12T10:00:00Z"
         },
         {
-          "id": "d7",
-          "title": "OpenClaw Update",
-          "description": "Updated from 2026.3.8 to 2026.3.11",
+          "id": "t7",
+          "title": "OpenClaw Update 2026.3.8",
+          "description": "Update gateway and fix breaking changes",
           "assignee": "Nova",
           "priority": "medium",
           "tags": [
-            "infra"
+            "openclaw",
+            "update"
           ],
-          "project": "Nova Platform",
-          "progress": 100,
-          "createdAt": "2026-03-13T15:00:00Z"
+          "createdAt": "2026-03-13T15:00:00Z",
+          "doneAt": "2026-03-13T16:00:00Z"
         },
         {
-          "id": "d8",
-          "title": "Token Cost Optimization",
-          "description": "Heartbeat model to Gemini Flash Lite, context pruning enabled",
-          "assignee": "Nova",
-          "priority": "high",
-          "tags": [
-            "ops",
-            "cost"
-          ],
-          "project": "Nova Platform",
-          "progress": 100,
-          "createdAt": "2026-03-13T15:00:00Z"
-        },
-        {
-          "id": "ip1",
+          "id": "t8",
           "title": "Live Data Integration",
-          "description": "Connect dashboard to real workspace data via API endpoints",
+          "description": "Wire Overview widgets to ecosystem.json and kanban.json via GatewayContext",
           "assignee": "Development",
           "priority": "high",
           "tags": [
-            "backend",
-            "api"
+            "dashboard",
+            "data",
+            "integration"
           ],
-          "project": "Nova Platform",
           "createdAt": "2026-03-13T10:00:00Z",
-          "steps": [
-            {
-              "text": "Wire Executive Summary to ecosystem data",
-              "done": true
-            },
-            {
-              "text": "Wire Execution Matrix to kanban data",
-              "done": true
-            },
-            {
-              "text": "Wire Resource Pulse to live agent status",
-              "done": true
-            },
-            {
-              "text": "Wire Event Stream to real events",
-              "done": true
-            },
-            {
-              "text": "Wire Agent Hub to live gateway status",
-              "done": true
-            }
-          ]
+          "doneAt": "2026-03-14T12:00:00Z"
         },
         {
-          "id": "d9",
-          "title": "Chat Page - Gateway Integration",
-          "description": "Wire chat page to OpenClaw gateway with real-time messaging",
-          "assignee": "Development",
-          "priority": "high",
-          "tags": [
-            "frontend",
-            "websocket"
-          ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-14T10:00:00Z",
-          "steps": [
-            {
-              "text": "WebSocket connection with device pairing",
-              "done": true
-            },
-            {
-              "text": "Real-time message streaming (delta/final)",
-              "done": true
-            },
-            {
-              "text": "Session list via sessions.list RPC",
-              "done": true
-            },
-            {
-              "text": "Chat history via chat.history RPC",
-              "done": true
-            },
-            {
-              "text": "Cross-channel sync (Telegram <-> Dashboard)",
-              "done": true
-            }
-          ]
-        },
-        {
-          "id": "d10",
+          "id": "t9",
           "title": "Kanban Task CRUD",
-          "description": "Create, delete, move tasks with GitHub persistence",
+          "description": "Inline task creation per column, persists to GitHub API",
           "assignee": "Development",
-          "priority": "high",
+          "priority": "medium",
           "tags": [
-            "frontend",
-            "api"
+            "kanban",
+            "crud"
           ],
-          "project": "Nova Platform",
           "createdAt": "2026-03-13T18:00:00Z",
-          "steps": [
-            {
-              "text": "Inline task creation per column",
-              "done": true
-            },
-            {
-              "text": "Double-click delete with confirm",
-              "done": true
-            },
-            {
-              "text": "Persist via GitHub API",
-              "done": true
-            },
-            {
-              "text": "Dynamic progress bars",
-              "done": true
-            }
-          ]
+          "doneAt": "2026-03-14T09:00:00Z"
         },
         {
+          "id": "t10",
           "title": "Cron Jobs Dashboard",
-          "description": "Wire cron UI to real OpenClaw cron.list RPC (currently shows static data)",
+          "description": "View, manage, and toggle cron jobs from the dashboard",
           "assignee": "Development",
-          "priority": "high",
+          "priority": "medium",
           "tags": [
-            "frontend",
-            "websocket"
+            "cron",
+            "dashboard"
           ],
-          "project": "Nova Platform",
           "createdAt": "2026-03-08T12:00:00Z",
-          "steps": [
-            {
-              "text": "Call cron.list + cron.status RPC via gateway WS",
-              "done": true
-            },
-            {
-              "text": "Display real jobs with status/schedule/last run",
-              "done": true
-            },
-            {
-              "text": "Add Run Now + Pause/Enable controls",
-              "done": true
-            },
-            {
-              "text": "Show expanded job details (config, payload, errors)",
-              "done": true
-            },
-            {
-              "text": "Auto-refresh + real-time cron event updates",
-              "done": true
-            }
-          ]
+          "doneAt": "2026-03-14T10:00:00Z"
         },
         {
+          "id": "t11",
           "title": "Editable MD Files",
-          "description": "Add workspace file editor to Agent Hub (SOUL.md, MEMORY.md, etc.)",
+          "description": "View and edit workspace MD files via gateway RPC from Agent Hub",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "files",
+            "editor",
+            "agent-hub"
+          ],
+          "createdAt": "2026-03-08T12:00:00Z",
+          "doneAt": "2026-03-14T11:00:00Z"
+        },
+        {
+          "id": "t12",
+          "title": "Elastic IP + Domain",
+          "description": "Assign Elastic IP 3.227.84.30, update Caddy and all dashboard URLs",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "aws",
+            "infrastructure",
+            "networking"
+          ],
+          "createdAt": "2026-03-09T12:00:00Z",
+          "doneAt": "2026-03-14T15:00:00Z"
+        },
+        {
+          "id": "t13",
+          "title": "Security Hardening",
+          "description": "fail2ban, SSH hardening, UFW firewall configuration",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "security",
+            "infrastructure"
+          ],
+          "createdAt": "2026-03-09T12:00:00Z",
+          "doneAt": "2026-03-14T15:30:00Z"
+        },
+        {
+          "id": "t14",
+          "title": "Runtime Gateway Config",
+          "description": "gateway-config.json loaded at runtime \u2014 no more hardcoded URLs in JS bundle",
+          "assignee": "Development",
+          "priority": "medium",
+          "tags": [
+            "config",
+            "gateway"
+          ],
+          "createdAt": "2026-03-14T10:00:00Z",
+          "doneAt": "2026-03-14T12:00:00Z"
+        },
+        {
+          "id": "t15",
+          "title": "Chat Page - Gateway Integration",
+          "description": "Real-time chat streaming, session list, cross-channel sync (Telegram \u2194 Dashboard)",
           "assignee": "Development",
           "priority": "high",
           "tags": [
-            "frontend",
-            "api"
+            "chat",
+            "gateway",
+            "realtime"
           ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-08T12:00:00Z",
-          "steps": [
-            {
-              "text": "Load workspace files via agents.files.list RPC",
-              "done": true
-            },
-            {
-              "text": "Read file content via agents.files.get RPC",
-              "done": true
-            },
-            {
-              "text": "Build edit textarea + save button UI",
-              "done": true
-            },
-            {
-              "text": "Save via agents.files.set RPC (writes to live workspace)",
-              "done": true
-            }
-          ]
+          "createdAt": "2026-03-14T10:00:00Z",
+          "doneAt": "2026-03-14T14:00:00Z"
         },
         {
-          "title": "Elastic IP + Domain",
-          "description": "Associate AWS Elastic IP so server IP survives reboots. Optional: custom domain.",
+          "id": "t16",
+          "title": "Hunter Alpha Model Switch",
+          "description": "Switch default LLM from Claude Opus 4.6 to Hunter Alpha (zero-cost)",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "model",
+            "config",
+            "cost-optimization"
+          ],
+          "createdAt": "2026-03-17T10:30:00Z",
+          "doneAt": "2026-03-17T10:45:00Z"
+        },
+        {
+          "id": "t17",
+          "title": "Nova API Proxy",
+          "description": "HTTP API server (port 3001) for model/file management \u2014 bypasses WS device pairing. systemd service.",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "api",
+            "infrastructure",
+            "backend"
+          ],
+          "createdAt": "2026-03-17T10:30:00Z",
+          "doneAt": "2026-03-17T10:35:00Z"
+        },
+        {
+          "id": "t18",
+          "title": "12 New Models Added",
+          "description": "DeepSeek V3.2, Gemini 3 Flash, Claude Sonnet 4.6, MiniMax M2.5, GLM-5, Kimi K2.5, Step 3.5 Flash, Gemini 3.1 Pro, GPT-5.4, Hunter Alpha, Healer Alpha, Qwen3 32B",
           "assignee": "Nova",
           "priority": "medium",
           "tags": [
-            "infrastructure",
-            "aws"
+            "models",
+            "config"
           ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-09T12:00:00Z",
-          "steps": [
-            {
-              "text": "Install AWS CLI + configure credentials",
-              "done": true
-            },
-            {
-              "text": "Allocate Elastic IP",
-              "done": true
-            },
-            {
-              "text": "Associate with EC2 instance",
-              "done": true
-            },
-            {
-              "text": "Update Caddy + dashboard + gateway configs",
-              "done": true
-            }
-          ]
+          "createdAt": "2026-03-17T10:30:00Z",
+          "doneAt": "2026-03-17T10:32:00Z"
         },
         {
-          "title": "Security Hardening",
-          "description": "Firewall, fail2ban, SSH hardening. UFW inactive, no fail2ban, iptables wide open.",
+          "id": "t19",
+          "title": "Mobile Responsive Dashboard",
+          "description": "Hamburger menu, slide-in drawer, responsive grids, touch targets, scrollable kanban columns",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "mobile",
+            "responsive",
+            "ui"
+          ],
+          "createdAt": "2026-03-17T11:00:00Z",
+          "doneAt": "2026-03-17T11:03:00Z"
+        },
+        {
+          "id": "t20",
+          "title": "Alpha Stack Configuration",
+          "description": "Configure Hunter Alpha (text) + Healer Alpha (images) as zero-cost model pair",
           "assignee": "Nova",
           "priority": "medium",
           "tags": [
-            "infrastructure",
+            "models",
+            "config",
+            "cost-optimization"
+          ],
+          "createdAt": "2026-03-17T11:56:00Z",
+          "doneAt": "2026-03-17T11:57:00Z"
+        },
+        {
+          "id": "t21",
+          "title": "Device Pairing + Trusted Proxies Fix",
+          "description": "Configure gateway trustedProxies, approve browser device, fix WS connection for all pages",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "gateway",
+            "websocket",
             "security"
           ],
-          "project": "Nova Platform",
-          "createdAt": "2026-03-09T12:00:00Z",
-          "steps": [
-            {
-              "text": "Install + configure fail2ban (SSH jail, 3 attempts = 2hr ban)",
-              "done": true
-            },
-            {
-              "text": "Harden SSH (no root login, no password auth, max 3 tries)",
-              "done": true
-            },
-            {
-              "text": "Enable UFW firewall (allow SSH/HTTP/HTTPS/OpenClaw only)",
-              "done": true
-            },
-            {
-              "text": "Verify all services still accessible",
-              "done": true
-            }
-          ]
+          "createdAt": "2026-03-17T12:29:00Z",
+          "doneAt": "2026-03-17T12:32:00Z"
+        },
+        {
+          "id": "t22",
+          "title": "Live Data + Dynamic API",
+          "description": "New /api/ecosystem endpoint reads from GitHub API, 30s refresh, no CDN cache, proper date sorting",
+          "assignee": "Development",
+          "priority": "high",
+          "tags": [
+            "api",
+            "data",
+            "performance"
+          ],
+          "createdAt": "2026-03-17T12:45:00Z",
+          "doneAt": "2026-03-17T13:00:00Z"
         }
       ]
     }
   ],
-  "cronJobs": [
-    {
-      "id": "hb1",
-      "name": "Nova Orchestrator Heartbeat",
-      "schedule": "every 2h",
-      "lastRun": "~1h ago",
-      "nextRun": "~1h",
-      "status": "active",
-      "target": "main"
-    }
-  ]
+  "cronJobs": []
 }
