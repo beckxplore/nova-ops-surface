@@ -22,27 +22,27 @@ interface Task {
   doneAt?: string;
 }
 
-const AGENTS = ['All', '@nova', '@kai', '@sage'] as const;
+const AGENTS = ['All', '@nova', '@kai', '@sage', '@mender'] as const;
 type AgentFilter = typeof AGENTS[number];
 
 const AGENT_NAMES: Record<string, string> = {
-  '@nova': 'Nova', '@kai': 'Kai (Dev Lead)', '@sage': 'Sage (Research)',
-  '@dev-lead': 'Kai', '@research-lead': 'Sage',
+  '@nova': 'Nova', '@kai': 'Kai (Dev Lead)', '@sage': 'Sage (Research)', '@mender': 'Mender (Doctor)',
+  '@dev-lead': 'Kai', '@research-lead': 'Sage', '@clinic-lead': 'Mender',
 };
 
 const AGENT_AVATARS: Record<string, string> = {
-  '@nova': '/avatars/nova.jpg', '@kai': '/avatars/kai.jpg', '@sage': '/avatars/sage.jpg',
-  '@dev-lead': '/avatars/kai.jpg', '@research-lead': '/avatars/sage.jpg',
+  '@nova': '/avatars/nova.jpg', '@kai': '/avatars/kai.jpg', '@sage': '/avatars/sage.jpg', '@mender': '/avatars/mender.jpg',
+  '@dev-lead': '/avatars/kai.jpg', '@research-lead': '/avatars/sage.jpg', '@clinic-lead': '/avatars/mender.jpg',
 };
 
 const AGENT_COLORS: Record<string, string> = {
-  '@nova': 'text-blue-400', '@kai': 'text-emerald-400', '@sage': 'text-purple-400',
-  '@dev-lead': 'text-emerald-400', '@research-lead': 'text-purple-400',
+  '@nova': 'text-blue-400', '@kai': 'text-emerald-400', '@sage': 'text-purple-400', '@mender': 'text-rose-400',
+  '@dev-lead': 'text-emerald-400', '@research-lead': 'text-purple-400', '@clinic-lead': 'text-rose-400',
 };
 
 const AGENT_BG: Record<string, string> = {
-  '@nova': 'bg-blue-500/20', '@kai': 'bg-emerald-500/20', '@sage': 'bg-purple-500/20',
-  '@dev-lead': 'bg-emerald-500/20', '@research-lead': 'bg-purple-500/20',
+  '@nova': 'bg-blue-500/20', '@kai': 'bg-emerald-500/20', '@sage': 'bg-purple-500/20', '@mender': 'bg-rose-500/20',
+  '@dev-lead': 'bg-emerald-500/20', '@research-lead': 'bg-purple-500/20', '@clinic-lead': 'bg-rose-500/20',
 };
 
 const TYPE_BADGE: Record<string, string> = {

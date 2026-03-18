@@ -54,11 +54,14 @@ const AGENT_AVATARS: Record<string, string> = {
   'development': '/avatars/kai.jpg',
   'research-lead': '/avatars/sage.jpg',
   'research': '/avatars/sage.jpg',
+  'clinic-lead': '/avatars/mender.jpg',
+  'clinic': '/avatars/mender.jpg',
 };
 
 const AGENT_DISPLAY_NAMES: Record<string, string> = {
   'Dev Lead': 'Kai',
   'Research Lead': 'Sage',
+  'Mender': 'Mender',
 };
 
 const OrgChartPage: React.FC = () => {
