@@ -20,6 +20,35 @@
       "title": "Done",
       "tasks": [
         {
+          "id": "t-1773821291719",
+          "title": "Real-time Demo Task",
+          "description": "Demonstrating live task tracking — watch this task progress on the board!",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "demo",
+            "live"
+          ],
+          "steps": [
+            {
+              "text": "Analyzing approach",
+              "done": true
+            },
+            {
+              "text": "Implementing solution",
+              "done": true
+            },
+            {
+              "text": "Verifying & deploying",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-18T08:08:11.720Z",
+          "progress": 100,
+          "startedAt": "2026-03-18T08:08:11.797Z",
+          "doneAt": "2026-03-18T08:08:43.325Z"
+        },
+        {
           "id": "t-1773820213745",
           "title": "Fix News page crash",
           "description": "IntelligenceBrief component crashed on undefined stats field. Added null-safe access and fixed brief.json structure.",

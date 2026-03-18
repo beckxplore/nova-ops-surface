@@ -4,14 +4,14 @@
     "name": "Nova",
     "role": "CEO's Personal AI Orchestrator",
     "status": "running",
-    "description": "Central orchestrator — manages tasks, delegates to departments, coordinates workflows"
+    "description": "Central orchestrator \u2014 manages tasks, delegates to departments, coordinates workflows"
   },
   "projects": [],
   "departments": [
     {
       "id": "development",
       "name": "Development",
-      "description": "Full-stack development — React, Vite, Tailwind, infrastructure",
+      "description": "Full-stack development \u2014 React, Vite, Tailwind, infrastructure",
       "project": null,
       "lead": {
         "id": "dev-lead",
@@ -35,6 +35,21 @@
         "status": "idle",
         "description": "Leads research tasks and model evaluation",
         "filesPath": "departments/research"
+      },
+      "agents": []
+    },
+    {
+      "id": "clinic",
+      "name": "Clinic",
+      "description": "System health monitoring, diagnostics, and automated repairs",
+      "project": null,
+      "lead": {
+        "id": "clinic-lead",
+        "name": "Mender",
+        "role": "System Doctor",
+        "status": "idle",
+        "description": "Monitors system health twice daily. Diagnoses and fixes issues proactively.",
+        "filesPath": "departments/clinic"
       },
       "agents": []
     }
