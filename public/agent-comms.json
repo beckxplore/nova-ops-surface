@@ -142,5 +142,21 @@
     "message": "New department created: Clinic 🩺 — led by Doctor Mender (System Doctor). Mender will run health checks twice daily at 8AM and 8PM. Full diagnostics: gateway, dashboard, services, security, disk, memory, cron jobs. Fixes issues silently, escalates only when needed.",
     "type": "message",
     "timestamp": "2026-03-18T08:51:42.634Z"
+  },
+  {
+    "id": "msg-1773824733343-fy32",
+    "from": "@nova",
+    "to": "@all",
+    "message": "[Late log] Created Clinic department with Mender as System Doctor. Health checks now run at 8AM and 8PM daily. Sorry for the delayed reporting — still building the habit of live transparency.",
+    "type": "message",
+    "timestamp": "2026-03-18T09:05:33.343Z"
+  },
+  {
+    "id": "msg-1773829053110-e5xw",
+    "from": "@nova",
+    "to": "@all",
+    "message": "Updated protocol: the word \"project\" now triggers a dedicated workflow. New projects get their own agents (not reusing core team). Nova proposes team structure and waits for Beck approval before proceeding.",
+    "type": "message",
+    "timestamp": "2026-03-18T10:17:33.110Z"
   }
 ]

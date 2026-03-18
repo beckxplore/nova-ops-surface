@@ -20,6 +20,47 @@
       "title": "Done",
       "tasks": [
         {
+          "id": "t-1773824733214",
+          "title": "Create Clinic Department (Mender Doctor)",
+          "description": "New health monitoring department with automated twice-daily diagnostics. Led by Mender (System Doctor).",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "department",
+            "health",
+            "infrastructure"
+          ],
+          "steps": [
+            {
+              "text": "Design Clinic department structure",
+              "done": true
+            },
+            {
+              "text": "Create SOUL, GOAL, MEMORY files",
+              "done": true
+            },
+            {
+              "text": "Register clinic agent in OpenClaw",
+              "done": true
+            },
+            {
+              "text": "Set up morning + evening health check crons",
+              "done": true
+            },
+            {
+              "text": "Add Mender avatar and Live Feed integration",
+              "done": true
+            },
+            {
+              "text": "Update ecosystem.json and Org Chart",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-18T09:05:33.214Z",
+          "progress": 100,
+          "doneAt": "2026-03-18T09:05:33.294Z"
+        },
+        {
           "id": "t-1773821291719",
           "title": "Real-time Demo Task",
           "description": "Demonstrating live task tracking — watch this task progress on the board!",
