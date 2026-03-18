@@ -11,6 +11,7 @@ import OrgChartPage from './pages/OrgChartPage';
 import SkillsPage from './pages/SkillsPage';
 import GatewaysPage from './pages/GatewaysPage';
 import NewsPage from './pages/NewsPage';
+import WorkflowsPage from './pages/WorkflowsPage';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -50,6 +51,7 @@ function App() {
             <Route path="/kanban" element={<KanbanPage />} />
             <Route path="/skills" element={<SkillsPage />} />
             <Route path="/news" element={<NewsPage />} />
+            <Route path="/workflows" element={<WorkflowsPage />} />
             <Route path="/gateways" element={<GatewaysPage />} />
             <Route path="/chat" element={<ChatPage />} />
           </Routes>

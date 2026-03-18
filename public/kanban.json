@@ -8,7 +8,42 @@
     {
       "id": "in-progress",
       "title": "In Progress",
-      "tasks": []
+      "tasks": [
+        {
+          "id": "t-1773832262541",
+          "title": "Integrate Superset DB into Robroi Dashboard",
+          "description": "Connect Superset API (64.227.129.135:8088) to dashboard. Database ID 6, SQLite, main schema. Build API proxy + data display.",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "integration",
+            "superset",
+            "api",
+            "robroi"
+          ],
+          "steps": [
+            {
+              "text": "Create Superset API proxy endpoint",
+              "done": true
+            },
+            {
+              "text": "Build data fetching utility",
+              "done": false
+            },
+            {
+              "text": "Create workflow data display component",
+              "done": false
+            },
+            {
+              "text": "Deploy and test",
+              "done": false
+            }
+          ],
+          "createdAt": "2026-03-18T11:11:02.541Z",
+          "progress": 25,
+          "startedAt": "2026-03-18T11:11:02.620Z"
+        }
+      ]
     },
     {
       "id": "review",
@@ -19,6 +54,47 @@
       "id": "done",
       "title": "Done",
       "tasks": [
+        {
+          "id": "t-1773831353250",
+          "title": "Setup Project Robroi — Agent Team & Workspace",
+          "description": "Clone repo, analyze codebase, create 3 project-specific agents (Axel Frontend, Nova Backend, Priya Data Engineer), add to Org Chart under project container.",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "project",
+            "setup",
+            "robroi"
+          ],
+          "steps": [
+            {
+              "text": "Clone and analyze Robroi repo",
+              "done": true
+            },
+            {
+              "text": "Propose team structure to Beck",
+              "done": true
+            },
+            {
+              "text": "Create agent workspaces and identities",
+              "done": true
+            },
+            {
+              "text": "Register agents in OpenClaw gateway",
+              "done": true
+            },
+            {
+              "text": "Add project container to Org Chart",
+              "done": true
+            },
+            {
+              "text": "Deploy updated dashboard",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-18T10:55:53.250Z",
+          "progress": 100,
+          "doneAt": "2026-03-18T10:55:53.330Z"
+        },
         {
           "id": "t-1773829249507",
           "title": "Analyze nova-ops-surface repo & propose project team",

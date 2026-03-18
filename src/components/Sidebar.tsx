@@ -8,6 +8,7 @@ const navItems = [
   { path: '/live-feed', label: 'Live Feed', icon: '📡' },
   { path: '/kanban', label: 'Kanban', icon: '📋' },
   { path: '/news', label: 'News', icon: '📡' },
+  { path: '/workflows', label: 'Workflows', icon: '🔄' },
   { path: '/skills', label: 'Skills', icon: '🧩' },
   { path: '/gateways', label: 'Gateways', icon: '🔌' },
   { path: '/chat', label: 'Chat', icon: '💬' },
