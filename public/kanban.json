@@ -20,23 +20,36 @@
       "title": "Done",
       "tasks": [
         {
-          "id": "t-daily-brief-2026-03-18",
-          "title": "Daily News Brief — March 18",
-          "description": "Scan AI/ML news, model releases, industry moves, and compile structured briefing JSON. 12 items including NVIDIA GTC, DLSS 5, GPT-5.4 Mini, Claude Memory, Grok 4.20.",
-          "assignee": "Research",
+          "id": "t-1773820213745",
+          "title": "Fix News page crash",
+          "description": "IntelligenceBrief component crashed on undefined stats field. Added null-safe access and fixed brief.json structure.",
+          "assignee": "Development",
           "priority": "high",
-          "tags": ["research", "daily", "briefing", "news"],
-          "steps": [
-            { "text": "Scan latest AI model releases", "done": true },
-            { "text": "Find key industry moves (NVIDIA GTC, Microsoft Copilot)", "done": true },
-            { "text": "Check for dev tools and TTS updates", "done": true },
-            { "text": "Compile structured briefing JSON (12 items)", "done": true },
-            { "text": "Write to brief.json", "done": true }
+          "tags": [
+            "bugfix",
+            "news"
           ],
-          "createdAt": "2026-03-18T05:00:00Z",
+          "steps": [
+            {
+              "text": "Diagnose TypeError on /news page",
+              "done": true
+            },
+            {
+              "text": "Fix brief.json missing stats field",
+              "done": true
+            },
+            {
+              "text": "Add null-safe access to IntelligenceBrief component",
+              "done": true
+            },
+            {
+              "text": "Build and deploy fix",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-18T07:50:13.745Z",
           "progress": 100,
-          "startedAt": "2026-03-18T05:00:00Z",
-          "doneAt": "2026-03-18T05:01:00Z"
+          "doneAt": "2026-03-18T07:50:14.866Z"
         },
         {
           "id": "t-1773784351123",

@@ -318,7 +318,7 @@ const LiveFeedPage: React.FC = () => {
       } catch {}
     };
     fetchComms();
-    const interval = setInterval(fetchComms, 60000);
+    const interval = setInterval(fetchComms, 5000); // 5s for real-time feel
     return () => clearInterval(interval);
   }, [addEvent]);
 
