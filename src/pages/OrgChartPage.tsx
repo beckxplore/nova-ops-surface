@@ -47,6 +47,20 @@ const LEVEL_GRADIENTS = [
 
 const LEVEL_ICONS = ['👑', '🧠', '🏢', '👤'];
 
+const AGENT_AVATARS: Record<string, string> = {
+  'ceo': '',
+  'orchestrator': '/avatars/nova.jpg',
+  'dev-lead': '/avatars/kai.jpg',
+  'development': '/avatars/kai.jpg',
+  'research-lead': '/avatars/sage.jpg',
+  'research': '/avatars/sage.jpg',
+};
+
+const AGENT_DISPLAY_NAMES: Record<string, string> = {
+  'Dev Lead': 'Kai',
+  'Research Lead': 'Sage',
+};
+
 const OrgChartPage: React.FC = () => {
   const [eco, setEco] = useState<EcosystemData | null>(null);
   const [selectedNode, setSelectedNode] = useState<OrgNode | null>(null);
@@ -137,7 +151,7 @@ const OrgChartPage: React.FC = () => {
       children: [
         {
           id: 'orchestrator',
-          name: 'Nova',
+          name: 'Nova (Orchestrator)',
           role: 'Orchestrator',
           level: 1,
           status: eco?.orchestrator.status || 'running',
@@ -175,11 +189,15 @@ const OrgChartPage: React.FC = () => {
       }`}
     >
       <div className="flex items-center gap-3 mb-2">
-        <div className={`h-10 w-10 md:h-11 md:w-11 rounded-xl bg-gradient-to-br ${node.gradient} flex items-center justify-center text-lg shadow-md shrink-0`}>
-          {node.icon}
+        <div className={`h-10 w-10 md:h-11 md:w-11 rounded-xl bg-gradient-to-br ${node.gradient} flex items-center justify-center text-lg shadow-md shrink-0 overflow-hidden`}>
+          {AGENT_AVATARS[node.id] ? (
+            <img src={AGENT_AVATARS[node.id]} alt={node.name} className="h-full w-full object-cover" />
+          ) : (
+            <span>{node.icon}</span>
+          )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-white truncate">{node.name}</p>
+          <p className="text-sm font-bold text-white truncate">{AGENT_DISPLAY_NAMES[node.name] || node.name}</p>
           <p className="text-[10px] text-slate-400 uppercase tracking-wider">{node.role}</p>
         </div>
         <StatusBadge status={node.status} />

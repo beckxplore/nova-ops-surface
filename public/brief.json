@@ -1,136 +1,127 @@
 {
-  "generated": "2026-03-17T19:48:00Z",
-  "period": "March 10-17, 2026",
+  "generatedAt": "2026-03-18T05:00:00Z",
+  "period": "2026-03-17 to 2026-03-18",
+  "itemCount": 12,
   "items": [
     {
-      "category": "model-release",
-      "title": "GPT-5.4 Released — 1M Token Context + Computer Use",
-      "summary": "OpenAI drops GPT-5.4 with massive 1M token context window and native computer-use capabilities. Available via API and ChatGPT.",
-      "source": "https://openai.com",
-      "date": "2026-03-15",
-      "priority": "high"
-    },
-    {
-      "category": "model-release",
-      "title": "Claude Opus 4.6 — New SWE-bench Leader at 75.6%",
-      "summary": "Anthropic's Claude Opus 4.6 sets new SWE-bench record for coding performance. Extended thinking and 1M context support.",
-      "source": "https://anthropic.com",
-      "date": "2026-03-15",
-      "priority": "high"
-    },
-    {
-      "category": "model-release",
-      "title": "DeepSeek V4 — 1 Trillion Parameter Open-Weight Model",
-      "summary": "DeepSeek releases V4 with 1T parameters as open-weight. Competitive with GPT-5.4 and Claude 4.6 on key benchmarks at fraction of the cost.",
-      "source": "https://deepseek.com",
-      "date": "2026-03-14",
-      "priority": "high"
-    },
-    {
-      "category": "model-release",
-      "title": "Gemini 3.1 Flash-Lite — Ultra-Efficient Google Model",
-      "summary": "Google ships Gemini 3.1 Flash-Lite optimized for speed and cost. Strong performance on lightweight tasks.",
-      "source": "https://deepmind.google",
-      "date": "2026-03-13",
-      "priority": "medium"
-    },
-    {
-      "category": "model-release",
-      "title": "OLMo Hybrid — Allen AI's Open Architecture",
-      "summary": "Allen Institute releases OLMo Hybrid combining dense and sparse attention for improved efficiency. Fully open-source.",
-      "source": "https://allenai.org",
-      "date": "2026-03-12",
-      "priority": "medium"
-    },
-    {
-      "category": "industry",
-      "title": "Yann LeCun's AMI Raises $1.03B Seed Round",
-      "summary": "Meta's former Chief Scientist raises over $1B in seed funding for AMI, focused on next-gen AI infrastructure and research.",
-      "source": "https://techcrunch.com",
+      "id": 1,
+      "category": "hardware",
+      "title": "NVIDIA GTC 2026: Vera Rubin, $1T Revenue Forecast, DLSS 5",
+      "summary": "Jensen Huang's 3-hour GTC keynote unveiled the Vera Rubin platform, projected $1 trillion cumulative revenue through 2027, and announced DLSS 5 with AI-powered real-time rendering for gaming. Blackwell orders through 2027 already exceed $500B.",
+      "source": "CNBC / Reuters / NVIDIA Blog",
       "date": "2026-03-16",
-      "priority": "high"
+      "priority": "critical",
+      "url": "https://www.cnbc.com/2026/03/16/nvidia-gtc-2026-ceo-jensen-huang-keynote-blackwell-vera-rubin.html"
     },
     {
+      "id": 2,
+      "category": "model-release",
+      "title": "DLSS 5 — AI-Powered Real-Time Rendering Goes Photorealistic",
+      "summary": "NVIDIA's DLSS 5 uses neural networks integrated directly into GPUs to reconstruct high-fidelity images in real time, focusing on lighting, materials, and photorealistic visuals. Demonstrates hardware-native AI surpassing general-purpose systems for specialized tasks.",
+      "source": "Labla.org / NVIDIA",
+      "date": "2026-03-18",
+      "priority": "high",
+      "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-18-2026-a-quiet-day-with-four-stories-worth-knowing/"
+    },
+    {
+      "id": 3,
+      "category": "model-release",
+      "title": "GPT-5.4 Mini & Nano Hit OpenRouter",
+      "summary": "OpenAI's GPT-5.4 mini and nano variants now available on OpenRouter. Optimized for speed and cost over maximum capability — significant latency improvements for agentic workflows where API call latency compounds across multi-step tasks.",
+      "source": "Labla.org",
+      "date": "2026-03-18",
+      "priority": "high",
+      "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-18-2026-a-quiet-day-with-four-stories-worth-knowing/"
+    },
+    {
+      "id": 4,
+      "category": "model-release",
+      "title": "Claude Gets Memory — Anthropic Rolls Out to All Users",
+      "summary": "Anthropic rolled out persistent memory features to all Claude users, allowing context and preferences to carry across conversations. Positions Claude directly against ChatGPT's year-old memory features. Changes the user experience from 'tool' to 'assistant that knows you.'",
+      "source": "Labla.org / Anthropic",
+      "date": "2026-03-17",
+      "priority": "high",
+      "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-17-2026-claude-gets-memory-microsoft-pulls-back-and-the-race-continues/"
+    },
+    {
+      "id": 5,
       "category": "industry",
-      "title": "Cursor in $50B Valuation Talks",
-      "summary": "AI coding assistant Cursor is in funding talks at a $50B valuation, reflecting explosive growth in AI developer tools.",
-      "source": "https://bloomberg.com",
-      "date": "2026-03-15",
-      "priority": "high"
+      "title": "Microsoft Quietly Pulls Back on Copilot Branding",
+      "summary": "Microsoft cut plans for some Copilot AI features in Windows 11 and shipped others without Copilot branding, reducing AI bloat. Signals shift from 'AI everywhere' to 'AI where it actually helps' — responding to user feedback about intrusive AI prompts.",
+      "source": "Labla.org / Microsoft",
+      "date": "2026-03-17",
+      "priority": "medium",
+      "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-17-2026-claude-gets-memory-microsoft-pulls-back-and-the-race-continues/"
     },
     {
+      "id": 6,
+      "category": "model-release",
+      "title": "Grok 4.20 — Four-Agent Parallel Architecture",
+      "summary": "xAI's Grok 4.20 uses a unique four-agent parallel architecture: Grok coordinates, Harper handles fact-checking with real-time X data, Benjamin manages logic/coding, Lucas covers creative reasoning. 128K token context, 8K output limit, native image understanding.",
+      "source": "Labla.org / xAI",
+      "date": "2026-03-17",
+      "priority": "high",
+      "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-17-2026-claude-gets-memory-microsoft-pulls-back-and-the-race-continues/"
+    },
+    {
+      "id": 7,
+      "category": "research",
+      "title": "Tether Fine-Tunes 1B Model on Smartphone in Under 2 Hours",
+      "summary": "Tether demonstrated a technique reducing VRAM requirements for fine-tuning 1B parameter models by ~80%, enabling fine-tuning on a smartphone in under 2 hours. Demo-stage but points toward AI customization moving from data centers to consumer hardware.",
+      "source": "Labla.org / Tether",
+      "date": "2026-03-18",
+      "priority": "medium",
+      "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-18-2026-a-quiet-day-with-four-stories-worth-knowing/"
+    },
+    {
+      "id": 8,
+      "category": "model-release",
+      "title": "Hume AI Drops tada-1b and tada-3b-ml TTS Models",
+      "summary": "Hume AI uploaded two new text-to-speech models to Hugging Face: tada-1b and tada-3b-ml (multilingual). Specializes in emotionally intelligent, human-sounding voice generation. Worth testing for voice generation workflows.",
+      "source": "Hugging Face / Hume AI",
+      "date": "2026-03-18",
+      "priority": "medium",
+      "url": "https://huggingface.co/hume-ai"
+    },
+    {
+      "id": 9,
       "category": "industry",
-      "title": "Nvidia Invests in Thinking Machines + 1GW Data Center Deal",
-      "summary": "Nvidia makes strategic investment in Thinking Machines and announces 1GW data center partnership for next-gen GPU clusters.",
-      "source": "https://nvidia.com",
-      "date": "2026-03-14",
-      "priority": "high"
+      "title": "271+ Model Releases Tracked in Q1 2026",
+      "summary": "AI industry pace: roughly 3 new models released every day in Q1 2026. Trends include reasoning models trading speed for accuracy, multimodal becoming standard, and efficiency improvements delivering GPT-4-level performance at dramatically lower costs.",
+      "source": "Labla.org / Kripesh Adwani",
+      "date": "2026-03-17",
+      "priority": "medium",
+      "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-17-2026-claude-gets-memory-microsoft-pulls-back-and-the-race-continues/"
     },
     {
-      "category": "industry",
-      "title": "Nvidia GTC — $1T in Chip Orders Previewed",
-      "summary": "At GTC 2026, Nvidia previews massive order pipeline for next-gen chips. AI infrastructure spending shows no signs of slowing.",
-      "source": "https://nvidia.com/gtc",
-      "date": "2026-03-13",
-      "priority": "medium"
-    },
-    {
-      "category": "industry",
-      "title": "Anthropic-Pentagon Partnership Sparks Debate",
-      "summary": "Anthropic's partnership with the US Department of Defense draws both praise and criticism from the AI safety community.",
-      "source": "https://wired.com",
-      "date": "2026-03-12",
-      "priority": "medium"
-    },
-    {
-      "category": "openclaw",
-      "title": "OpenClaw Hits 280K+ GitHub Stars — Most Starred Ever",
-      "summary": "OpenClaw becomes the most starred project in GitHub history, surpassing all previous records. Massive community growth continues.",
-      "source": "https://github.com/openclaw/openclaw",
+      "id": 10,
+      "category": "hardware",
+      "title": "NVIDIA Bets Big on AI Inference — $1T Opportunity",
+      "summary": "NVIDIA pivoting focus from training dominance to inference computing, where it faces competition from Google TPUs, Intel, and AMD CPUs. Jensen Huang called inference 'the next big wave' with a $1 trillion chip revenue opportunity through 2027.",
+      "source": "Reuters / CNBC",
       "date": "2026-03-16",
-      "priority": "high"
+      "priority": "high",
+      "url": "https://www.reuters.com/world/asia-pacific/nvidia-ceo-set-reveal-new-chips-software-ai-megaconference-gtc-2026-03-16/"
     },
     {
-      "category": "openclaw",
-      "title": "NYT: China Rapidly Adopting OpenClaw",
-      "summary": "New York Times features deep-dive on how OpenClaw is being rapidly adopted across China for enterprise and personal AI workflows.",
-      "source": "https://nytimes.com",
-      "date": "2026-03-15",
-      "priority": "high"
-    },
-    {
-      "category": "devtools",
-      "title": "LangChain Deep Agents — Complex Task Orchestration",
-      "summary": "LangChain launches Deep Agents for building AI systems that handle complex multi-step tasks with persistent memory.",
-      "source": "https://langchain.com",
+      "id": 11,
+      "category": "industry",
+      "title": "Jensen Huang: 'AI Is a 5-Layer Cake'",
+      "summary": "NVIDIA CEO argues AI depends on five layers that must scale together: energy, chips, infrastructure, models, and applications. Framing underpins GTC announcements and the company's strategy to remain central to the AI ecosystem buildout.",
+      "source": "Fortune / NVIDIA Blog",
       "date": "2026-03-14",
-      "priority": "medium"
+      "priority": "medium",
+      "url": "https://fortune.com/2026/03/12/nvidia-gtc-preview-the-real-march-madness-jensen-huang/"
     },
     {
+      "id": 12,
       "category": "devtools",
-      "title": "Google Conductor — CLI Extension for AI Workflows",
-      "summary": "Google releases Conductor, a CLI extension for orchestrating AI workflows directly from the terminal.",
-      "source": "https://developers.google.com",
-      "date": "2026-03-13",
-      "priority": "low"
-    },
-    {
-      "category": "devtools",
-      "title": "OpenAI Workspace Analytics for Enterprise",
-      "summary": "OpenAI launches enterprise analytics dashboard for tracking AI usage, costs, and performance across organizations.",
-      "source": "https://openai.com",
-      "date": "2026-03-11",
-      "priority": "low"
+      "title": "The Pace of 2026: A New Model Every 72 Hours",
+      "summary": "Community sentiment captures the AI release pace: it feels like a significant new model drops every 72 hours. The industry is releasing at a rate that makes it genuinely difficult to keep up. Most releases are specialized models, fine-tunes, and domain-specific tools rather than frontier launches.",
+      "source": "Labla.org",
+      "date": "2026-03-18",
+      "priority": "low",
+      "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-18-2026-a-quiet-day-with-four-stories-worth-knowing/"
     }
-  ],
-  "stats": {
-    "totalItems": 15,
-    "highPriority": 9,
-    "categories": {
-      "model-release": 5,
-      "industry": 5,
-      "openclaw": 2,
-      "devtools": 3
-    }
-  }
+  ]
 }

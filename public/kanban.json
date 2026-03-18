@@ -20,6 +20,25 @@
       "title": "Done",
       "tasks": [
         {
+          "id": "t-daily-brief-2026-03-18",
+          "title": "Daily News Brief — March 18",
+          "description": "Scan AI/ML news, model releases, industry moves, and compile structured briefing JSON. 12 items including NVIDIA GTC, DLSS 5, GPT-5.4 Mini, Claude Memory, Grok 4.20.",
+          "assignee": "Research",
+          "priority": "high",
+          "tags": ["research", "daily", "briefing", "news"],
+          "steps": [
+            { "text": "Scan latest AI model releases", "done": true },
+            { "text": "Find key industry moves (NVIDIA GTC, Microsoft Copilot)", "done": true },
+            { "text": "Check for dev tools and TTS updates", "done": true },
+            { "text": "Compile structured briefing JSON (12 items)", "done": true },
+            { "text": "Write to brief.json", "done": true }
+          ],
+          "createdAt": "2026-03-18T05:00:00Z",
+          "progress": 100,
+          "startedAt": "2026-03-18T05:00:00Z",
+          "doneAt": "2026-03-18T05:01:00Z"
+        },
+        {
           "id": "t-1773784351123",
           "title": "Dashboard Audit & Fixes",
           "description": "Full audit of all dashboard pages, console errors, API endpoints, and data freshness",
