@@ -70,16 +70,16 @@ export default function IntelligenceBrief() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-base font-semibold text-white">📡 Intelligence Brief</h2>
-          <p className="text-[10px] text-slate-500 mt-0.5">{brief.period} • {brief.stats.totalItems} items</p>
+          <p className="text-[10px] text-slate-500 mt-0.5">{brief.period} • {brief.stats?.totalItems ?? brief.items?.length ?? 0} items</p>
         </div>
         <div className="flex items-center gap-2">
-          {brief.stats.highPriority > 0 && (
+          {(brief.stats?.highPriority ?? 0) > 0 && (
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 ring-1 ring-red-500/20">
               {brief.stats.highPriority} priority
             </span>
           )}
           <span className="text-[10px] text-slate-600">
-            Updated {new Date(brief.generated).toLocaleTimeString()}
+            Updated {new Date(brief.generated || brief.generatedAt || Date.now()).toLocaleTimeString()}
           </span>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function IntelligenceBrief() {
           className={`px-3 py-1.5 rounded-md text-[10px] font-medium whitespace-nowrap transition-all ${
             filter === 'all' ? 'bg-slate-700 text-white' : 'text-slate-500 hover:text-slate-300'
           }`}
-        >All ({brief.stats.totalItems})</button>
+        >All ({brief.stats?.totalItems ?? brief.items?.length ?? 0})</button>
         {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => (
           <button key={key} onClick={() => setFilter(key)}
             className={`px-3 py-1.5 rounded-md text-[10px] font-medium whitespace-nowrap transition-all flex items-center gap-1 ${
@@ -100,7 +100,7 @@ export default function IntelligenceBrief() {
           >
             <span>{cfg.icon}</span>
             <span>{cfg.label}</span>
-            {brief.stats.categories[key] ? <span className="text-slate-600">({brief.stats.categories[key]})</span> : null}
+            {brief.stats?.categories?.[key] ? <span className="text-slate-600">({brief.stats.categories[key]})</span> : null}
           </button>
         ))}
       </div>

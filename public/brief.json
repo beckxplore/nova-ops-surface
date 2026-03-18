@@ -16,7 +16,7 @@
     {
       "id": 2,
       "category": "model-release",
-      "title": "DLSS 5 — AI-Powered Real-Time Rendering Goes Photorealistic",
+      "title": "DLSS 5 \u2014 AI-Powered Real-Time Rendering Goes Photorealistic",
       "summary": "NVIDIA's DLSS 5 uses neural networks integrated directly into GPUs to reconstruct high-fidelity images in real time, focusing on lighting, materials, and photorealistic visuals. Demonstrates hardware-native AI surpassing general-purpose systems for specialized tasks.",
       "source": "Labla.org / NVIDIA",
       "date": "2026-03-18",
@@ -27,7 +27,7 @@
       "id": 3,
       "category": "model-release",
       "title": "GPT-5.4 Mini & Nano Hit OpenRouter",
-      "summary": "OpenAI's GPT-5.4 mini and nano variants now available on OpenRouter. Optimized for speed and cost over maximum capability — significant latency improvements for agentic workflows where API call latency compounds across multi-step tasks.",
+      "summary": "OpenAI's GPT-5.4 mini and nano variants now available on OpenRouter. Optimized for speed and cost over maximum capability \u2014 significant latency improvements for agentic workflows where API call latency compounds across multi-step tasks.",
       "source": "Labla.org",
       "date": "2026-03-18",
       "priority": "high",
@@ -36,7 +36,7 @@
     {
       "id": 4,
       "category": "model-release",
-      "title": "Claude Gets Memory — Anthropic Rolls Out to All Users",
+      "title": "Claude Gets Memory \u2014 Anthropic Rolls Out to All Users",
       "summary": "Anthropic rolled out persistent memory features to all Claude users, allowing context and preferences to carry across conversations. Positions Claude directly against ChatGPT's year-old memory features. Changes the user experience from 'tool' to 'assistant that knows you.'",
       "source": "Labla.org / Anthropic",
       "date": "2026-03-17",
@@ -47,7 +47,7 @@
       "id": 5,
       "category": "industry",
       "title": "Microsoft Quietly Pulls Back on Copilot Branding",
-      "summary": "Microsoft cut plans for some Copilot AI features in Windows 11 and shipped others without Copilot branding, reducing AI bloat. Signals shift from 'AI everywhere' to 'AI where it actually helps' — responding to user feedback about intrusive AI prompts.",
+      "summary": "Microsoft cut plans for some Copilot AI features in Windows 11 and shipped others without Copilot branding, reducing AI bloat. Signals shift from 'AI everywhere' to 'AI where it actually helps' \u2014 responding to user feedback about intrusive AI prompts.",
       "source": "Labla.org / Microsoft",
       "date": "2026-03-17",
       "priority": "medium",
@@ -56,7 +56,7 @@
     {
       "id": 6,
       "category": "model-release",
-      "title": "Grok 4.20 — Four-Agent Parallel Architecture",
+      "title": "Grok 4.20 \u2014 Four-Agent Parallel Architecture",
       "summary": "xAI's Grok 4.20 uses a unique four-agent parallel architecture: Grok coordinates, Harper handles fact-checking with real-time X data, Benjamin manages logic/coding, Lucas covers creative reasoning. 128K token context, 8K output limit, native image understanding.",
       "source": "Labla.org / xAI",
       "date": "2026-03-17",
@@ -96,7 +96,7 @@
     {
       "id": 10,
       "category": "hardware",
-      "title": "NVIDIA Bets Big on AI Inference — $1T Opportunity",
+      "title": "NVIDIA Bets Big on AI Inference \u2014 $1T Opportunity",
       "summary": "NVIDIA pivoting focus from training dominance to inference computing, where it faces competition from Google TPUs, Intel, and AMD CPUs. Jensen Huang called inference 'the next big wave' with a $1 trillion chip revenue opportunity through 2027.",
       "source": "Reuters / CNBC",
       "date": "2026-03-16",
@@ -123,5 +123,16 @@
       "priority": "low",
       "url": "https://www.labla.org/latest-ai-model-releases-past-24-hours/ai-model-releases-march-18-2026-a-quiet-day-with-four-stories-worth-knowing/"
     }
-  ]
+  ],
+  "stats": {
+    "totalItems": 12,
+    "highPriority": 5,
+    "categories": {
+      "hardware": 2,
+      "model-release": 5,
+      "industry": 3,
+      "research": 1,
+      "devtools": 1
+    }
+  }
 }
