@@ -10,10 +10,11 @@ interface BriefItem {
 }
 
 interface BriefData {
-  generated: string;
+  generated?: string;
+  generatedAt?: string;
   period: string;
   items: BriefItem[];
-  stats: { totalItems: number; highPriority: number; categories: Record<string, number> };
+  stats?: { totalItems?: number; highPriority?: number; categories?: Record<string, number> };
 }
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
@@ -75,7 +76,7 @@ export default function IntelligenceBrief() {
         <div className="flex items-center gap-2">
           {(brief.stats?.highPriority ?? 0) > 0 && (
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 ring-1 ring-red-500/20">
-              {brief.stats.highPriority} priority
+              {brief.stats?.highPriority} priority
             </span>
           )}
           <span className="text-[10px] text-slate-600">
