@@ -6,7 +6,49 @@
     "status": "running",
     "description": "Central orchestrator \u2014 manages tasks, delegates to departments, coordinates workflows"
   },
-  "projects": [],
+  "projects": [
+    {
+      "id": "robroi",
+      "name": "Robroi (J.A.R.V 2.0)",
+      "description": "Financial workflow analysis dashboard \u2014 employee data, P&L, leakage audit, ROI waterfall",
+      "status": "active",
+      "repo": "https://github.com/beckxplore/Robroi",
+      "branch": "dev",
+      "manager": {
+        "id": "nova",
+        "name": "Nova",
+        "status": "running"
+      },
+      "departments": [
+        "robroi-axel",
+        "robroi-nova",
+        "robroi-priya"
+      ],
+      "agents": [
+        {
+          "id": "robroi-axel",
+          "name": "Axel",
+          "role": "Frontend Dev",
+          "status": "idle",
+          "description": "UI cleanup, theme system, component consolidation"
+        },
+        {
+          "id": "robroi-nova",
+          "name": "Nova (Backend)",
+          "role": "Backend Dev",
+          "status": "idle",
+          "description": "API layer, SQLite backend, auth"
+        },
+        {
+          "id": "robroi-priya",
+          "name": "Priya",
+          "role": "Data Engineer",
+          "status": "idle",
+          "description": "Python scripts, workflow analysis, data models"
+        }
+      ]
+    }
+  ],
   "departments": [
     {
       "id": "development",

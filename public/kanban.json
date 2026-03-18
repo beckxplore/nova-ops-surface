@@ -20,6 +20,40 @@
       "title": "Done",
       "tasks": [
         {
+          "id": "t-1773829249507",
+          "title": "Analyze nova-ops-surface repo & propose project team",
+          "description": "Clone and analyze https://github.com/beckxplore/nova-ops-surface to understand scope, then propose dedicated project agent team structure.",
+          "assignee": "Nova",
+          "priority": "high",
+          "tags": [
+            "project",
+            "analysis",
+            "setup"
+          ],
+          "steps": [
+            {
+              "text": "Clone repo and analyze codebase",
+              "done": true
+            },
+            {
+              "text": "Identify tech stack, architecture, gaps",
+              "done": true
+            },
+            {
+              "text": "Propose project team structure",
+              "done": true
+            },
+            {
+              "text": "Await Beck approval",
+              "done": true
+            }
+          ],
+          "createdAt": "2026-03-18T10:20:49.507Z",
+          "progress": 100,
+          "startedAt": "2026-03-18T10:20:49.586Z",
+          "doneAt": "2026-03-18T10:37:07.394Z"
+        },
+        {
           "id": "t-1773824733214",
           "title": "Create Clinic Department (Mender Doctor)",
           "description": "New health monitoring department with automated twice-daily diagnostics. Led by Mender (System Doctor).",

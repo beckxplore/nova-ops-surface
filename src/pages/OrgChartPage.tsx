@@ -20,6 +20,7 @@ interface EcosystemData {
   orchestrator: AgentInfo;
   departments: DepartmentInfo[];
   individualAgents: AgentInfo[];
+  projects?: any[];
 }
 
 interface OrgNode {
@@ -56,12 +57,18 @@ const AGENT_AVATARS: Record<string, string> = {
   'research': '/avatars/sage.jpg',
   'clinic-lead': '/avatars/mender.jpg',
   'clinic': '/avatars/mender.jpg',
+  'robroi-axel': '/avatars/axel.jpg',
+  'robroi-nova': '/avatars/nova.jpg',
+  'robroi-priya': '/avatars/priya.jpg',
 };
 
 const AGENT_DISPLAY_NAMES: Record<string, string> = {
   'Dev Lead': 'Kai',
   'Research Lead': 'Sage',
   'Mender': 'Mender',
+  'Axel': 'Axel',
+  'Nova (Backend)': 'Nova (Backend)',
+  'Priya': 'Priya',
 };
 
 const OrgChartPage: React.FC = () => {
@@ -165,7 +172,39 @@ const OrgChartPage: React.FC = () => {
           files: [],
           gradient: LEVEL_GRADIENTS[1],
           icon: LEVEL_ICONS[1],
-          children: deptChildren,
+          children: [
+            ...deptChildren,
+            // Project containers
+            ...(eco?.projects || []).map((proj: any) => ({
+              id: proj.id,
+              name: `📁 ${proj.name}`,
+              role: 'Project',
+              level: 2,
+              status: proj.status || 'active',
+              description: proj.description || '',
+              tasksAssigned: 0,
+              tasksCompleted: 0,
+              skills: [],
+              files: [],
+              gradient: 'from-orange-500 to-red-600',
+              icon: '📁',
+              children: (proj.agents || []).map((agent: any) => ({
+                id: agent.id,
+                name: agent.name,
+                role: agent.role,
+                level: 3,
+                status: agent.status || 'idle',
+                description: agent.description || '',
+                tasksAssigned: 0,
+                tasksCompleted: 0,
+                skills: [],
+                files: [],
+                gradient: LEVEL_GRADIENTS[3],
+                icon: LEVEL_ICONS[3],
+                children: [],
+              })),
+            })),
+          ],
         },
       ],
     };
