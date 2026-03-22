@@ -94,6 +94,21 @@
         "filesPath": "departments/clinic"
       },
       "agents": []
+    },
+    {
+      "id": "finance",
+      "name": "Finance",
+      "description": "Token‑cost monitoring, spending optimization, budget forecasting",
+      "project": null,
+      "lead": {
+        "id": "finance-lead",
+        "name": "Fiona",
+        "role": "Finance Lead",
+        "status": "running",
+        "description": "Tracks daily token usage, calculates costs, sends spending reports. Frugal, detail‑obsessed, numbers‑driven.",
+        "filesPath": "departments/finance"
+      },
+      "agents": []
     }
   ],
   "individualAgents": []

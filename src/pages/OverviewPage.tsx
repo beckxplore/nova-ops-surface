@@ -3,6 +3,7 @@ import ExecutiveSummary from '../components/ExecutiveSummary';
 import ExecutionMatrix from '../components/ExecutionMatrix';
 import ResourcePulse from '../components/ResourcePulse';
 import EventStream from '../components/EventStream';
+import CostsWidget from '../components/CostsWidget';
 import { useGateway } from '../context/GatewayContext';
 
 const OverviewPage: React.FC = () => {
@@ -105,6 +106,11 @@ const OverviewPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Costs Widget */}
+      <div className="mb-4 md:mb-6">
+        <CostsWidget />
+      </div>
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">

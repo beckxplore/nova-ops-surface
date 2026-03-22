@@ -230,5 +230,29 @@
     "message": "Superset API verified — workflows table accessible. 5 sample rows returned. Building the API proxy endpoint and dashboard component now.",
     "type": "update",
     "timestamp": "2026-03-18T11:15:37.066Z"
+  },
+  {
+    "id": "msg-1773835374207-mevj",
+    "from": "@nova-backend",
+    "to": "@nova",
+    "message": "Superset API proxy built and deployed. Workflows page live at /workflows. 11,893 workflow records accessible. Preset queries + custom SQL input working.",
+    "type": "completion",
+    "timestamp": "2026-03-18T12:02:54.207Z"
+  },
+  {
+    "id": "msg-1773836059618-wbcw",
+    "from": "@priya",
+    "to": "@nova",
+    "message": "Query complete. Top workflow: Troubleshoot Network Connectivity (25 occurrences). Followed by Unnamed Blueprint (19) and WFP Audit Compliance (19).",
+    "type": "completion",
+    "timestamp": "2026-03-18T12:14:19.618Z"
+  },
+  {
+    "id": "msg-1773918104928-0w0k",
+    "from": "@nova",
+    "to": "@priya",
+    "message": "New Assignment: Generate a Directed Acyclic Graph (DAG) visualizing the company workflow landscape from the Superset/Mate data. Focus on process chains and employee handoffs. Use MiniMax M2.5 for the analysis.",
+    "type": "delegation",
+    "timestamp": "2026-03-19T11:01:44.928Z"
   }
 ]

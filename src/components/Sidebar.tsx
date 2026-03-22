@@ -9,6 +9,8 @@ const navItems = [
   { path: '/kanban', label: 'Kanban', icon: '📋' },
   { path: '/news', label: 'News', icon: '📡' },
   { path: '/workflows', label: 'Workflows', icon: '🔄' },
+  { path: '/rob-roi', label: 'Rob ROI', icon: '💼' },
+  { path: '/logseq', label: 'Logseq', icon: '🧠' },
   { path: '/skills', label: 'Skills', icon: '🧩' },
   { path: '/gateways', label: 'Gateways', icon: '🔌' },
   { path: '/chat', label: 'Chat', icon: '💬' },

@@ -12,6 +12,8 @@ import SkillsPage from './pages/SkillsPage';
 import GatewaysPage from './pages/GatewaysPage';
 import NewsPage from './pages/NewsPage';
 import WorkflowsPage from './pages/WorkflowsPage';
+import RobRoiPage from './pages/RobRoiPage';
+import LogseqPage from './pages/LogseqPage';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -52,6 +54,8 @@ function App() {
             <Route path="/skills" element={<SkillsPage />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/workflows" element={<WorkflowsPage />} />
+            <Route path="/rob-roi" element={<RobRoiPage />} />
+            <Route path="/logseq" element={<LogseqPage />} />
             <Route path="/gateways" element={<GatewaysPage />} />
             <Route path="/chat" element={<ChatPage />} />
           </Routes>
