@@ -55,8 +55,7 @@ const GatewaysPage: React.FC = () => {
       try {
         const cfg = await getGatewayConfig();
         const wsUrl = cfg.gatewayUrl || '';
-        const base = wsUrl.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:') + '/nova-api';
-        const r = await fetch(`${base}/api/health`, {
+        const r = await fetch('/api/health', {
           headers: { Authorization: `Bearer ${cfg.authToken}` },
         });
         if (r.ok) {

@@ -23,8 +23,7 @@ const SkillsPage: React.FC = () => {
       try {
         const cfg = await getGatewayConfig();
         const wsUrl = cfg.gatewayUrl || '';
-        const base = wsUrl.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:') + '/nova-api';
-        const r = await fetch(`${base}/api/skills`, {
+        const r = await fetch('/api/skills', {
           headers: { Authorization: `Bearer ${cfg.authToken}` },
         });
         if (r.ok) {
@@ -42,8 +41,7 @@ const SkillsPage: React.FC = () => {
     try {
       const cfg = await getGatewayConfig();
       const wsUrl = cfg.gatewayUrl || '';
-      const base = wsUrl.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:') + '/nova-api';
-      const r = await fetch(`${base}/api/files?agent=nova`, {
+      const r = await fetch('/api/files?agent=nova', {
         headers: { Authorization: `Bearer ${cfg.authToken}` },
       });
       // Try reading the SKILL.md directly via a different approach
