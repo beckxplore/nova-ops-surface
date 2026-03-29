@@ -14,12 +14,32 @@ async function getFileContent(path, token) {
   return Buffer.from(data.content, 'base64').toString('utf-8');
 }
 
+const MODELS = [
+  { id: 'openrouter/minimax/minimax-m2.5:free', name: 'MiniMax M2.5 (Free)', alias: 'MiniMax M2.5 (Free)' },
+  { id: 'openrouter/xiaomi/mimo-v2-pro', name: 'MiMo-V2-Pro', alias: 'MiMo-V2-Pro' },
+  { id: 'openrouter/deepseek/deepseek-v3.2', name: 'DeepSeek V3.2', alias: 'DeepSeek V3.2' },
+  { id: 'openrouter/deepseek/deepseek-r1', name: 'DeepSeek R1', alias: 'DeepSeek R1' },
+  { id: 'openrouter/stepfun/step-3.5-flash', name: 'Step 3.5 Flash', alias: 'Step 3.5 Flash' },
+  { id: 'openrouter/stepfun/step-3.5-flash:free', name: 'Step 3.5 Flash (Free)', alias: 'Step 3.5 Flash (Free)' },
+  { id: 'openrouter/anthropic/claude-sonnet-4.6', name: 'Claude Sonnet 4.6', alias: 'Claude Sonnet 4.6' },
+  { id: 'openrouter/google/gemini-3-flash-preview', name: 'Gemini 3 Flash', alias: 'Gemini 3 Flash' },
+  { id: 'openrouter/openai/gpt-5.4', name: 'GPT-5.4', alias: 'GPT-5.4' },
+  { id: 'openrouter/qwen/qwen3-32b', name: 'Qwen3 32B', alias: 'Qwen3 32B' },
+  { id: 'auto', name: 'OpenRouter Auto', alias: 'Auto' },
+];
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  if (req.query.route === 'models') return res.status(200).json(MODELS);
+  if (req.query.route === 'model') {
+    if (req.method === 'PUT') return res.status(200).json({ model: req.body?.model || 'openrouter/xiaomi/mimo-v2-pro', updated: true });
+    return res.status(200).json({ model: 'openrouter/xiaomi/mimo-v2-pro' });
+  }
 
   const token = process.env.GITHUB_TOKEN;
   if (!token) return res.status(500).json({ error: 'GITHUB_TOKEN not configured' });

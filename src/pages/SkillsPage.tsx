@@ -23,7 +23,7 @@ const SkillsPage: React.FC = () => {
       try {
         const cfg = await getGatewayConfig();
         const wsUrl = cfg.gatewayUrl || '';
-        const r = await fetch('/api/skills', {
+        const r = await fetch('/api/status?route=skills', {
           headers: { Authorization: `Bearer ${cfg.authToken}` },
         });
         if (r.ok) {

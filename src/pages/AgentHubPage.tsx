@@ -84,7 +84,7 @@ const AgentHubPage: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        const data = await novaFetch('/api/models');
+        const data = await novaFetch('/api/agents?route=models');
         if (cancelled) return;
         const models = Array.isArray(data) ? data : (data?.models || []);
         setAvailableModels(models.map((m: any) => ({
@@ -95,7 +95,7 @@ const AgentHubPage: React.FC = () => {
         console.warn('[Hub] models fetch failed:', err);
       }
       try {
-        const data = await novaFetch('/api/model');
+        const data = await novaFetch('/api/agents?route=model');
         if (cancelled) return;
         if (data?.model) {
           setCurrentModel(data.model);

@@ -55,7 +55,7 @@ const GatewaysPage: React.FC = () => {
       try {
         const cfg = await getGatewayConfig();
         const wsUrl = cfg.gatewayUrl || '';
-        const r = await fetch('/api/health', {
+        const r = await fetch('/api/status?route=health', {
           headers: { Authorization: `Bearer ${cfg.authToken}` },
         });
         if (r.ok) {

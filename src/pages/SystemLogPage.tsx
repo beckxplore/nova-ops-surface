@@ -16,7 +16,7 @@ const SystemLogPage: React.FC = () => {
   const fetchLogs = async () => {
     try {
       const cfg = await fetch('/gateway-config.json').then(r => r.json());
-      const res = await fetch('/api/logs', {
+      const res = await fetch('/api/status?route=logs', {
         headers: {
           'Authorization': `Bearer ${cfg.authToken}`
         }
